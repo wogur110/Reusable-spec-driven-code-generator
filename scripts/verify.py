@@ -5,6 +5,7 @@ import os
 import sys
 from pathlib import Path
 from common import ROOT, PYTHON, browser_env, execute, input_hashes, now, run_id, write_json
+from gui_support import virtual_display
 
 
 def main():
@@ -41,7 +42,11 @@ def main():
         browser_report=directory/'browser.json';env=browser_env()
         env.update(TEST_JSON_REPORT=str(browser_report), TEST_ARTIFACTS=str(directory/'browser'), TEST_PYTHON=PYTHON)
         env.setdefault('PLAYWRIGHT_BROWSERS_PATH','/tmp/reusable-spec-playwright')
-        record=execute(['node','node_modules/@playwright/test/cli.js','test','--config','playwright.config.js'],cwd=ROOT/'tests',timeout=600,env=env)
+        try:
+            with virtual_display(env) as desktop_env:
+                record=execute(['node','node_modules/@playwright/test/cli.js','test','--config','playwright.config.js'],cwd=ROOT/'tests',timeout=600,env=desktop_env)
+        except Exception as exc:
+            report.update(status='BLOCKED',reason=str(exc),finished=now());write_json(destination,report);print(report['reason']);return 2
         report['commands'].append(record);print(record['stdout']+record['stderr'],end='')
         if browser_report.exists():
             stats=json.loads(browser_report.read_text()).get('stats',{})

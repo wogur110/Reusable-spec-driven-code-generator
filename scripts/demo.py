@@ -19,7 +19,7 @@ def main():
         print('Browser URL:',origin,flush=True)
         print('Use a fresh private browser window; log in as bob.',flush=True)
         print('In another terminal: '+shlex.join(['python3','generated/python-client/main.py','--server',origin,'--state-dir',state]),flush=True)
-        print('At the Python Username prompt enter alice. Keep this server running during the walkthrough.',flush=True)
+        print('In the Python desktop window enter alice and click Log in. Keep this server running during the walkthrough.',flush=True)
         return child.wait()
     except KeyboardInterrupt:return 0
     finally:

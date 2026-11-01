@@ -2,9 +2,11 @@
 import argparse
 import ctypes
 import os
+import shutil
 import sys
 from pathlib import Path
 from common import ROOT, browser_env, execute, now, run_id, write_json
+from gui_support import virtual_display
 
 
 def main():
@@ -13,6 +15,18 @@ def main():
     args = parser.parse_args()
     report = {'status': 'IN_PROGRESS', 'started': now(), 'commands': []}
     path = ROOT/'artifacts/setup'/run_id()/'report.json'
+    try:
+        # Install native GUI packages through the OS package manager before setup.
+        # Extracting Xvfb alone is insufficient: it invokes /usr/bin/xkbcomp.
+        for binary in ('Xvfb', 'xkbcomp', 'xwininfo'):
+            if not shutil.which(binary):
+                raise RuntimeError(binary+' is missing. On Ubuntu/WSL run: sudo apt-get install -y python3-tk xvfb x11-xkb-utils x11-utils')
+        with virtual_display() as display_env:
+            record = execute([sys.executable, '-c', 'import tkinter as t; r=t.Tk(); print(r.tk.call("info", "patchlevel"), r.tk.call("package", "provide", "Tk")); r.destroy()'], env=display_env, timeout=15)
+        report['commands'].append(record)
+        if record['exit_code'] or record['timeout']:raise RuntimeError(record['stderr']+' Install python3-tk for this interpreter.')
+    except Exception as exc:
+        report.update(status='BLOCKED', reason='GUI prerequisites: '+str(exc));write_json(path,report);print(report['reason']);return 2
     env = browser_env()
     env.setdefault('npm_config_cache', str(ROOT/'artifacts/npm-cache'))
     env.setdefault('PLAYWRIGHT_BROWSERS_PATH', '/tmp/reusable-spec-playwright')

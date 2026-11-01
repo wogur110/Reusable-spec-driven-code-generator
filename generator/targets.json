@@ -25,7 +25,7 @@
   "repair_rounds": 3,
   "total_timeout_seconds": 5400,
   "dependency_policy": {
-    "python": "standard library only, Python >=3.10",
+    "python": "Python >=3.10 standard library including tkinter/ttk; native Tcl/Tk 8.6; Xvfb for retained GUI tests",
     "node": ">=22",
     "typescript": "5.9.3",
     "playwright": "1.56.1",
@@ -38,7 +38,8 @@
       ],
       "output": "generated/python-client",
       "required_files": [
-        "main.py"
+        "main.py",
+        "gui.py"
       ],
       "managed_lockfiles": [],
       "checks": [

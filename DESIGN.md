@@ -1,6 +1,6 @@
 # Design and ownership
 
-Status: implemented architecture. The expanded 44-test baseline and nine harness guards pass; clean-regeneration proof passes with unchanged assertions. [Decisions](docs/DECISIONS.md) record provenance; [status](docs/STATUS.md) separates readiness and evidence.
+Status: CHG-001 desktop evolution verified; 55 acceptance cases, nine harness guards, and clean regeneration pass. [Decisions](docs/DECISIONS.md) record provenance; [status](docs/STATUS.md) separates readiness and evidence.
 
 ## Your design priorities
 
@@ -49,13 +49,13 @@ One send and one incoming page per cycle balance outgoing FIFO with receive prog
 | Independent retained tests | Common behavior checked without shared client code | Optional forced-crash/write-failure paths remain unverified until exercised |
 | Staged publication | Failed generations preserve usable source | Requires disposable workspaces and integrity manifests |
 
-No authentication, production security, network exactly-once guarantee, server database, push notifications, offline browser asset cache, or unrequested feature is included. A specification change may later extend these limits through [FUTURE.md](FUTURE.md), which currently has no requests.
+No authentication, production security, network exactly-once guarantee, server database, push notifications, offline browser asset cache, or unrequested feature is included. A specification change may later extend these limits through [FUTURE.md](FUTURE.md), whose completed CHG-001 desktop change is archived in [CHANGES](docs/CHANGES.md).
 
 ## Dependency rationale
 
 Python 3.10+ standard libraries cover server, harness, SQLite client, and unittest. Node.js 22+ runs build/test tooling. Select exact TypeScript 5.9.3 and retained `@playwright/test` 1.56.1 with its matching Chromium for a reproducible compiler/browser test pair. Their upstream releases exist; the selected compiler/browser pair is installed and the expanded baseline passes. See [TypeScript release](https://github.com/microsoft/TypeScript/releases/tag/v5.9.3) and [Playwright release](https://github.com/microsoft/playwright/releases/tag/v1.56.1).
 
-Real package-manager locks are committed; tested versions are recorded in STATUS. The generation CLI is a separate development dependency; select and pin a version only after an authenticated readiness check in the harness environment. Do not infer current account access from installed binaries or successful work in another project. No runtime package or cloud messaging service is required.
+Real package-manager locks are committed; tested versions are recorded in STATUS. The generation CLI is a separate development dependency; select and pin a version only after an authenticated readiness check in the harness environment. Do not infer current account access from installed binaries or successful work in another project. The desktop requires native tkinter/Tcl/Tk packages; retained GUI tests require Xvfb and X11 utilities. No pip package or cloud messaging service is required. README and TESTING list the exact Ubuntu/WSL installation command.
 
 ## Authorship and regeneration ownership
 
@@ -66,7 +66,11 @@ Real package-manager locks are committed; tested versions are recorded in STATUS
 | USER preference cells | User-owned inputs | All 26 blank; adjacent defaults resolved separately |
 | M01–M06 | User-owned factual observations | Blank; no manual results recorded |
 | generator/, server/, tests/, scripts/ | Retained during client generation | Parent coding agent authored retained infrastructure/tests; actual commits record milestones |
-| generated/python-client/, generated/typescript-web/ | Deletion/regeneration boundaries | Separate actual Codex 0.166.0 / requested gpt-6-astra harness calls; Python regenerated for the page-limit regression |
+| generated/python-client/, generated/typescript-web/ | Deletion/regeneration boundaries | Separate actual Codex 0.166.0 / requested gpt-6-astra harness calls; Python regenerated for the page-limit regression and CHG-001 desktop GUI |
 | Dependency locks / compiled assets | Locks committed / builds disposable | npm created committed locks; TypeScript/Node produced disposable browser assets |
 
 Retained does not mean human-written. Do not invent authors, dates, commits, verification runs, or an old project lineage. Stage 2 records actual commands, input/test hashes, repairs, and generated source provenance. A release archive includes authentic history and excludes credentials, stores, caches, and old source-bearing transcripts; verify restoration before marking archive completion.
+
+## Desktop presentation (CHG-001)
+
+Tkinter/ttk supplies the Python desktop window. The GUI and retained --machine interface use the same generated Python messaging core; the browser implementation remains independent. Tk owns the main thread, while one bounded synchronization worker exchanges committed snapshots through scheduled UI updates. SQLite version 1 remains compatible with pre-GUI stores. Actual-widget tests complement existing machine protocol tests. Native Tcl/Tk and automated Xvfb prerequisites are installed/reported separately from Python packages. Evolution verification must preserve generic orchestration/prompt hashes and regenerate from the revised specifications; CHG-001 execution passed, with exact fingerprints and commands in [CHANGES](docs/CHANGES.md).

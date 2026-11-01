@@ -13,7 +13,7 @@ from generator.core import Blocked,check_inventory,copy_files,inventory,retained
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.parse_args()
     folder=ROOT/'artifacts/regeneration'/run_id();folder.mkdir(parents=True)
-    report={'status':'IN_PROGRESS','started':now(),'commands':[],'environment_reuse':'Installed interpreters, /tmp/reusable-spec-playwright browser binaries, and /tmp/reusable-spec-native Ubuntu NSS/NSPR libraries; no prior client source.'}
+    report={'status':'IN_PROGRESS','started':now(),'commands':[],'environment_reuse':'Installed interpreters and system Tk/Xvfb/X11 tools, /tmp/reusable-spec-playwright browser binaries, and /tmp/reusable-spec-native Ubuntu NSS/NSPR libraries; no prior client source.'}
     path=folder/'report.json';write_json(path,report);deadline=time.monotonic()+7200
     try:
         original=inventory(ROOT);frozen=retained_inventory(ROOT);report['input_hashes']=frozen

@@ -1,6 +1,6 @@
 # Acceptance contract
 
-Status: retained executable tests implement this contract. The expanded baseline has 44 passing tests and nine harness guards pass; clean regeneration passes with the same frozen assertions. Tests were authored before the generation run they validate; generated clients may not edit them.
+Status: all 55 acceptance tests and nine harness guards pass. Clean regeneration passes the same 55 acceptance cases inside the harness and again standalone. Failed earlier runs remain recorded separately in CHANGES and EVIDENCE. Tests were authored before the generation run they validate; generated clients may not edit them.
 
 ## Your acceptance expectations
 
@@ -20,7 +20,7 @@ Blank preferences use adjacent defaults. Examples here are expected behavior, no
 
 Use a real server on an allocated loopback port, a real Python subprocess, and Chromium with real page interactions. Each case owns isolated stores and processes. Per-client retained HTTP proxies independently inject API faults while forwarding static assets; the server remains alive. Browser-wide offline is a separate case after page load. Tests must not manipulate production queues to pretend a send or receive occurred. Direct API seeding is allowed for server fixtures and pagination; state-file setup is allowed only for explicit storage/version cases.
 
-Python is driven through [its machine interface](PYTHON.md#machine-interface), and browser controls through [its selectors](TYPESCRIPT.md#user-interface-and-observable-selectors). Capture transport attempts and persisted snapshots so retries can be checked for unchanged IDs/payloads. Observe inbox contents, not just a successful HTTP call. Poll conditions with a monotonic 30-second deadline for each required transition. An observation cadence is not evidence by itself. A deadline failure is FAIL, not a reason to increase timing silently or skip the case. Build/tool timeouts are separate in [GENERATE.md](../GENERATE.md).
+Python protocol boundaries use [its machine interface](PYTHON.md#machine-interface); CHG-001 graphical scenarios use the real widgets in [the desktop contract](PYTHON.md#retained-gui-automation-contract), and browser controls through [its selectors](TYPESCRIPT.md#user-interface-and-observable-selectors). Capture transport attempts and persisted snapshots so retries can be checked for unchanged IDs/payloads. Observe inbox contents, not just a successful HTTP call. Poll conditions with a monotonic 30-second deadline for each required transition. An observation cadence is not evidence by itself. A deadline failure is FAIL, not a reason to increase timing silently or skip the case. Build/tool timeouts are separate in [GENERATE.md](../GENERATE.md).
 
 Required text fixtures: greeting `Hi Bob, I have something important to tell you`; reply `What is it?`; Alice queued text `Alice queued while offline`; Bob queued text `Bob queued while offline`. Exact Unicode fixture: `  한글 😀\nsecond line  `, where `\n` denotes a literal LF after the emoji. The reverse-direction Unicode fixture replaces 한글 with 답장. Use unique valid UUIDs for direct API seeds and retain client-issued IDs for assertions.
 
@@ -45,7 +45,7 @@ Rows may expand into several executable tests. Reports must map collected tests 
 
 | ID | Stimulus | Required observations |
 |---|---|---|
-| AT-01 | First launch, invalid names, valid login, same-name login, attempted identity change, ordinary restart; confirmed/canceled browser reset and stopped CLI reset | Names persist; invalid inputs do not establish identity; another name is rejected until reset; confirmation is necessary; unrelated store files/storage survive reset. |
+| AT-01 | First launch, invalid names, valid login, same-name login, attempted identity change, ordinary restart; confirmed/canceled browser reset and stopped Python reset; desktop confirmed/canceled reset | Names persist; invalid inputs do not establish identity; another name is rejected until reset; confirmation is necessary; unrelated store files/storage survive reset. |
 | AT-02 | Send greeting/reply and exact Unicode/space/newline fixtures in both directions | Sender accepted; receiver shows exact sender/text once, in sequence order. |
 | AT-03 | Fixed scenario with Python Alice | All eight steps and final counts above pass under independent API faults. |
 | AT-04 | Fixed scenario with browser Alice | Same results with roles reversed. |
@@ -53,9 +53,9 @@ Rows may expand into several executable tests. Reports must map collected tests 
 | AT-06 | Queue three entries offline for one recipient; restore transport; then inject 500 for the queued head while an incoming message is available | Sends reach server in local order; only queued head retries; a failed send does not block receiving; recovery delivers all entries once and in order. Test both senders. |
 | AT-07 | Proxy forwards a POST, receives successful acceptance, then drops its response before the client sees it | Client retries identical ID/payload; server responds 200 on replay; recipient and server each contain one message. Test both senders. |
 | AT-08 | Direct exact replay, changed text, changed valid recipient, same ID under another sender, and concurrent exact requests | 201 first, 200 exact original receipt, 409 conflicts with no allocation; another sender independent; concurrent exact requests allocate one sequence only. |
-| AT-09 | Queue behind blocked API; restart CLI / reload page with assets available and same store/origin; recover; then restart after receiving | Identity, pending ID/text/order/state survive; eventual one delivery; inbox and cursor persist and do not duplicate. Test both platforms. |
+| AT-09 | Queue behind blocked API; restart Python / reload page with assets available and same store/origin; recover; then restart after receiving | Identity, pending ID/text/order/state survive; eventual one delivery; inbox and cursor persist and do not duplicate. Test both platforms. |
 | AT-10 | Seed 205 incoming messages while recipient inactive, then start it; separately seed 100 texts each containing 4,096 NUL scalar characters | All 205 exact ordered entries, cursor 205; page boundaries 100/200/205, each page at most 100. The maximum-size escaped page also arrives intact with cursor 100. Repeat both checks for both recipients. |
-| AT-11 | Empty text, invalid recipient, self-send, 4,097 ASCII bytes, 1,025 emoji, lone surrogate where interface permits; valid whitespace, 4,096 ASCII bytes, 1,024 emoji | Invalid submissions show error, preserve browser draft, create no durable row/network POST. Valid boundaries preserve text and enqueue. API enforces the same limits. Test representable UI values and machine/wire scalar boundaries. |
+| AT-11 | Empty text, invalid recipient, self-send, 4,097 ASCII bytes, 1,025 emoji, lone surrogate where interface permits; valid whitespace, 4,096 ASCII bytes, 1,024 emoji | Invalid submissions show error, preserve graphical drafts, create no durable row/network POST. Valid boundaries preserve text and enqueue. API enforces the same limits. Test representable UI values and machine/wire scalar boundaries. |
 | AT-12 | Actual browser network offline after loading; also exercise both development transport controls | Already-loaded page can enqueue; request genuinely fails and entry stays queued; restore transport and observe one delivery. Mode controls do not bypass production storage/transport logic. |
 | AT-13 | Per client: POST timeout, 408, 429, 500, redirect, malformed/mismatched 201 receipt, permanent 400/409; GET wrong recipient/gapped sequence/bad next_after; valid CURSOR_INVALID | Uncertain sends keep IDs queued; permanent sends fail and later entries proceed; malformed pages preserve complete inbox/cursor; later valid page recovers; cursor error pauses both directions and demands reset. |
 | AT-14 | Wire framing/schema errors, duplicate JSON request members, unknown fields/routes, media/body limits, bad/repeated query keys, invalid cursors; static resources and health | Exact status/code/field mapping; no acceptance from invalid sends; browser assets and requests stay local; no store/session claim from health alone. |
@@ -66,7 +66,7 @@ Rows may expand into several executable tests. Reports must map collected tests 
 
 Baseline verification collects AT-01–AT-14, AT-16, and AT-17. Harness verification covers AT-18. Full Stage 2 implementation completion also requires AT-15 and verified documentation/builds.
 
-Allowed platform differences: same-name login and attempted different-name login are machine-interface assertions for Python; the browser removes login controls after login and requires the confirmed reset flow to select another name. Browser startup/version and draft behavior use visible controls; Python origin binding, quit, and process exit use its CLI contract. Normal restart/persistence, input validation, synchronization, retry, and deduplication remain required for both clients. Wire-only framing and concurrency checks target the shared server directly. AT-18 uses retained fixtures rather than a production model request; AT-15 supplies that separate real-generation evidence.
+Allowed platform differences: same-name login and attempted different-name login are machine-interface assertions for Python; the browser removes login controls after login and requires the confirmed reset flow to select another name. Browser startup/version and draft behavior use visible controls; Python origin binding and machine quit retain their command contract; desktop close, responsive editing, draft preservation, and confirmed reset are checked through actual Tk widgets. Normal restart/persistence, input validation, synchronization, retry, and deduplication remain required for both clients. Wire-only framing and concurrency checks target the shared server directly. AT-18 uses retained fixtures rather than a production model request; AT-15 supplies that separate real-generation evidence.
 
 ## Requirement traceability
 
@@ -100,3 +100,18 @@ For final user sign-off, complete the fixed walkthrough, queued restart check, a
 Optional OF-01 forcibly terminates a client around an incoming transaction to inspect crash atomicity. Optional OF-02 injects SQLite/IndexedDB write failures to verify failed enqueue dispatches nothing and failed receive advances no cursor. Their behavior remains required by the contract, but fault-injection execution is deferred and must be reported NOT_RUN unless actually exercised. Normal restart, malformed-page atomicity, and startup storage boundaries remain required baseline tests.
 
 No evolution case is active. An explicit selected change or experiment must first define its own specification delta and independent acceptance IDs, preserve applicable baseline cases, and verify with unchanged generic harness/prompt logic. Do not import an old feature experiment or create a FUTURE request from an example.
+
+## CHG-001 desktop acceptance delta
+
+These cases are required in addition to all existing baseline assertions. No wire behavior changes, no new shared extension, and no schema migration are selected. Freeze revised specs/tests before every generation run.
+
+| ID | Required exercise and result |
+|---|---|
+| GUI-01 | Actual desktop login invalid/valid; visible identity/controls; invalid recipient, self-send, empty/oversized draft show errors and retain draft with no POST/outbox row; valid Unicode/newline text survives selection into detail panes. |
+| GUI-02 | Repeat AT-03/04 fixed eight-step scenario using actual desktop controls against browser controls in both roles, with independent external API faults. Exact texts, FIFO observations and one displayed inbox row per message remain required. |
+| GUI-03 | Close/reopen desktop with a queued row using the same store; preserve original ID/text/identity and deliver once on reconnect. Also open a specified version-1 pre-GUI fixture containing queued/accepted/failed rows, inbox and cursor; no migration/reset or data loss. |
+| GUI-04 | Confirm/cancel GUI reset, preserve unrelated files, restore login/empty rows on success. Before resetting, the proxy must actually hold a GET response containing an old-identity message, with delivery still pending. Confirm reset during that held response; later delivery must not populate the new identity's inbox. |
+| GUI-05 | During a delayed request edit a draft and inspect the window promptly; draft survives background refresh. Window close finishes within six seconds. Default main.py opens a GUI and stays alive with stdin closed. |
+| GUI-06 | Unsupported store startup shows a visible error, leaves version/data unchanged, and offers a closable window. CURSOR_INVALID visibly disables sends; real permanent send failure shows failed plus reason. |
+
+GUI tests run on a real Tk display, using an isolated Xvfb display in automated Linux runs. Missing Tk/display prerequisites are BLOCKED, never a skip or a successful machine-only substitute. GUI-01–06 belong to baseline verification and AT-15 clean regeneration. User M01–M06 remain separate final manual sign-off evidence.

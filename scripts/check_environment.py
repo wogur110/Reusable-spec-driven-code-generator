@@ -6,6 +6,7 @@ import shutil
 import sqlite3
 import sys
 from common import ROOT, browser_env, execute
+from gui_support import virtual_display
 
 
 def main():
@@ -14,6 +15,14 @@ def main():
     args = parser.parse_args()
     result = {'python': sys.version.split()[0], 'sqlite': sqlite3.sqlite_version, 'missing': [], 'commands': [], 'model_access': 'UNVERIFIED'}
     if sys.version_info < (3, 10): result['missing'].append('Python >=3.10')
+    try:
+        with virtual_display() as env:
+            record = execute([sys.executable, '-c', 'import tkinter as t; r=t.Tk(); print("Tk", r.tk.call("package", "provide", "Tk")); r.destroy()'], env=env, timeout=15)
+        result['commands'].append(record)
+        if record['exit_code'] or record['timeout']:result['missing'].append('Tk window creation: '+record['stderr'])
+    except Exception as exc:
+        result['missing'].append('Desktop prerequisites: '+str(exc))
+    if not shutil.which('xwininfo'): result['missing'].append('xwininfo: install x11-utils for GUI launch checks')
     for binary in ('node', 'npm', 'git'):
         record = execute([binary, '--version'], timeout=10)
         result['commands'].append(record)

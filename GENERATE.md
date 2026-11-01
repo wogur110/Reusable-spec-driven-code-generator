@@ -1,6 +1,6 @@
 # Generation harness contract
 
-Status: Stage 2 implementation complete. Actual all-target generation, targeted Python regeneration, and fresh-workspace clean regeneration passed. Both clean-proof acceptance runs passed all 44 tests without assertion changes. The runtime application contract lives in specs/; this document defines reusable orchestration.
+Status: CHG-001 generation and clean proof pass. Both freshly generated clients pass all 55 acceptance tests inside the harness and again standalone; evidence and earlier failures are recorded in CHANGES/STATUS. The runtime application contract lives in specs/; this document defines reusable orchestration.
 
 ## Inputs and target configuration
 
@@ -36,7 +36,7 @@ The following matches generator/targets.json. The project-local CLI and requeste
   "repair_rounds": 3,
   "total_timeout_seconds": 5400,
   "dependency_policy": {
-    "python": "standard library only, Python >=3.10",
+    "python": "Python >=3.10 standard library including tkinter/ttk; native Tcl/Tk 8.6; Xvfb for retained GUI tests",
     "node": ">=22",
     "typescript": "5.9.3",
     "playwright": "1.56.1",
@@ -49,7 +49,8 @@ The following matches generator/targets.json. The project-local CLI and requeste
       ],
       "output": "generated/python-client",
       "required_files": [
-        "main.py"
+        "main.py",
+        "gui.py"
       ],
       "managed_lockfiles": [],
       "checks": [
@@ -171,3 +172,7 @@ Report final PASS/FAIL/BLOCKED, times, commands as argument vectors, exits/timeo
 Implemented proof command: `python3 scripts/regenerate_check.py`. Make a fresh retained-input copy with no generated source or indirect source copies, Git history, previous agent sessions, transcripts, builds, or client stores. Standard installed interpreters/dependency download caches may be reused only if they cannot contain client implementations; record this environment reuse. Assert target directories are absent before generation. Freeze retained manifests, run setup, actual generator --target all, setup/build, and standalone baseline verification. Compare inventories/hashes afterward and preserve the original project. Record all command outcomes; this outer proof is never called by baseline verification itself.
 
 Evolution execution is deferred. If a selected FUTURE request or separate explicit experiment is authorized, first define its spec delta, affected targets, intended independent test changes, migration checks, and any retained server support. Freeze that revised contract; run the ordinary harness with registered extensions, baseline checks where applicable, and new checks. Verify generic runner/adapter/prompt hashes are unchanged to demonstrate adaptation from specs/configuration alone. Retain the reproducible delta/evidence. An isolated experiment must leave baseline source and the FUTURE queue unchanged. Do not pre-create an unrequested feature specification.
+
+## CHG-001 desktop inputs
+
+The Python target now requires main.py and gui.py and reads the revised registered PYTHON/PRODUCT/ACCEPTANCE contracts. The TypeScript implementation and protocol remain unchanged. Native prerequisites are listed in README and TESTING; setup checks Tk/Xvfb/xkbcomp/xwininfo before validation. GUI-01–06 run through actual widgets in the baseline verification command and therefore in clean regeneration. Generic orchestration and the prompt are unchanged; record their before/after hashes as evolution evidence. Preserve frozen assertions across repairs. Source USER cells remain verbatim; DECISIONS records the authorized interface override.

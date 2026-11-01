@@ -28,7 +28,7 @@ Private source paths and commissioning details are intentionally absent. NOT_INC
 | SRC-07 | Keep the server small; in-memory operation is sufficient. | One process and locked memory streams/receipts; explicit client reset for new server sessions. |
 | SRC-08 | Provide repository archive(s) with generated source and meaningful authentic commit history. | Single repository, source/lock inclusion, defined archive restoration proof; archive verification recorded in STATUS. |
 | SRC-09 | Make harness, specs, generator usage, generated boundaries, server, and actual authorship easy to find. | README navigation, DESIGN ownership, AGENTS and GENERATE workflows. |
-| SRC-10 | Demonstrate design judgment, quality, interoperability, authoritative specs, and suitability for evolving specifications. | Independent test plan and criterion mapping; distinguish baseline proof from deferred executed evolution. |
+| SRC-10 | Demonstrate design judgment, quality, interoperability, authoritative specs, and suitability for evolving specifications. | Independent test plan and criterion mapping; distinguish baseline proof from separately recorded evolution evidence. |
 
 The source permits flexible harness/repository structure and language selection, and makes a future-work document optional. This project chooses one repository, Python/TypeScript, a Python orchestration CLI, and an initially empty FUTURE request workflow. Those are project choices, not claims that the source prescribed them.
 
@@ -36,4 +36,4 @@ The source permits flexible harness/repository structure and language selection,
 
 The eighth scenario step, restart-persistence checks, receipt-loss deduplication, strict validation, local schema contracts, three repair rounds, and 30-second observations make the selected behavior testable. The source's minimal behavior is preserved; these concrete project contracts are recorded as defaults/derived decisions in [DECISIONS.md](DECISIONS.md).
 
-No additional feature or evolution experiment is active. The generic harness is designed to accept registered changes, but executed adaptation remains NOT_RUN until authorized. Required human sign-off is a project workflow step, distinct from automated acceptance and Stage 2 implementation completion. None of this source comparison establishes runtime compliance; see [ASSIGNMENT_REVIEW.md](ASSIGNMENT_REVIEW.md).
+The user-selected CHG-001 desktop change demonstrates adaptation through revised specifications/configuration with unchanged generic orchestration and prompt. Its actual acceptance and clean-regeneration evidence is recorded in CHANGES; the active request queue is now empty. Required human sign-off is a project workflow step, distinct from automated acceptance and Stage 2 implementation completion. None of this source comparison establishes runtime compliance; see [ASSIGNMENT_REVIEW.md](ASSIGNMENT_REVIEW.md).

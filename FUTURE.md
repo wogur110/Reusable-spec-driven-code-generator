@@ -5,7 +5,7 @@ Use this queue after reviewing the project to request deliberate changes. Saving
 ## Active requests
 
 <!-- CHANGE_REQUESTS:BEGIN -->
-No active requests yet.
+No active requests. Completed CHG-001 is archived in [docs/CHANGES.md](docs/CHANGES.md).
 <!-- CHANGE_REQUESTS:END -->
 
 ## How to write a request

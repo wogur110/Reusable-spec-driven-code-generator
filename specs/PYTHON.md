@@ -1,10 +1,10 @@
 # Python client contract
 
-Status: current implemented Python contract; the commands below are supported. Shared behavior is authoritative in [PRODUCT.md](PRODUCT.md) and [PROTOCOL.md](PROTOCOL.md).
+Status: implemented and verified CHG-001 desktop contract; normal launch opens the GUI and --machine remains available. Shared behavior is authoritative in [PRODUCT.md](PRODUCT.md) and [PROTOCOL.md](PROTOCOL.md).
 
 ## Source and entry point
 
-Generated boundary: `generated/python-client/`. Required entry: `main.py`. Separate presentation, storage, validation/transport, and synchronization concerns into local modules; implementation file names other than main.py are free. Python 3.10+ standard library only; no pip dependency, messaging SDK, browser implementation imports, or shared messaging source. Tests drive the same application operations as the human interface.
+Generated boundary: `generated/python-client/`. Required entries: `main.py` and `gui.py`. Separate presentation, storage, validation/transport, and synchronization concerns into local modules; implementation file names other than main.py are free. Python 3.10+ standard library including tkinter/ttk with Tcl/Tk 8.6; no pip dependency, messaging SDK, browser implementation imports, or shared messaging source. Normal launch opens a desktop window. Tests drive real desktop widgets and the existing machine interface, both using the same production storage/synchronization core. Tk native modules/libraries are operating-system prerequisites, documented by setup; no pip package is required.
 
 ```sh
 python3 generated/python-client/main.py --server http://127.0.0.1:8765 --state-dir var/alice
@@ -34,25 +34,44 @@ If an outcome write fails, leave the previously committed row queued and report 
 
 ## Concurrency and transport
 
-One background worker implements the protocol's serialized cycles; the main thread remains responsive to commands. Use the storage lock for short transactions/snapshots only, never across network calls or user input. Serialize writes to stdout. Use a five-second total HTTP deadline including body reads, no redirects, and no environment proxy routing. Validate status/content type/body independently as specified in PROTOCOL.md. A development transport toggle uses the real transport abstraction; it does not pretend acceptance or insert messages directly.
+One background worker implements the protocol's serialized cycles; the Tk main thread remains responsive to editing and window events. Only the main thread touches widgets; marshal committed snapshots through after/queues. Use the storage lock for short transactions/snapshots only, never across network calls or user input. Serialize writes to stdout. Use a five-second total HTTP deadline including body reads, no redirects, and no environment proxy routing. Validate status/content type/body independently as specified in PROTOCOL.md. A development transport toggle uses the real transport abstraction; it does not pretend acceptance or insert messages directly.
 
-On quit, stdin EOF, or SIGINT: stop scheduling, finish or cancel the current bounded request, do not start a new receive afterward, complete owned storage work, close the database, and exit within six seconds. Exit 0 for ordinary shutdown and help, 2 for unusable startup/reset arguments or store. Runtime command errors keep the client running. Human display updates must not destroy a partially typed draft.
+On window close or SIGINT (and on quit/stdin EOF in machine mode only): stop scheduling, finish or cancel the current bounded request, do not start a new receive afterward, complete owned storage work, close the database, and exit within six seconds. Exit 0 for ordinary shutdown and help, 2 for unusable startup/reset arguments or store. Runtime command errors keep the client running. Human display updates must not destroy a partially typed draft.
 
-## Human interface
+## Desktop interface
 
-If identity is absent, prompt exactly `Username:`; invalid input shows a reason and prompts again without trimming. A restored identity skips this prompt. Show the current username, server origin, and command hint. On incoming commits, print sender and exact text; on outgoing changes, show message ID and queued / accepted by server / failed plus error. Render text unambiguously, preserving newlines and spaces in lists.
+Use Tkinter/ttk, window title `Local Messenger - Python`, English labels, and a resizable window initially at least 960 by 640 pixels. Match the browser's task sequence: identity and connection header, recipient and multiline text composer, Send, Development transport, Reset local store, and side-by-side Inbox/Outgoing panels. Include a visible note that accepted by server is not a delivery/read receipt. Comparable grouping and wording matter; platform styling may differ. Scrollbars and message-detail panes must allow reading complete long/multiline messages without logs. Keep editing focus/draft/selection through background refreshes. Enter in the multiline composer inserts a newline; sending uses the Send button. Ordinary keyboard traversal works.
 
-| Command | Behavior |
+Before login show username and Log in; preserve invalid input and show the error. Restore saved identity without prompting. Disable composition until identity is ready, and while CURSOR_INVALID pauses synchronization. Show errors visibly, including storage/startup/reset errors. A local form error persists until the next form action resolves/replaces it. Show per-message errors for failed or retrying sends. Clear the composer only after a successful durable enqueue. Never trim text, silently truncate it, or replace its original code points.
+
+Development transport is a readonly online/offline selection, default online on launch. It controls the production transport abstraction. Reset local store opens an explicit confirmation with Confirm reset and Cancel. Cancel preserves everything. Confirm stops scheduling and invalidates/finishes in-flight operations before clearing only the selected application's SQLite data and restoring version-1 metadata. Preserve unrelated files. Return to login with online/unknown/unpaused state only after successful reset; old responses must never populate a new identity's store. Keep reset and inspection usable during CURSOR_INVALID. Preserve the existing SQLite version-1 schema: a pre-GUI store opens without migration or loss of identity, IDs, order, state, messages, and cursor.
+
+Closing the window gracefully stops the worker and exits within six seconds even during a request; do not start another request after closing. Default GUI launch does not read stdin or exit when stdin is closed. --machine, --help and the stopped --reset-state operation work without Tk or a display; import Tk lazily. Missing GUI prerequisites produce an actionable stderr error and exit 2, without clearing a store.
+
+### Retained GUI automation contract
+
+`gui.py` exports `DesktopApp(root, server_origin, state_dir, transport="online")`, where root is an existing tkinter.Tk and state_dir accepts a path string. Production main.py creates this same class and runs root.mainloop(). The constructor creates the widgets below immediately; successful startup sets `app.ready=True` only after durable state has rendered. An unusable store leaves ready false with a visible error and a closable window. `app.close()` is the same callback registered for WM_DELETE_WINDOW, including graceful worker/storage shutdown and root destruction. No parallel test messaging implementation is permitted.
+
+Expose `app.widgets`, a mapping to the actual production Tk widgets, for retained tests to enter text, invoke buttons, generate selection events, and read displayed state. This is an observation/control locator contract, not a backend mutation API.
+
+| Key | Tk widget and observable contract |
 |---|---|
-| `send bob Hello Bob` | Recipient is the token after send; text is the exact remainder after its single separator, preserving additional spaces. |
-| `send-json bob "First line\nSecond line"` | Decode exactly one JSON string and use normal text validation; useful for embedded newlines. |
-| `inbox` | Show persisted incoming rows in sequence order. |
-| `outbox` | Show persisted outgoing rows in local_order, including exact text, recipient, ID, state, and error. |
-| `status` | Show identity, mode, observed connection, cursor, pending count, pause, and last error. |
-| `transport offline` / `transport online` | Change the real transport mode; online schedules immediate synchronization unless paused. |
-| `help` / `quit` | Explain commands / shut down cleanly. |
+| username-input | Entry/ttk.Entry before login; exact text input |
+| login-button | Button/ttk.Button invoking normal login |
+| current-user | Label/ttk.Label whose text is the exact saved username, or empty before login |
+| recipient-input | Entry/ttk.Entry |
+| message-input | tkinter.Text; get("1.0", "end-1c") is the exact draft |
+| send-button | Button/ttk.Button using the normal enqueue handler |
+| connection-status | Label/ttk.Label text exactly unknown/online/offline/error; put any descriptive prefix in a separate label |
+| error-message | Label/ttk.Label text empty or a visible actionable error |
+| transport-mode | ttk.Combobox values online/offline; <<ComboboxSelected>> runs the production handler |
+| reset-button | Button/ttk.Button showing confirmation |
+| reset-confirm / reset-cancel | Button/ttk.Button visible only during confirmation; normal reset/cancel handlers |
+| inbox | ttk.Treeview; iid is sender + ":" + message_id; values in order sender, text, sequence; rows in sequence order |
+| outbox | ttk.Treeview; iid is message_id; values in order recipient, text, state, error, local_order; rows in local order; state text queued / accepted by server / failed |
+| inbox-detail / outbox-detail | Readonly tkinter.Text; selecting a row via <<TreeviewSelect>> shows its exact message text, excluding Tk's terminal newline |
 
-Typing a new username after login is not an identity-switch command. `send` need not echo the full text in its immediate acknowledgment; `outbox` is the authoritative inspection command.
+Tree column #0 displays the message ID for inspection. Text/values are data, never Tcl code. Detail panes preserve spaces and newlines. Do not promise glyphs for nonprinting scalar values; persisted and machine values remain exact. Retained tests query real widgets, may inspect SQLite read-only for cursor/schema assertions, and inject real transport faults outside the application. They must not call messaging methods to bypass GUI handlers. The JSON-lines machine interface below remains available for deep protocol/scalar boundaries and does not require a display.
 
 ## Machine interface
 

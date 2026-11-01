@@ -37,14 +37,14 @@ async function server() {
 }
 
 async function proxy(origin) {
-  const mode = {}; const history = []; const timers = new Set();
+  const mode = {}; const history = []; const assetHistory = []; const timers = new Set();
   const listener = http.createServer(async (req, res) => {
     const chunks = []; for await (const chunk of req) chunks.push(chunk);
     const body = Buffer.concat(chunks);
     const api = req.url.startsWith('/api/');
     const entry = { method: req.method, url: req.url, body: body.toString(), failed: false };
-    if (api) history.push(entry);
-    const fail = () => { entry.failed = true; req.socket.destroy(); };
+    if (api) history.push(entry); else assetHistory.push(entry);
+    const fail = (error) => { entry.failed = true; entry.error = error ? {code:error.code,message:error.message} : {code:'INJECTED_OUTAGE'}; if (!res.writableEnded && !res.destroyed) req.socket.destroy(); };
     if (api && mode.offline) return fail();
     const reply = (status, value, headers = {}) => {
       const data = typeof value === 'string' ? value : JSON.stringify(value);
@@ -55,14 +55,20 @@ async function proxy(origin) {
     }
     if (api && req.method === 'GET' && mode.page) return reply(mode.getStatus || 200, typeof mode.page === 'function' ? mode.page(req.url) : mode.page);
     const forward = () => {
-      const upstream = http.request(new URL(req.url, origin), { method: req.method, headers: {...req.headers, host: new URL(origin).host, connection:'close'} }, response => {
+      // The retained server closes each response; never pool its upstream sockets.
+      const upstream = http.request(new URL(req.url, origin), { agent: false, method: req.method, headers: {...req.headers, host: new URL(origin).host, connection:'close'} }, response => {
         const data = []; response.on('data', chunk => data.push(chunk));
         response.on('end', () => {
           entry.status = response.statusCode;
-          const payload = Buffer.concat(data); entry.response = payload.toString();
+          const payload = Buffer.concat(data); if (api) entry.response = payload.toString();
+          // Static diagnostics must not expose another client's source to repairs.
           if (api && req.method === 'POST' && mode.dropAck) { mode.dropAck = false; return fail(); }
           if (api && req.method === 'POST' && mode.receipt !== undefined) return reply(201, mode.receipt);
-          if (!res.destroyed) { res.writeHead(response.statusCode, response.headers); res.end(payload); }
+          const deliver = () => { entry.delivered = true; if (!res.destroyed) { res.writeHead(response.statusCode, response.headers); res.end(payload); } };
+          if (api && req.method === 'GET' && mode.getResponseDelay) {
+            entry.held = true;
+            const timer = setTimeout(() => { timers.delete(timer); deliver(); }, mode.getResponseDelay); timers.add(timer);
+          } else deliver();
         });
       });
       upstream.on('error', fail); req.on('error', () => upstream.destroy());
@@ -73,14 +79,15 @@ async function proxy(origin) {
     } else forward();
   });
   await new Promise(resolve => listener.listen(0, '127.0.0.1', resolve));
-  return { mode, history, origin:`http://127.0.0.1:${listener.address().port}`,
+  return { mode, history, assetHistory, origin:`http://127.0.0.1:${listener.address().port}`,
     async close() { for (const t of timers) clearTimeout(t); listener.closeAllConnections(); await new Promise(r => listener.close(r)); } };
 }
 
 class Cli {
   constructor(origin, state) { this.origin = origin; this.state = state; this.pending = new Map(); this.next = 0; }
+  launchArguments(offline) { return ['generated/python-client/main.py', '--server', this.origin, '--state-dir', this.state, '--machine', '--transport', offline ? 'offline' : 'online']; }
   async start(offline = false) {
-    this.process = spawn(PYTHON, ['generated/python-client/main.py', '--server', this.origin, '--state-dir', this.state, '--machine', '--transport', offline ? 'offline' : 'online'], { cwd:ROOT, stdio:['pipe','pipe','pipe'] });
+    this.process = spawn(PYTHON, this.launchArguments(offline), { cwd:ROOT, stdio:['pipe','pipe','pipe'] });
     this.errors = ''; this.process.stderr.on('data', b => { this.errors += b; });
     const lines = readline.createInterface({input:this.process.stdout});
     await new Promise((resolve,reject) => {
@@ -118,9 +125,39 @@ class Cli {
   async close() { if(this.process) await stop(this.process); }
 }
 
+class Gui extends Cli {
+  launchArguments(offline) { return ['tests/gui_driver.py', '--server', this.origin, '--state-dir', this.state, '--transport', offline ? 'offline' : 'online']; }
+  async action(command,params={}) { const r=await this.command(command,params);expect(r.ok,JSON.stringify(r.error)).toBe(true);return r.data; }
+  async snapshot() { return this.action('snapshot'); }
+  async fill(widget,text) { return this.action('fill',{widget,text}); }
+  async click(widget) { return this.action('click',{widget}); }
+  async login(username) {
+    await expect.poll(async()=> (await this.snapshot()).ready).toBe(true);
+    await this.fill('username-input',username);await this.click('login-button');
+    await expect.poll(async()=> (await this.snapshot()).widgets['current-user'].text).toBe(username);this.username=username;
+  }
+  async send(recipient,text) {
+    const before=new Set((await this.outbox()).map(m=>m.message_id));
+    await this.fill('recipient-input',recipient);await this.fill('message-input',text);await this.click('send-button');
+    await expect.poll(async()=> (await this.outbox()).filter(m=>!before.has(m.message_id)).length).toBe(1);
+    return (await this.outbox()).find(m=>!before.has(m.message_id)).message_id;
+  }
+  async inbox() { return (await this.snapshot()).inbox; }
+  async outbox() { return (await this.snapshot()).outbox; }
+  async cursor() { return (await this.snapshot()).cursor; }
+  async transport(mode) { await this.action('select',{widget:'transport-mode',value:mode}); }
+  async quit() {
+    if(this.process.exitCode!==null)return;
+    const exit=new Promise(resolve=>this.process.once('exit',resolve));
+    await this.action('close');
+    await Promise.race([exit,new Promise((_,reject)=>{const t=setTimeout(()=>reject(new Error('Desktop shutdown timeout')),6000);t.unref();})]);
+    expect(this.process.exitCode).toBe(0);
+  }
+}
+
 class Web {
   constructor(context,page,origin) { this.context=context;this.page=page;this.origin=origin; }
-  async start() { await this.page.goto(this.origin); await expect(this.page.getByTestId('app-ready')).toHaveAttribute('data-ready','true'); return this; }
+  async start() { const errors=[];this.page.on('pageerror',e=>errors.push(String(e)));this.page.on('requestfailed',r=>errors.push(r.url()+': '+r.failure()?.errorText));await this.page.goto(this.origin);try { await expect(this.page.getByTestId('app-ready')).toHaveAttribute('data-ready','true'); } catch(e) { throw new Error(e.message+'\nBrowser diagnostics: '+JSON.stringify(errors)); } return this; }
   async login(username) { await this.page.getByTestId('username-input').fill(username); await this.page.getByTestId('login-button').click(); await expect(this.page.getByTestId('current-user')).toHaveText(username); this.username=username; }
   async send(recipient,text) {
     const before = new Set((await this.outbox()).map(m=>m.message_id));
@@ -144,8 +181,9 @@ async function fixture(browser) {
     async client(kind,username) {
       const p=await proxy(backend.origin); proxies.push(p);
       let c;
-      if(kind==='python') c=await new Cli(p.origin,path.join(dir,`${kind}-${clients.length}`)).start();
-      else {const context=await browser.newContext();c=await new Web(context,await context.newPage(),p.origin).start();}
+      if(kind==='gui') c=await new Gui(p.origin,path.join(dir,`${kind}-${clients.length}`)).start();
+      else if(kind==='python') c=await new Cli(p.origin,path.join(dir,`${kind}-${clients.length}`)).start();
+      else {const context=await browser.newContext();try {c=await new Web(context,await context.newPage(),p.origin).start();} catch(error) {await context.close();throw new Error(error.message+'\nAsset proxy diagnostics: '+JSON.stringify(p.assetHistory));}}
       clients.push(c);c.proxy=p;c.kind=kind;if(username)await c.login(username);return c;
     },
     async close() { for(const c of clients)await c.close();for(const p of proxies)await p.close();await backend.close();await fs.rm(dir,{recursive:true,force:true}); }
@@ -159,4 +197,4 @@ async function seed(origin,recipient,text='seed',extra={}) {
   const response=await fetch(origin+'/api/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(message)});
   expect(response.status).toBe(201); return {...message,...await response.json()};
 }
-module.exports={fixture,Cli,Web,accepted,received,seed,ROOT,PYTHON,stop};
+module.exports={fixture,Cli,Gui,Web,accepted,received,seed,ROOT,PYTHON,stop};

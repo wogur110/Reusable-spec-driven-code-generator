@@ -32,7 +32,7 @@ Only generated/python-client/ and generated/typescript-web/ are published client
 
 ## Verification discipline
 
-Author retained tests independently from the written contracts before generating clients. Use actual CLI operations, browser controls, and external per-client transport faults while the server stays alive. Never delete/weaken assertions, hide failures with skips/retries, accept zero collected tests, or claim runtime success from compilation alone. Three repair rounds follow initial generation; concrete deadlines are in GENERATE.md. Agent repairs cannot change retained contracts or tests. An intentional feature change revises specs/tests first and begins a separately recorded run.
+Author retained tests independently from the written contracts before generating clients. Use actual desktop controls, machine-interface operations, browser controls, and external per-client transport faults while the server stays alive. Never delete/weaken assertions, hide failures with skips/retries, accept zero collected tests, or claim runtime success from compilation alone. Three repair rounds follow initial generation; concrete deadlines are in GENERATE.md. Agent repairs cannot change retained contracts or tests. An intentional feature change revises specs/tests first and begins a separately recorded run.
 
 Implemented entry points (consult STATUS for actual results and pending checks):
 
