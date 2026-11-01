@@ -46,6 +46,7 @@ async function proxy(origin) {
     const messageApi=route==='/api/v1/messages';
     const directory=route==='/api/v1/users';
     const acknowledgment=route==='/api/v1/receipts';
+    const presence=route==='/api/v1/presence';
     const entry = { method: req.method, url: req.url, body: body.toString(), failed: false };
     // Preserve existing message-only fault assertions; expose every API attempt separately.
     if (api) { apiHistory.push(entry); (messageApi ? history : auxiliaryHistory).push(entry); } else assetHistory.push(entry);
@@ -55,6 +56,7 @@ async function proxy(origin) {
       const data = typeof value === 'string' ? value : JSON.stringify(value);
       res.writeHead(status, { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data), ...headers }); res.end(data);
     };
+    if (presence && mode.presenceStatus) return reply(mode.presenceStatus,{error:{code:'INTERNAL_ERROR',message:'Injected presence failure.',field:null}});
     if (acknowledgment && mode.blockReceipts) return fail();
     if (acknowledgment && mode.ackStatus) return reply(mode.ackStatus,{error:{code:'INVALID_RECEIPT',message:'Injected receipt failure.',field:'through'}});
     if (directory && req.method==='POST' && mode.announceStatus) return reply(mode.announceStatus,{error:{code:'INTERNAL_ERROR',message:'Injected announcement failure.',field:null}});
@@ -76,13 +78,20 @@ async function proxy(origin) {
           entry.status = response.statusCode;
           const payload = Buffer.concat(data); if (api) entry.response = payload.toString();
           // Static diagnostics must not expose another client's source to repairs.
+          if (presence && mode.dropPresenceReply) {
+            // Keep the accepted response unreadable until the client's deadline. Closing a pooled
+            // socket here lets Chromium transparently retry POST and defeats this fault.
+            mode.dropPresenceReply=false; entry.failed=true; entry.held=true;
+            entry.error={code:'INJECTED_LOST_REPLY'}; return;
+          }
           if (acknowledgment && mode.dropReceiptAck) { mode.dropReceiptAck=false; return fail(); }
           if (messageApi && req.method === 'POST' && mode.dropAck) { mode.dropAck = false; return fail(); }
           if (messageApi && req.method === 'POST' && mode.receipt !== undefined) return reply(201, mode.receipt);
           const deliver = () => { entry.delivered = true; if (!res.destroyed) { res.writeHead(response.statusCode, response.headers); res.end(payload); } };
-          if (messageApi && req.method === 'GET' && mode.getResponseDelay) {
+          const heldDelay = (presence && mode.presenceResponseDelay) || (directory && req.method === 'POST' && mode.announceResponseDelay) || (messageApi && req.method === 'GET' && mode.getResponseDelay);
+          if (heldDelay) {
             entry.held = true;
-            const timer = setTimeout(() => { timers.delete(timer); deliver(); }, mode.getResponseDelay); timers.add(timer);
+            const timer = setTimeout(() => { timers.delete(timer); deliver(); }, heldDelay); timers.add(timer);
           } else deliver();
         });
       });

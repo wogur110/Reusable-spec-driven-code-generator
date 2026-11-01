@@ -1,13 +1,33 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Local Messenger</title><link rel="stylesheet" href="./styles.css"></head>
-<body><main data-testid="app-ready" data-ready="false"><header><h1>Local Messenger</h1><p>Persistent messages for one local server session.</p></header>
-<p data-testid="error-message" role="alert"></p>
-<form id="login-form"><label>Username <input data-testid="username-input" autocomplete="username"></label><button data-testid="login-button">Log in</button></form>
-<p>Current user: <strong data-testid="current-user"></strong></p>
-<div class="toolbar"><label>Development transport <select data-testid="transport-mode"><option value="online">online</option><option value="offline">offline</option></select></label><span data-testid="connection-status" data-state="unknown">unknown</span><button data-testid="reset-button" type="button">Reset local store</button></div>
-<div id="reset-panel" hidden><p>Clear this application's identity and all local messages?</p><button data-testid="reset-confirm">Confirm reset</button><button id="reset-cancel">Cancel</button></div>
-<section><h2>Known recipients</h2><label>Filter users <input data-testid="user-filter"></label><button data-testid="user-refresh">Refresh</button><p>Directory: <span data-testid="directory-status">loading</span></p><div data-testid="user-directory"></div><p>Durable receipt report: <span data-testid="receipt-status">unknown</span></p><p id="feature-detail"></p></section>
-<form id="compose"><h2>Compose</h2><label>Recipient <input data-testid="recipient-input" autocomplete="off" disabled></label><label>Message <textarea data-testid="message-input" rows="4" disabled></textarea></label><button data-testid="send-button" disabled>Send</button></form>
-<div class="columns"><section><h2>Inbox</h2><div data-testid="inbox"></div></section><section><h2>Outgoing</h2><div data-testid="outbox"></div></section></div>
-<footer>Server acceptance is not delivery or read confirmation. Receipt reports describe durable storage, not reading. Use one active tab per identity. After restarting the server, reset client stores. Assets must be reachable to reload this page.</footer>
-</main><script type="module" src="./src/main.js"></script></body></html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Local Messenger</title><link rel="stylesheet" href="./styles.css"></head>
+<body>
+<main data-testid="app-ready" data-ready="false">
+  <section class="panel session" data-testid="session-panel" aria-label="Session">
+    <form id="login-form"><label>Username <input data-testid="username-input" autocomplete="off" spellcheck="false" disabled></label><button data-testid="login-button" disabled>Log in</button></form>
+    <span id="identity" hidden>User: <strong data-testid="current-user"></strong></span>
+    <span>Connection: <strong data-testid="connection-status" data-state="unknown">unknown</strong></span>
+    <label>Development transport <select data-testid="transport-mode"><option value="online">online</option><option value="offline">offline</option></select></label>
+    <span>Presence report: <strong data-testid="presence-status">unknown</strong></span>
+    <button data-testid="reset-button" disabled>Reset local store</button>
+    <small class="wide">Presence reports the selected mode to the server. Real network loss may delay server Offline status. Use one active tab per identity.</small>
+    <div id="reset-panel" class="wide" hidden>Clear this application's identity and all local messages? <button data-testid="reset-confirm">Confirm reset</button> <button id="reset-cancel">Cancel</button></div>
+    <div data-testid="error-message" class="error wide" role="alert"></div>
+  </section>
+  <section class="panel directory" data-testid="directory-panel" aria-label="Known recipients">
+    <div class="toolbar"><h2>Known recipients</h2><label>Filter <input data-testid="user-filter" type="search"></label><button data-testid="user-refresh">Refresh</button><span>Directory: <strong data-testid="directory-status">loading</strong></span><span>Receipt report: <strong data-testid="receipt-status">unknown</strong></span></div>
+    <div data-testid="user-directory" class="directory-list"></div>
+    <small id="feature-error" class="error"></small>
+  </section>
+  <form class="panel compose" data-testid="compose-panel" id="compose-form">
+    <div class="toolbar"><label>Recipient <input data-testid="recipient-input" autocomplete="off" spellcheck="false" disabled></label><button data-testid="send-button" disabled>Send</button></div>
+    <label for="message">Message</label><textarea id="message" data-testid="message-input" disabled></textarea>
+  </form>
+  <small class="notice">Accepted by server is not delivery or read confirmation. Receipt reports acknowledge durable local storage, not reading.</small>
+  <div class="histories" data-testid="message-panels">
+    <section class="panel history" data-testid="inbox-panel"><h2>Inbox</h2><div class="table-scroll"><table><thead><tr><th>Message ID</th><th>Sender</th><th>Text</th><th>Sequence</th></tr></thead><tbody data-testid="inbox"></tbody></table><p id="inbox-empty">No incoming messages.</p></div><h3>Selected message</h3><pre data-testid="inbox-detail" tabindex="0" aria-label="Selected incoming text"></pre></section>
+    <section class="panel history" data-testid="outbox-panel"><h2>Outgoing</h2><div class="table-scroll"><table><thead><tr><th>Message ID</th><th>Recipient</th><th>Text</th><th>State</th><th>Error</th><th>Order</th></tr></thead><tbody data-testid="outbox"></tbody></table><p id="outbox-empty">No outgoing messages.</p></div><h3>Selected message</h3><pre data-testid="outbox-detail" tabindex="0" aria-label="Selected outgoing text"></pre></section>
+  </div>
+</main>
+<script type="module" src="./src/main.js"></script>
+</body></html>

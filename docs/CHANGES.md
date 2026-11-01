@@ -199,3 +199,48 @@ Direct user request: “I also want to show that the user is currently offline o
 The server Users table now has a Status column showing Online/Offline from the existing presence boolean. A visible notice explains the 15-second heartbeat window and delayed disconnect detection. The protocol, generated clients, client labels, queue classification, and USER blocks are unchanged. SERVER/DIRECTORY contracts and manual instructions describe the server-specific wording. No new change-request ID or FUTURE entry was invented.
 
 Validation: `python3 scripts/verify.py --suite server-gui --report artifacts/presence-labels/server-gui.json` passed 12/12, including a new real-widget/HTTP test with a controlled presence clock. It checks never-announced users, the exact expiry boundary, automatic refresh, reconnection, selection retention, and unchanged receipt state. No client regeneration was needed for this server-only presentation update. The earlier 80-case full suite and clean proof remain historical CHG-003 evidence; neither was rerun for this follow-up. User manual confirmation is pending.
+
+
+## CHG-004 — Desktop-style web UI and explicit client presence
+
+State: COMPLETE — implementation and automated clean regeneration verified; user manual review pending.
+
+### Original user request (verbatim)
+
+```text
+I want to change UI in web similar to python gui. Also, I want to change that if I set offline in the client, the server should change the status of the user by communication with client. For now, it online change when another user sent to the offline user. Fix it.
+
+I want to treat this as CHG-004
+```
+
+The request was registered as CHG-004 in FUTURE.md before implementation. Its normalized original entry is retained in EVIDENCE.json. All 26 USER preference cells and six manual-observation cells retain their previous blank values and exact wording. The explicit request extends P04/P10 defaults without rewriting source inputs.
+
+### Behavior and compatibility
+
+The browser now uses a compact desktop-style arrangement: session controls, bounded known-recipient list, compose area, then side-by-side Inbox and Outgoing tables with full-text detail panes. Rows support mouse/keyboard selection; narrow screens stack the history panels without whole-page horizontal overflow. Existing controls, state attributes, Unicode/whitespace handling and version-1 stores remain compatible. Requirements REQ-WEB-UI-02 and WEB-01 specify the layout without using Python source as a template.
+
+REQ-PRESENCE-01 and PRES-01–05 add POST /api/v1/presence with exact username/boolean online fields. One serialized scheduler prioritizes a bounded presence transition: Offline blocks ordinary traffic immediately but permits one final two-second notification after existing work finishes; Online explicitly announces reconnection before ordinary synchronization. Presence-report status distinguishes pending/confirmed/error from local desired mode. Notification failure keeps local queues intact and falls back to heartbeat expiry; no further requests are scheduled while offline. Server state is protected by the same store lock. An explicit-offline latch prevents late legacy announcements, addressed messages, receipts, or operator inspection from restoring Online. Only explicit Online clears it. Closing/crashing or a real outage still expires after 15 seconds without a heartbeat. No cloud service, runtime dependency, database migration, account management, read receipts, or offline outbox telemetry was added.
+
+PRESENCE.md is registered after DIRECTORY.md; platform/shared contracts, retained tests and operating docs were revised before generation. The generic core, runner and prompt hashes are unchanged. Both clients were generated through the actual harness with no manual source patches. Reset wording clarifies that hidden Treeview rows must also be empty before login is shown, preserving the existing unchanged GUI-04 assertion.
+
+### Actual checks and retained failures
+
+| Check | Actual result |
+|---|---|
+| Pre-implementation presence protocol tests | Expected FAIL: two new cases received 404 before the route existed; 13 prior cases passed. red-protocol.json retained. |
+| Focused retained server checks | Protocol 15/15 and server GUI 13/13 PASS. |
+| Harness guards | 9/9 PASS. |
+| Initial generation 20261101T224431170398Z | STOPPED, no publication. Initial TypeScript DOM collection iteration type error was repaired; full acceptance then passed 90/92. Python reset exposed stale hidden rows. Lost-reply web test received a transparent browser retry, independently reproduced without client logic. Parent stopped the harness and owned subprocesses before correcting inputs; last checkpoint is not a completed successful report. |
+| Fault-fixture diagnosis | One plain fetch produced two requests and success when a pooled socket was closed. Corrected fixture withholds the accepted response; probe produced one request and a timeout. Assertions were unchanged. Artifacts: probe-lost-reply.json and probe-lost-reply-corrected.json. |
+| python3 generator/run.py --target all | PASS 20261101T230328364307Z; 92/92 before publication, calls per target {'python': 1, 'typescript': 1}. |
+| python3 scripts/regenerate_check.py | PASS 20261101T232007378344Z; inner run 20261101T232019679970Z, calls per target {'python': 3, 'typescript': 3}; 92/92 inside the harness and 92/92 standalone, original tree preserved. |
+| Clean-generation build repair | Initial browser candidate redeclared the DOM global closed; repaired through the bounded harness with unchanged specifications/tests. |
+| Clean-generation acceptance repair | First full clean validation passed 91/92. Existing web AT-13 timed-out send did not display Offline; all CHG-004 cases passed. Failed report retained and ordinary bounded repair used unchanged assertions. |
+| Agent visual inspection | PASS: actual desktop/narrow browser panels, exact detail panes, explicit Offline confirmation with server presence false, and local queued message; Python presence control also inspected. Screenshots and visual.json remain under artifacts/changes/CHG-004. Not user sign-off. |
+| Integrity | USER blocks, prior browser assertions and generic generator/prompt preserved. Full frozen source/spec/test inventories and published client hashes are in EVIDENCE.json. |
+
+The validated snapshot is based on `ecfa93db0300b232d5d5d989973c13c37a7f4ea8` plus authorized CHG-004 changes. Requested model: gpt-6-astra; effective: UNREPORTED; tool: codex-cli 0.166.0. Failed/stopped reports remain evidence, with no skips, whole-test retries, relaxed assertions or increased timeouts. Final evidence documentation follows the verified source snapshot.
+
+### Manual verification and limits
+
+Follow [TESTING.md](../TESTING.md#chg-004-web-layout-and-explicit-presence). Test Offline without any peer messages, then send to the offline user, reconnect, and inspect both client roles. Check desktop/narrow web layout and exact detail panes. README keeps only the short change summary. Actual network loss cannot deliver an Offline notification, so expiry remains necessary. Presence is an unauthenticated local-demo claim; one active client per username is the supported precondition. Native Windows/macOS and optional OF-01/OF-02 remain unverified. User observations and current archive preparation are separate from automated implementation completion.

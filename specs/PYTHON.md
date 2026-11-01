@@ -109,3 +109,10 @@ Verification coverage is defined in [ACCEPTANCE.md](ACCEPTANCE.md), including bo
 ## CHG-003 directory and receipt extension
 
 Implement the explicitly registered [DIRECTORY.md](DIRECTORY.md) contract and its platform-specific selectors. It extends serialized scheduling and GUI observation, without changing version-1 durable storage, existing selectors, or the machine interface. Keep auxiliary errors separate from ordinary messaging errors and apply the same reset-generation guard to every response. Receipt progress comes only from committed inbox/cursor metadata; never infer it from display or a downloaded page.
+
+
+## CHG-004 explicit presence override
+
+The registered [PRESENCE.md](PRESENCE.md) extension adds explicit mode notifications and overrides heartbeat-only presence and the blanket offline-request prohibition within its defined bounds. Preserve all other contracts.
+
+Reset readiness includes hidden widgets: inbox, outbox and user-directory Treeviews must contain zero items before username-input becomes mapped/enabled, even if their parent frames are hidden. Clear their selection/detail state and cached snapshots too. Hiding the old frame is not clearing old rows. Apply the cleared snapshot and login readiness together on the Tk thread; an old snapshot must never repopulate those widgets afterward. This makes the existing reset contract observable consistently through actual widget state.

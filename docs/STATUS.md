@@ -2,7 +2,13 @@
 
 Updated 2026-11-01 (America/Los_Angeles). The agent authored specifications and retained infrastructure/tests; actual isolated Codex harness calls authored both clients. Blank USER preferences are not user-authored answers, and automated/agent checks do not fill manual observations.
 
-## Server presence display follow-up
+## CHG-004 complete
+
+Both clients explicitly notify the server when their Development transport changes, and the web interface follows the Python desktop layout. Server Offline state is independent of peer message traffic and cannot be undone by a late legacy heartbeat. Real connection loss still uses heartbeat expiry. Published generation 20261101T230328364307Z passed 92/92; one initial call per target. Nine harness guards pass. Clean proof 20261101T232007378344Z passed 92/92 inside the harness and 92/92 standalone and preserved the original tree; three calls per target (initial plus two repairs).
+
+The first run was intentionally stopped after a compiler repair and a 90/92 result: Python reset exposed stale rows, and an isolated probe proved Chromium automatically retried the lost-reply fixture. The corrected fixture withholds the accepted reply until the client deadline. All acceptance assertions remained unchanged; a new generation run used fresh candidates. Clean generation separately repaired a TypeScript DOM-name conflict and a 91/92 run where an existing browser send-timeout check failed to show Offline. All new CHG-004 cases passed that run. Exact hashes and reports are recorded in EVIDENCE.json. USER blocks and generic generator/prompt remain unchanged. User manual review and a current release archive remain pending.
+
+## Server presence display follow-up (historical)
 
 The Users table now displays Online/Offline with a visible 15-second heartbeat explanation. Focused server GUI verification passed 12/12, including automatic expiry and recovery. This is a retained server presentation change; clients and wire behavior are unchanged. Full-suite and clean-regeneration results below describe the preceding CHG-003 baseline, not a rerun of this follow-up. See TESTING for manual checks.
 
@@ -29,18 +35,18 @@ Earlier clean proof 20261101T143710332729Z remains FAIL: TypeScript's initial co
 | Area | State | Evidence / remaining work |
 |---|---|---|
 | Stage 1 documentation | COMPLETE | All 16 required documents, source comparison, catalog forms, and contracts completed; current docs reconciled with implementation |
-| Preferences | COMPLETE | All 26 optional cells unchanged/blank; effective defaults and explicit CHG-001–003 decisions in DECISIONS; no unresolved user-choice conflict |
+| Preferences | COMPLETE | All 26 optional cells unchanged/blank; effective defaults and explicit CHG-001–004 decisions in DECISIONS; no unresolved user-choice conflict |
 | Environment | VERIFIED for this environment | Ubuntu 22.04.5/WSL2 x86_64; Python 3.10.12, SQLite 3.37.2, Node 22.17.0, npm 10.9.2, Git 2.34.1; Tk 8.6.12; native GUI prerequisites installed by the user |
 | Coding-tool access | PASS | Project-local Codex 0.166.0, requested gpt-6-astra, effective UNREPORTED; authenticated writable preflight and real generation calls |
 | Implementation | COMPLETE | Retained components and generated clients build; actual generation, required checks, clean proof, and operating documentation complete |
-| Automated baseline | PASS | 80 tests: 13 protocol, four machine interface, 31 existing client/browser, 11 client desktop, 11 server GUI, two server/client integration and eight directory cases; zero failures/skips/flaky results |
+| Automated baseline | PASS | 92 tests: 15 protocol, four machine interface, 13 server GUI and 60 browser/client cases; zero failures/skips/flaky results |
 | Harness guards | PASS | Nine AT-18 tests, including inventory/path violations, incomplete events, invalid reports, timeout, input allowlisting, and publication rollback |
-| Clean regeneration | PASS | Run 20261101T215733141945Z recreated both clients, passed 80 tests in the harness and again standalone, and preserved the original tree |
-| Evolution | PASS — CHG-001, CHG-002 and CHG-003 | Client desktop, server GUI, directory and durable receipts verified; generic runner/prompt unchanged; storage remains version 1 |
+| Clean regeneration | PASS | Run 20261101T232007378344Z recreated both clients, passed 92 tests in the harness and again standalone, and preserved the original tree |
+| Evolution | PASS — CHG-001–004 | Client desktop, server GUI, directory and durable receipts verified; generic runner/prompt unchanged; storage remains version 1 |
 | Optional storage/crash injections | NOT_RUN — deferred | OF-01/OF-02 remain disclosed optional executions; normal restart, malformed-page rollback, and unsupported-store checks pass |
 | User manual review | GENERAL CONFIRMATION RECEIVED — CHG-001 and CHG-002 | The user confirmed CHG-002: “I found it works well.” Detailed M01–M06 observations were not supplied; source cells remain blank. |
-| Review archive | PRIOR REVISION VERIFIED; CURRENT NOT_CREATED | Earlier CHG-001 archive passed source/history restoration. Package the final committed CHG-003 revision separately; prior manifests do not cover it. |
-| Final release readiness | NOT_READY — manual observations and current archive pending | CHG-003 implementation/automated checks are complete; its manual review is pending. Detailed user observations and an archive of the final CHG-003 revision remain pending. |
+| Review archive | PRIOR REVISION VERIFIED; CURRENT NOT_CREATED | Earlier CHG-001 archive passed source/history restoration. Package the final committed CHG-004 revision separately; prior manifests do not cover it. |
+| Final release readiness | NOT_READY — manual observations and current archive pending | CHG-004 implementation/automated checks are complete; its manual review is pending. Detailed user observations and an archive of the final CHG-004 revision remain pending. |
 
 Baseline Stage 2 implementation completion requires generation, builds, required acceptance/guard checks, clean regeneration, and truthful operating documentation. Pending user observations and unrequested evolution remain separate; neither is silently marked passed.
 

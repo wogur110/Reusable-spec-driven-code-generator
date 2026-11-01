@@ -61,6 +61,7 @@ class Store:
         self.clock = clock or time.monotonic
         self.users = {}
         self.acknowledged = {}
+        self.explicit_offline = set()
 
     def send(self, data):
         validate(data)
@@ -86,7 +87,7 @@ class Store:
 
     def _directory_locked(self):
         now = self.clock()
-        return [{'username': name, 'online': seen is not None and now - seen < 15}
+        return [{'username': name, 'online': name not in self.explicit_offline and seen is not None and now - seen < 15}
                 for name, seen in sorted(self.users.items())]
 
     def announce(self, data):
@@ -96,8 +97,26 @@ class Store:
         if not isinstance(name, str) or not NAME.fullmatch(name):
             raise Problem(400, 'INVALID_USERNAME', 'username')
         with self.lock:
-            self.users[name] = self.clock()
+            if name not in self.explicit_offline:
+                self.users[name] = self.clock()
         return {'username': name}
+
+    def presence(self, data):
+        if not isinstance(data, dict) or set(data) != {'username', 'online'}:
+            raise Problem(400, 'INVALID_FIELDS')
+        name, online = data['username'], data['online']
+        if not isinstance(name, str) or not NAME.fullmatch(name):
+            raise Problem(400, 'INVALID_USERNAME', 'username')
+        if type(online) is not bool:
+            raise Problem(400, 'INVALID_PRESENCE', 'online')
+        with self.lock:
+            if online:
+                self.explicit_offline.discard(name)
+                self.users[name] = self.clock()
+            else:
+                self.explicit_offline.add(name)
+                self.users[name] = None
+        return {'username': name, 'online': online}
 
     def directory(self):
         with self.lock:
@@ -260,7 +279,7 @@ class Handler(BaseHTTPRequestHandler):
         route = urlsplit(self.path)
         path = route.path
         routes = {'/api/v1/messages': ('GET', 'POST'), '/api/v1/users': ('GET', 'POST'),
-                  '/api/v1/receipts': ('POST',), '/health': ('GET',)}
+                  '/api/v1/receipts': ('POST',), '/api/v1/presence': ('POST',), '/health': ('GET',)}
         if path in routes:
             allowed = routes[path]
             if self.command not in allowed:
@@ -292,6 +311,8 @@ class Handler(BaseHTTPRequestHandler):
                     raise Problem(400, 'INVALID_QUERY', 'after')
                 return self.reply(200, self.server.store.receive(query['recipient'], int(after)))
             data = self.read_json()
+            if path == '/api/v1/presence':
+                return self.reply(200, self.server.store.presence(data))
             if path == '/api/v1/users':
                 return self.reply(200, self.server.store.announce(data))
             if path == '/api/v1/receipts':

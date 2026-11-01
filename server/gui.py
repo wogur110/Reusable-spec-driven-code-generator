@@ -103,7 +103,7 @@ class ServerApp:
         w['directory-status']=ttk.Label(bar,text='stopped');w['directory-status'].pack(side='left',padx=6)
         w['queue-notice']=ttk.Label(parent,text='Queued = accepted, awaiting recipient acknowledgment. Received = recipient-reported durable storage, not read confirmation. Offline client queues: unknown.',wraplength=950)
         w['queue-notice'].grid(row=1,column=0,columnspan=2,sticky='ew',padx=5,pady=5)
-        w['presence-notice']=ttk.Label(parent,text='Online: heartbeat within the last 15 seconds. Offline: no recent heartbeat. Disconnections may take 15 seconds to appear.',wraplength=950)
+        w['presence-notice']=ttk.Label(parent,text='Online: recent client presence. A communicated Offline choice applies immediately; uncommunicated disconnections expire after 15 seconds.',wraplength=950)
         w['presence-notice'].grid(row=4,column=0,columnspan=2,sticky='ew',padx=5,pady=5)
         usersbox=ttk.Frame(parent,padding=5);usersbox.grid(row=2,column=0,sticky='nsew')
         usersbox.rowconfigure(0,weight=1);usersbox.columnconfigure(0,weight=1)

@@ -2,20 +2,20 @@
 
 A reusable agentic harness that turns written specifications into independent Python and TypeScript clients. A local messaging application provides a concrete example of offline queues, durable client state, and interoperability.
 
-**Status: CHG-001, CHG-002 and CHG-003 complete.** The CHG-003 baseline passed 80 acceptance tests and nine harness guards; the subsequent server Online/Offline display update passes all 12 focused server GUI tests. Clean regeneration passed the same 80 tests inside the harness and again standalone. CHG-003 manual review remains pending. [Status and evidence](docs/STATUS.md) records actual results.
+**Status: CHG-001–004 complete.** All 92 acceptance tests and nine harness guards pass. Clean regeneration passed 92 tests inside the harness and again standalone. User review of CHG-004 remains pending. [Status and evidence](docs/STATUS.md) records actual results.
 
 ## Change summary
 
 - **CHG-001:** Replaced the Python terminal interface with a desktop GUI, preserved existing stored data and the headless interface, and added GUI tests and setup instructions. Automated verification and clean regeneration passed.
 - **CHG-002:** Added a desktop window to start, stop, and monitor the local server, with session status, message activity, and GUI integration tests. Automated verification and clean regeneration passed.
-
-- **CHG-003:** Adds shared recipient discovery, click-to-address, and per-user server activity with durable receipt acknowledgments. The server also shows Online/Offline status using a 15-second heartbeat timeout. Offline client queues remain unknown to the server. See [manual verification](TESTING.md#shared-directory-and-user-activity-chg-003).
+- **CHG-003:** Adds shared recipient discovery, click-to-address, and per-user server activity with durable receipt acknowledgments. The server shows Online/Offline status; CHG-004 adds explicit mode notifications with heartbeat timeout as fallback. Offline client queues remain unknown to the server. See [manual verification](TESTING.md#shared-directory-and-user-activity-chg-003).
+- **CHG-004:** A compact web layout matching the Python workflow, plus explicit client Offline/Online notifications to update server status without peer message traffic. See [manual verification](TESTING.md#chg-004-web-layout-and-explicit-presence).
 
 See [docs/CHANGES.md](docs/CHANGES.md) for the full change history and verification evidence.
 
 ## Start here
 
-To try the committed application, follow the local demonstration below and [TESTING.md](TESTING.md). Read [the resolved choices](docs/DECISIONS.md) and the edit map if you want to change behavior. Leave preference cells blank when the defaults fit; you do not need to author wire protocols or database schemas.
+To try the generated application, follow the local demonstration below and [TESTING.md](TESTING.md). Read [the resolved choices](docs/DECISIONS.md) and the edit map if you want to change behavior. Leave preference cells blank when the defaults fit; you do not need to author wire protocols or database schemas.
 
 The selected interfaces are a Python desktop GUI, a plain TypeScript browser client, a small local Python server, and Codex-driven generation. Both clients persist identity and messages. The server retains data only during one running server session; each new server session requires explicit fresh/reset demo client stores. CHG-001 replaces the Python human terminal interface; the headless machine interface remains for protocol tests.
 

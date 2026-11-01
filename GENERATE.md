@@ -17,7 +17,8 @@ The following matches generator/targets.json. The project-local CLI and requeste
     "ACCEPTANCE.md"
   ],
   "extensions": [
-    "DIRECTORY.md"
+    "DIRECTORY.md",
+    "PRESENCE.md"
   ],
   "context_files": [
     "Instruction_for_Agent.md",
@@ -186,3 +187,6 @@ The optional server desktop is retained infrastructure specified in specs/SERVER
 ## CHG-003 registered shared extension
 
 DIRECTORY.md is explicitly registered for both targets. It adds user announcements, directory observations and durable-receipt reports, plus GUI selectors. Both clients require actual harness regeneration; no manual behavioral patches. Generic orchestration and prompt templates remain unchanged. Expanded retained tests are frozen before each generation run and included in clean regeneration.
+
+
+CHG-004 registers PRESENCE.md after DIRECTORY.md for explicit mode notifications. Both clients are affected and must be generated through the ordinary harness; TYPESCRIPT.md defines the independently authored desktop-style web layout. Generic orchestration/prompt remain unchanged.

@@ -82,3 +82,6 @@ The optional server/gui.py Tkinter window owns one retained Server per Start/Sto
 ## CHG-003 directory and receipt design
 
 One retained Store lock protects messages, session-known users, explicit announcement times and cumulative recipient acknowledgments. Shared directory observations are returned over new version-1 routes; the server GUI reads the same state locally. Clients serialize receipt/announcement/directory calls after normal message synchronization and acknowledge only committed cursors. No schema migration or per-message receipt table is needed. GUI caches are transient, guarded by identity/reset generation, and cannot prevent manual sending. Server per-user views show observational receipt status; unseen offline outboxes remain unknown. See specs/DIRECTORY.md for exact contracts.
+
+
+CHG-004 separates local transport intent from confirmed server presence. A serialized priority control request communicates mode changes; explicit offline state cannot be undone by message activity or a late heartbeat. Failed offline notification leaves queues intact and uses expiry as fallback. The browser adopts the Python task layout with bounded panels and exact detail panes.

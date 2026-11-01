@@ -1,45 +1,40 @@
-"""Tk presentation of the production client; widgets are also automation locators."""
-import queue
+"""Tk desktop presentation. All messaging uses the production Client core."""
 import threading
 import tkinter as tk
 from tkinter import ttk
-from client import Client
-from protocol import ClientError
+from core import Client
+from model import ClientError, reset_files
 
 class DesktopApp:
     def __init__(self, root, server_origin, state_dir, transport='online'):
-        self.root = root
+        self.root, self.server, self.state_dir = root, server_origin, state_dir
         self.widgets = {}
         self.ready = False
+        self.startup_failed = False
+        self.client = None
         self.closing = False
         self.resetting = False
-        self.reset_thread = None
-        self.client = None
         self.form_error = ''
         self.last_snapshot = None
-        self.completions = queue.Queue()
-        root.title('Local Messenger - Python')
-        root.geometry('1100x800')
-        root.minsize(960, 640)
-        root.protocol('WM_DELETE_WINDOW', self.close)
+        self.root.title('Local Messenger - Python')
+        self.root.geometry('1100x780')
+        self.root.minsize(700, 540)
+        self.root.protocol('WM_DELETE_WINDOW', self.close)
         self.build()
         try:
             self.client = Client(server_origin, state_dir, transport)
             self.render()
             self.ready = True
             self.client.start()
-        except Exception as exc:
-            self.form_error = self.describe(exc)
+        except ClientError as e:
+            self.startup_failed = True
+            self.form_error = e.code + ': ' + e.message
             self.widgets['error-message'].configure(text=self.form_error)
-            self.set_composition(False)
             self.widgets['login-button'].configure(state='disabled')
-        self.root.after(80, self.tick)
+            self.widgets['send-button'].configure(state='disabled')
+        self.root.after(100, self.poll)
 
-    @staticmethod
-    def describe(exc):
-        return (exc.code + ': ' + exc.message) if isinstance(exc, ClientError) else str(exc)
-
-    def add(self, key, widget):
+    def widget(self, key, widget):
         self.widgets[key] = widget
         return widget
 
@@ -51,182 +46,187 @@ class DesktopApp:
         self.login_frame = ttk.Frame(header)
         self.login_frame.pack(side='left')
         ttk.Label(self.login_frame, text='Username').pack(side='left')
-        self.add('username-input', ttk.Entry(self.login_frame, width=24)).pack(side='left', padx=5)
-        self.add('login-button', ttk.Button(self.login_frame, text='Log in', command=self.login)).pack(side='left')
-        self.identity_label = ttk.Label(header, text='   Current user: ')
-        self.identity_label.pack(side='left')
-        self.add('current-user', ttk.Label(header, text='')).pack(side='left')
-        ttk.Label(header, text='   Connection: ').pack(side='left')
-        self.add('connection-status', ttk.Label(header, text='unknown')).pack(side='left')
-        toolbar = ttk.Frame(outer)
-        toolbar.pack(fill='x', pady=6)
-        ttk.Label(toolbar, text='Development transport').pack(side='left')
-        combo = self.add('transport-mode', ttk.Combobox(toolbar, values=('online', 'offline'), state='readonly', width=10))
-        combo.set('online')
-        combo.pack(side='left', padx=6)
-        combo.bind('<<ComboboxSelected>>', self.transport)
-        self.add('reset-button', ttk.Button(toolbar, text='Reset local store', command=self.confirmation)).pack(side='left')
+        self.widget('username-input', ttk.Entry(self.login_frame, width=25)).pack(side='left', padx=5)
+        self.widget('login-button', ttk.Button(self.login_frame, text='Log in', command=self.login)).pack(side='left')
+        ttk.Label(header, text='Current user:').pack(side='left', padx=(12, 2))
+        self.widget('current-user', ttk.Label(header, text='')).pack(side='left')
+        ttk.Label(header, text='Connection:').pack(side='left', padx=(12, 2))
+        self.widget('connection-status', ttk.Label(header, text='unknown')).pack(side='left')
+        self.widget('reset-button', ttk.Button(header, text='Reset local store', command=self.ask_reset)).pack(side='right')
         self.confirm_frame = ttk.Frame(outer)
-        ttk.Label(self.confirm_frame, text='Clear this identity and all local messages?').pack(side='left')
-        self.add('reset-confirm', ttk.Button(self.confirm_frame, text='Confirm reset', command=self.reset)).pack(side='left', padx=5)
-        self.add('reset-cancel', ttk.Button(self.confirm_frame, text='Cancel', command=self.cancel_reset)).pack(side='left')
-        self.add('error-message', ttk.Label(outer, text='', foreground='#a32121', wraplength=1000)).pack(fill='x')
-        directory = ttk.LabelFrame(outer, text='Known recipients — presence is advisory', padding=5)
-        directory.pack(fill='x', pady=5)
-        bar = ttk.Frame(directory)
-        bar.pack(fill='x')
-        ttk.Label(bar, text='Filter usernames').pack(side='left')
-        entry = self.add('user-filter', ttk.Entry(bar, width=25))
-        entry.pack(side='left', padx=5)
-        entry.bind('<KeyRelease>', lambda event: self.render_directory())
-        self.add('user-refresh', ttk.Button(bar, text='Refresh', command=self.refresh)).pack(side='left')
-        ttk.Label(bar, text='  Directory: ').pack(side='left')
-        self.add('directory-status', ttk.Label(bar, text='loading')).pack(side='left')
-        ttk.Label(bar, text='  Durable receipt report: ').pack(side='left')
-        self.add('receipt-status', ttk.Label(bar, text='unknown')).pack(side='left')
-        tree = self.add('user-directory', ttk.Treeview(directory, columns=('username','presence'), show='headings', height=3))
-        tree.heading('username', text='Username')
-        tree.heading('presence', text='Recent presence')
-        tree.pack(fill='x')
-        tree.bind('<<TreeviewSelect>>', self.select_user)
-        self.feature_label = ttk.Label(directory, text='', wraplength=1000)
-        self.feature_label.pack(fill='x')
-        compose = ttk.LabelFrame(outer, text='Compose', padding=5)
+        ttk.Label(self.confirm_frame, text='Clear identity and all local messages?').pack(side='left')
+        self.widget('reset-confirm', ttk.Button(self.confirm_frame, text='Confirm reset', command=self.confirm_reset)).pack(side='left')
+        self.widget('reset-cancel', ttk.Button(self.confirm_frame, text='Cancel', command=self.cancel_reset)).pack(side='left')
+        modes = ttk.Frame(outer)
+        modes.pack(fill='x', pady=5)
+        ttk.Label(modes, text='Development transport').pack(side='left')
+        mode = self.widget('transport-mode', ttk.Combobox(modes, values=('online', 'offline'), state='readonly', width=10))
+        mode.set('online')
+        mode.pack(side='left', padx=6)
+        mode.bind('<<ComboboxSelected>>', self.change_mode)
+        for label, key in [('Presence report:', 'presence-status'), ('Directory:', 'directory-status'), ('Receipt report:', 'receipt-status')]:
+            ttk.Label(modes, text=label).pack(side='left', padx=(10, 2))
+            self.widget(key, ttk.Label(modes, text='unknown')).pack(side='left')
+        ttk.Label(outer, text='Presence reports the selected mode to the server. Real network loss may delay server Offline status.').pack(anchor='w')
+        self.widget('error-message', ttk.Label(outer, text='', foreground='#a02020', wraplength=1000)).pack(fill='x', pady=3)
+        compose = ttk.Frame(outer)
         compose.pack(fill='x')
-        row = ttk.Frame(compose)
-        row.pack(fill='x')
-        ttk.Label(row, text='Recipient').pack(side='left')
-        self.add('recipient-input', ttk.Entry(row)).pack(side='left', fill='x', expand=True, padx=5)
-        self.add('send-button', ttk.Button(row, text='Send', command=self.send)).pack(side='right')
-        self.add('message-input', tk.Text(compose, height=4, wrap='word')).pack(fill='x', pady=4)
-        ttk.Label(outer, text='Accepted by server is not a delivery/read receipt. Receipt reporting confirms durable storage, not reading.').pack(fill='x', pady=4)
-        panels = ttk.Panedwindow(outer, orient='horizontal')
-        panels.pack(fill='both', expand=True)
-        for key, title, columns in [('inbox', 'Inbox', ('sender','text','sequence')), ('outbox', 'Outgoing', ('recipient','text','state','error','local_order'))]:
-            panel = ttk.LabelFrame(panels, text=title)
-            panels.add(panel, weight=1)
-            holder = ttk.Frame(panel)
-            holder.pack(fill='both', expand=True)
-            tree = self.add(key, ttk.Treeview(holder, columns=columns, height=7))
-            tree.heading('#0', text='Message ID')
-            tree.column('#0', width=110)
+        directory = ttk.LabelFrame(compose, text='Known recipients (advisory presence)', padding=5)
+        directory.pack(side='left', fill='both', padx=(0, 10))
+        controls = ttk.Frame(directory)
+        controls.pack(fill='x')
+        filt = self.widget('user-filter', ttk.Entry(controls, width=20))
+        filt.pack(side='left')
+        filt.bind('<KeyRelease>', lambda e: self.render_directory())
+        self.widget('user-refresh', ttk.Button(controls, text='Refresh', command=self.refresh)).pack(side='left')
+        tree = self.widget('user-directory', ttk.Treeview(directory, columns=('username', 'presence'), show='headings', height=5))
+        tree.heading('username', text='Username')
+        tree.heading('presence', text='Presence')
+        tree.column('username', width=110)
+        tree.column('presence', width=130)
+        tree.pack(fill='both', expand=True)
+        tree.bind('<<TreeviewSelect>>', self.select_user)
+        form = ttk.Frame(compose)
+        form.pack(side='left', fill='both', expand=True)
+        ttk.Label(form, text='Recipient').pack(anchor='w')
+        self.widget('recipient-input', ttk.Entry(form)).pack(fill='x')
+        ttk.Label(form, text='Message (Enter inserts a newline)').pack(anchor='w')
+        self.widget('message-input', tk.Text(form, height=5, wrap='word')).pack(fill='both', expand=True)
+        self.widget('send-button', ttk.Button(form, text='Send', command=self.send)).pack(anchor='e', pady=3)
+        ttk.Label(outer, text='Accepted by server is not a delivery/read receipt. Receipt report confirms durable incoming storage, not reading.').pack(anchor='w', pady=5)
+        histories = ttk.Panedwindow(outer, orient='horizontal')
+        histories.pack(fill='both', expand=True)
+        for key, title, columns in [('inbox', 'Inbox', ('sender', 'text', 'sequence')), ('outbox', 'Outgoing', ('recipient', 'text', 'state', 'error', 'local_order'))]:
+            panel = ttk.LabelFrame(histories, text=title, padding=4)
+            histories.add(panel, weight=1)
+            rows = ttk.Frame(panel)
+            rows.pack(fill='both', expand=True)
+            rows.rowconfigure(0, weight=1)
+            rows.columnconfigure(0, weight=1)
+            table = self.widget(key, ttk.Treeview(rows, columns=columns, height=8, selectmode='browse'))
+            table.heading('#0', text='Message ID')
+            table.column('#0', width=130, stretch=False)
             for col in columns:
-                tree.heading(col, text=col.replace('_', ' ').title())
-                tree.column(col, width=140 if col in ('text','state','error') else 85)
-            y = ttk.Scrollbar(holder, orient='vertical', command=tree.yview)
-            x = ttk.Scrollbar(holder, orient='horizontal', command=tree.xview)
-            tree.configure(yscrollcommand=y.set, xscrollcommand=x.set)
-            tree.grid(row=0, column=0, sticky='nsew')
-            y.grid(row=0, column=1, sticky='ns')
-            x.grid(row=1, column=0, sticky='ew')
-            holder.rowconfigure(0, weight=1)
-            holder.columnconfigure(0, weight=1)
-            detail_frame = ttk.Frame(panel)
-            detail_frame.pack(fill='both', expand=True)
-            detail = self.add(key + '-detail', tk.Text(detail_frame, height=5, wrap='word', state='disabled'))
-            scroll = ttk.Scrollbar(detail_frame, command=detail.yview)
-            detail.configure(yscrollcommand=scroll.set)
+                table.heading(col, text=col.replace('_', ' ').title())
+                table.column(col, width=160 if col in ('text', 'error') else 110, stretch=False)
+            table.grid(row=0, column=0, sticky='nsew')
+            sy = ttk.Scrollbar(rows, orient='vertical', command=table.yview)
+            sx = ttk.Scrollbar(rows, orient='horizontal', command=table.xview)
+            table.configure(yscrollcommand=sy.set, xscrollcommand=sx.set)
+            sy.grid(row=0, column=1, sticky='ns')
+            sx.grid(row=1, column=0, sticky='ew')
+            detailframe = ttk.Frame(panel)
+            detailframe.pack(fill='both', pady=(5, 0))
+            detail = self.widget(key + '-detail', tk.Text(detailframe, height=6, wrap='word', state='disabled'))
             detail.pack(side='left', fill='both', expand=True)
+            scroll = ttk.Scrollbar(detailframe, orient='vertical', command=detail.yview)
             scroll.pack(side='right', fill='y')
-            tree.bind('<<TreeviewSelect>>', lambda event, k=key: self.show_detail(k))
+            detail.configure(yscrollcommand=scroll.set)
+            table.bind('<<TreeviewSelect>>', lambda e, k=key: self.select_message(k))
 
-    def set_composition(self, enabled):
-        for key in ('recipient-input','message-input','send-button'):
-            self.widgets[key].configure(state='normal' if enabled else 'disabled')
-
-    def action(self, operation):
+    def operation(self, action):
         try:
-            result = operation()
+            action()
             self.form_error = ''
-            self.render()
-            return result
-        except Exception as exc:
-            self.form_error = self.describe(exc)
-            self.widgets['error-message'].configure(text=self.form_error)
-            return None
+        except Exception as e:
+            self.form_error = (e.code + ': ' + e.message) if isinstance(e, ClientError) else 'STORAGE_UNAVAILABLE: ' + str(e)
+        self.render()
 
     def login(self):
         if self.client and not self.resetting:
-            self.action(lambda: self.client.login(self.widgets['username-input'].get()))
+            self.operation(lambda: self.client.login(self.widgets['username-input'].get()))
 
     def send(self):
-        if not self.client or not self.ready:
+        if not self.client or self.resetting:
             return
-        result = self.action(lambda: self.client.send(self.widgets['recipient-input'].get(), self.widgets['message-input'].get('1.0','end-1c')))
-        if result is not None:
+        def action():
+            self.client.send(self.widgets['recipient-input'].get(), self.widgets['message-input'].get('1.0', 'end-1c'))
             self.widgets['message-input'].delete('1.0', 'end')
+        self.operation(action)
 
-    def transport(self, event=None):
+    def change_mode(self, event=None):
         if self.client and not self.resetting:
-            self.action(lambda: self.client.transport(self.widgets['transport-mode'].get()))
+            self.operation(lambda: self.client.transport(self.widgets['transport-mode'].get()))
 
     def refresh(self):
         if self.client and not self.resetting:
-            self.client.wake.set()
+            self.client.refresh()
 
-    def confirmation(self):
+    def ask_reset(self):
         if not self.resetting:
-            self.confirm_frame.pack(fill='x', before=self.widgets['error-message'])
+            self.confirm_frame.pack(fill='x', after=self.widgets['reset-button'].master)
 
     def cancel_reset(self):
         self.confirm_frame.pack_forget()
 
-    def reset(self):
-        if not self.client or self.resetting:
+    def confirm_reset(self):
+        if self.resetting or self.closing:
             return
-        self.cancel_reset()
         self.resetting = True
         self.ready = False
-        self.login_frame.pack_forget()
-        self.set_composition(False)
-        for key in ('login-button','username-input','reset-button','transport-mode'):
-            self.widgets[key].configure(state='disabled')
+        self.cancel_reset()
+        self.widgets['login-button'].configure(state='disabled')
+        self.widgets['send-button'].configure(state='disabled')
+        self.widgets['reset-button'].configure(state='disabled')
+        self.widgets['username-input'].configure(state='disabled')
+        old = self.client
+        self.client = None
+        self.reset_result = None
         def work():
             try:
-                self.client.reset()
-                self.completions.put(None)
-            except Exception as exc:
-                self.completions.put(exc)
-        self.reset_thread = threading.Thread(target=work, daemon=True)
-        self.reset_thread.start()
+                if old:
+                    old.shutdown()
+                reset_files(self.state_dir)
+                replacement = Client(self.server, self.state_dir, 'online')
+                self.reset_result = (replacement, None)
+            except Exception as e:
+                self.reset_result = (None, e)
+        threading.Thread(target=work, daemon=True).start()
+        self.root.after(30, self.finish_reset)
 
-    def sync_tree(self, tree, rows):
-        wanted = {iid for iid, _, _ in rows}
-        for iid in tree.get_children():
-            if iid not in wanted:
+    def finish_reset(self):
+        if self.closing:
+            return
+        if self.reset_result is None:
+            self.root.after(30, self.finish_reset)
+            return
+        self.client, error = self.reset_result
+        self.clear_rendered()
+        self.resetting = False
+        self.widgets['reset-button'].configure(state='normal')
+        self.form_error = '' if error is None else 'STORAGE_UNAVAILABLE: ' + str(error)
+        if self.client:
+            self.render()
+            self.ready = True
+            self.client.start()
+        else:
+            self.widgets['error-message'].configure(text=self.form_error)
+
+    def clear_rendered(self):
+        self.last_snapshot = None
+        for key in ('inbox', 'outbox', 'user-directory'):
+            tree = self.widgets[key]
+            for iid in tree.get_children():
                 tree.delete(iid)
-        for index, (iid, label, values) in enumerate(rows):
-            if tree.exists(iid):
-                # Updating in place preserves focus, scroll position and selection.
-                current = tree.item(iid)
-                if current['text'] != label or tuple(map(str, current['values'])) != tuple(map(str, values)):
-                    tree.item(iid, text=label, values=values)
-                if tree.index(iid) != index:
-                    tree.move(iid, '', index)
-            else:
-                tree.insert('', 'end', iid=iid, text=label, values=values)
+        for key in ('inbox-detail', 'outbox-detail'):
+            self.set_detail(key, '')
+        for key in ('username-input', 'recipient-input', 'user-filter'):
+            self.widgets[key].configure(state='normal')
+            self.widgets[key].delete(0, 'end')
+        self.widgets['message-input'].configure(state='normal')
+        self.widgets['message-input'].delete('1.0', 'end')
 
-    def render_directory(self):
-        if self.last_snapshot is None:
-            return
-        snap = self.last_snapshot
-        query = self.widgets['user-filter'].get().lower()
-        current = snap['status']['username']
-        rows = [(u['username'], '', (u['username'], 'recently seen' if u['online'] else 'not recently seen')) for u in snap['users'] if u['username'] != current and query in u['username'].lower()]
-        self.sync_tree(self.widgets['user-directory'], rows)
+    def set_detail(self, key, text):
+        w = self.widgets[key]
+        if w.get('1.0', 'end-1c') != text:
+            w.configure(state='normal')
+            w.delete('1.0', 'end')
+            w.insert('1.0', text)
+            w.configure(state='disabled')
 
-    def select_user(self, event=None):
-        if not self.ready or not self.last_snapshot or not self.last_snapshot['status']['username']:
-            return
-        selected = self.widgets['user-directory'].selection()
-        if selected:
-            entry = self.widgets['recipient-input']
-            if str(entry.cget('state')) != 'disabled':
-                entry.delete(0, 'end')
-                entry.insert(0, selected[0])
-
-    def show_detail(self, key):
-        selected = self.widgets[key].selection()
+    def select_message(self, key):
+        tree = self.widgets[key]
+        selected = tree.selection()
         text = ''
         if selected and self.last_snapshot:
             for row in self.last_snapshot[key]:
@@ -234,83 +234,100 @@ class DesktopApp:
                 if iid == selected[0]:
                     text = row['text']
                     break
-        widget = self.widgets[key + '-detail']
-        if widget.get('1.0','end-1c') != text:
-            widget.configure(state='normal')
-            widget.delete('1.0','end')
-            widget.insert('1.0', text)
-            widget.configure(state='disabled')
+        self.set_detail(key + '-detail', text)
+
+    def select_user(self, event=None):
+        selected = self.widgets['user-directory'].selection()
+        if selected and self.client and not self.resetting:
+            entry = self.widgets['recipient-input']
+            entry.delete(0, 'end')
+            entry.insert(0, selected[0])
+
+    def reconcile_tree(self, tree, rows):
+        wanted = {iid for iid, text, values in rows}
+        for iid in tree.get_children():
+            if iid not in wanted:
+                tree.delete(iid)
+        for index, (iid, text, values) in enumerate(rows):
+            if tree.exists(iid):
+                # Avoid repeated item writes and selection events while editing.
+                if tuple(str(x) for x in tree.item(iid, 'values')) != tuple(str(x) for x in values):
+                    tree.item(iid, text=text, values=values)
+            else:
+                tree.insert('', 'end', iid=iid, text=text, values=values)
+            tree.move(iid, '', index)
+
+    def render_directory(self):
+        if not self.last_snapshot:
+            return
+        s = self.last_snapshot
+        query = self.widgets['user-filter'].get().lower()
+        rows = [(u['username'], '', (u['username'], 'recently seen' if u['online'] else 'not recently seen')) for u in s['users'] if u['username'] != s['status']['username'] and query in u['username'].lower()]
+        self.reconcile_tree(self.widgets['user-directory'], rows)
 
     def render(self):
-        if not self.client or self.resetting:
-            return
-        snap = self.client.snapshot()
-        self.last_snapshot = snap
-        status = snap['status']
-        logged = status['username'] is not None
-        self.widgets['current-user'].configure(text=status['username'] or '')
-        self.widgets['connection-status'].configure(text=status['connection'])
-        self.widgets['username-input'].configure(state='disabled' if logged else 'normal')
-        self.widgets['login-button'].configure(state='disabled' if logged else 'normal')
-        self.widgets['reset-button'].configure(state='normal')
-        self.widgets['transport-mode'].configure(state='readonly')
-        self.widgets['transport-mode'].set(status['transport'])
-        self.set_composition(logged and not status['sync_paused'])
-        error = status['last_error']
-        self.widgets['error-message'].configure(text=self.form_error or ((error['code'] + ': ' + error['message']) if error else ''))
-        for key in ('directory-status','receipt-status'):
-            self.widgets[key].configure(text=snap[key.replace('-', '_')])
-        self.feature_label.configure(text=snap['feature_error'])
-        self.sync_tree(self.widgets['inbox'], [(r['sender'] + ':' + r['message_id'], r['message_id'], (r['sender'],r['text'],r['sequence'])) for r in snap['inbox']])
-        self.sync_tree(self.widgets['outbox'], [(r['message_id'],r['message_id'],(r['recipient'],r['text'],'accepted by server' if r['state']=='accepted' else r['state'], (r['error']['code'] + ': ' + r['error']['message']) if r['error'] else '',r['local_order'])) for r in snap['outbox']])
-        self.render_directory()
-        self.show_detail('inbox')
-        self.show_detail('outbox')
-        # Expose login only after the complete durable snapshot is rendered.
-        # Reset keeps this frame hidden until the worker has finished clearing
-        # the store, so visible login always accompanies the cleared rows.
-        if logged:
-            self.login_frame.pack_forget()
-        else:
-            self.login_frame.pack(side='left', before=self.identity_label)
-
-    def tick(self):
-        if self.closing:
+        if not self.client or self.resetting or self.closing:
             return
         try:
-            if self.resetting:
-                try:
-                    result = self.completions.get_nowait()
-                except queue.Empty:
-                    pass
+            snap = self.client.snapshot()
+        except Exception as e:
+            self.widgets['error-message'].configure(text='STORAGE_UNAVAILABLE: ' + str(e))
+            return
+        self.last_snapshot = snap
+        status = snap['status']
+        # Reconcile all rows before exposing login after a reset.
+        for key in ('inbox', 'outbox'):
+            rows = []
+            for row in snap[key]:
+                if key == 'inbox':
+                    iid = row['sender'] + ':' + row['message_id']
+                    values = (row['sender'], row['text'], row['sequence'])
                 else:
-                    self.resetting = False
-                    self.form_error = '' if result is None else self.describe(result)
-                    if result is None:
-                        for key in ('username-input', 'recipient-input'):
-                            self.widgets[key].configure(state='normal')
-                            self.widgets[key].delete(0,'end')
-                        self.widgets['message-input'].configure(state='normal')
-                        self.widgets['message-input'].delete('1.0','end')
-                    self.render()
-                    self.ready = result is None
-            else:
-                self.render()
-        except Exception as exc:
-            self.widgets['error-message'].configure(text=self.describe(exc))
-        self.root.after(100, self.tick)
+                    iid = row['message_id']
+                    err = row['error']
+                    values = (row['recipient'], row['text'], 'accepted by server' if row['state'] == 'accepted' else row['state'], (err['code'] + ': ' + err['message']) if err else '', row['local_order'])
+                rows.append((iid, row['message_id'], values))
+            self.reconcile_tree(self.widgets[key], rows)
+            self.select_message(key)
+        self.render_directory()
+        self.widgets['current-user'].configure(text=status['username'] or '')
+        self.widgets['connection-status'].configure(text=status['connection'])
+        for key in ('directory', 'receipt', 'presence'):
+            self.widgets[key + '-status'].configure(text=snap[key + '_status'])
+        self.widgets['transport-mode'].set(status['transport'])
+        error = status['last_error']
+        self.widgets['error-message'].configure(text=self.form_error or (error['code'] + ': ' + error['message'] if error else ''))
+        enabled = bool(status['username']) and not status['sync_paused']
+        for key in ('recipient-input', 'message-input', 'send-button'):
+            self.widgets[key].configure(state='normal' if enabled else 'disabled')
+        if status['username']:
+            self.login_frame.pack_forget()
+        else:
+            if not self.login_frame.winfo_manager():
+                self.login_frame.pack(side='left', before=self.widgets['current-user'].master.winfo_children()[1])
+            self.widgets['username-input'].configure(state='normal')
+            self.widgets['login-button'].configure(state='normal')
+
+    def poll(self):
+        if self.closing:
+            return
+        if not self.resetting:
+            self.render()
+        self.root.after(100, self.poll)
 
     def close(self):
         if self.closing:
             return
         self.closing = True
         self.ready = False
-        try:
-            if self.reset_thread and self.reset_thread.is_alive():
-                self.client.http.cancel()
-                self.reset_thread.join(5.5)
-            if self.client:
-                # Closing cancels the same bounded transport used by all routes.
-                self.client.close()
-        finally:
-            self.root.destroy()
+        if self.client:
+            self.client.shutdown()
+            self.client = None
+        if self.resetting:
+            # A reset owns at most one bounded request; do not abandon its store.
+            import time
+            while self.reset_result is None:
+                time.sleep(0.01)
+            if self.reset_result[0]:
+                self.reset_result[0].shutdown()
+        self.root.destroy()

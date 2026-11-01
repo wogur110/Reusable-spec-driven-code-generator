@@ -307,3 +307,16 @@ class ServerGuiTests(unittest.TestCase):
         self.http(origin, '/api/v1/users', {'username': 'alice'})
         self.wait(lambda: self.w['users'].item('alice', 'values')[1] == 'Online')
         self.assertEqual(self.app.server.store.acknowledged, {})
+
+    def test_PRES02_status_changes_by_client_presence_without_messages(self):
+        origin=self.start();route='/api/v1/presence'
+        for online,label in [(True,'Online'),(False,'Offline'),(True,'Online')]:
+            self.assertEqual(self.http(origin,route,{'username':'alice','online':online})[0],200)
+            self.wait(lambda:'alice' in self.w['users'].get_children() and self.w['users'].item('alice','values')[1]==label)
+            self.assertEqual(self.text('message-count'),'0')
+        self.http(origin,route,{'username':'alice','online':False})
+        self.http(origin,'/api/v1/users',{'username':'alice'})
+        self.http(origin,'/api/v1/messages',self.message())
+        self.wait(lambda:self.text('message-count')=='1')
+        self.assertEqual(self.w['users'].item('alice','values')[1],'Offline')
+        self.assertIn('Offline choice',self.text('presence-notice'))

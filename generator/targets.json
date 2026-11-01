@@ -6,7 +6,8 @@
     "ACCEPTANCE.md"
   ],
   "extensions": [
-    "DIRECTORY.md"
+    "DIRECTORY.md",
+    "PRESENCE.md"
   ],
   "context_files": [
     "Instruction_for_Agent.md",

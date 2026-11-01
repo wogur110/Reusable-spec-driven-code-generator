@@ -74,3 +74,6 @@ REQ-RECEIPT-01: Clients report only durably committed receive progress through i
 REQ-ACTIVITY-01: Server selection exposes that user’s accepted Sent, acknowledged Received, and inbound Queued messages with exact details. The user explicitly chose queued=server-accepted awaiting recipient acknowledgment; offline client queues are unknown. No outbox telemetry or account/message administration.
 
 These requirements are defined by the registered [DIRECTORY.md](DIRECTORY.md) extension. P10’s source cell stays blank; the later explicit request supplies this feature. Both earlier GUI requests remain implemented. Existing client version-1 data and messaging behavior must survive regeneration without migration.
+
+
+CHG-004 adds REQ-PRESENCE-01: client mode changes explicitly update server presence independently of other-user traffic, with bounded notification and heartbeat fallback. REQ-WEB-UI-02: compact desktop-style browser workflow with side-by-side history and exact detail panes, responsive on small screens. No USER preferences or storage schemas change.

@@ -75,3 +75,34 @@ class DirectoryProtocolTests(unittest.TestCase):
         self.assertEqual(self.api('GET','/api/v1/users')[1],{'users':[]})
         self.api('POST','/api/v1/messages',self.message())
         self.assertEqual(self.api('POST','/api/v1/receipts',{'recipient':'bob','through':0})[1]['through'],0)
+
+    def test_PRES01_explicit_offline_latch_and_online_expiry(self):
+        route='/api/v1/presence'
+        for online in [True,False,False]:
+            self.assertEqual(self.api('POST',route,{'username':'bob','online':online}),(200,{'username':'bob','online':online}))
+        self.api('POST','/api/v1/users',{'username':'bob'})
+        self.api('POST','/api/v1/messages',self.message())
+        self.api('POST','/api/v1/receipts',{'recipient':'bob','through':0})
+        self.assertEqual(self.api('GET','/api/v1/users')[1]['users'],[{'username':'alice','online':False},{'username':'bob','online':False}])
+        self.assertEqual(self.server.snapshot('bob')['activity']['queued'][0]['state'],'queued')
+        self.api('POST',route,{'username':'bob','online':True})
+        self.clock[0]+=14.999
+        self.assertTrue(self.api('GET','/api/v1/users')[1]['users'][1]['online'])
+        self.clock[0]+=.001
+        self.assertFalse(self.api('GET','/api/v1/users')[1]['users'][1]['online'])
+        self.api('POST','/api/v1/users',{'username':'bob'})
+        self.assertTrue(self.api('GET','/api/v1/users')[1]['users'][1]['online'])
+        self.assertEqual(self.server.store.acknowledged,{'bob':0})
+
+    def test_PRES01_invalid_presence_never_mutates_directory(self):
+        route='/api/v1/presence'
+        for body in [[],{}, {'username':'alice'}, {'username':'alice','online':True,'extra':1}]:
+            self.error(self.api('POST',route,body),400,'INVALID_FIELDS')
+        self.error(self.api('POST',route,{'username':'Alice','online':True}),400,'INVALID_USERNAME','username')
+        for value in [None,0,1,'false',[],{}]:
+            self.error(self.api('POST',route,{'username':'alice','online':value}),400,'INVALID_PRESENCE','online')
+        self.error(self.api('POST',route,raw=b'{"username":"alice","online":true,"online":false}'),400,'INVALID_JSON')
+        self.error(self.api('POST',route,raw=b'{}',headers={'Content-Type':'text/plain'}),415,'UNSUPPORTED_MEDIA_TYPE')
+        self.error(self.api('POST',route+'?x=1',{}),400,'INVALID_QUERY')
+        self.error(self.api('GET',route),405,'METHOD_NOT_ALLOWED')
+        self.assertEqual(self.api('GET','/api/v1/users'),(200,{'users':[]}))

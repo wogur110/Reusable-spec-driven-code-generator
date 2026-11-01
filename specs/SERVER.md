@@ -32,3 +32,8 @@ The registered [DIRECTORY.md](DIRECTORY.md) contract adds a shared directory and
 ### Server user Online/Offline display
 
 The Users directory's presence column is titled **Status** and displays **Online** for online=true and **Offline** for online=false. These labels use the existing 15-second announcement timeout, not guaranteed network reachability. Show a visible presence notice explaining that Online means a heartbeat within the last 15 seconds and Offline means none; detection may lag a disconnection. Known users who never announced are Offline. Automatic refresh updates expiry/reconnection without operator intervention and preserves user selection/activity. Add a `presence-notice` Label to app.widgets. This server-only presentation refinement leaves client labels, wire behavior, and receipt classification unchanged.
+
+
+## CHG-004 explicit presence override
+
+The registered [PRESENCE.md](PRESENCE.md) extension adds explicit mode notifications and overrides heartbeat-only presence and the blanket offline-request prohibition within its defined bounds. Preserve all other contracts.

@@ -128,3 +128,8 @@ Server process restart discards all streams, receipts, and counters. Even when a
 ## Active CHG-003 extension
 
 [DIRECTORY.md](DIRECTORY.md) adds users/receipts routes, Error fields username/through, INVALID_RECEIPT, and serialized auxiliary work after the original send/receive cycle. Its exact scheduling, validation and acknowledgment rules supersede the baseline two-request-only cycle above. Legacy message payloads, health version, send acceptance states and client storage schemas remain unchanged. Server restart here includes Stop/Start inside the management process.
+
+
+## CHG-004 explicit presence override
+
+The registered [PRESENCE.md](PRESENCE.md) extension adds explicit mode notifications and overrides heartbeat-only presence and the blanket offline-request prohibition within its defined bounds. Preserve all other contracts.
