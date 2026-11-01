@@ -1,7 +1,1 @@
-{
-  "compilerOptions": {
-    "target": "ES2022", "module": "ES2022", "lib": ["ES2022", "DOM"],
-    "strict": true, "rootDir": "src", "outDir": "dist", "noEmitOnError": true
-  },
-  "include": ["src/**/*.ts"]
-}
+{"compilerOptions":{"target":"ES2022","module":"ES2022","moduleResolution":"Bundler","lib":["ES2022","DOM"],"strict":true,"outDir":"dist/src","rootDir":"src","noEmitOnError":true},"include":["src/**/*.ts"]}

@@ -5,7 +5,7 @@ Use this queue after reviewing the project to request deliberate changes. Saving
 ## Active requests
 
 <!-- CHANGE_REQUESTS:BEGIN -->
-No active requests. Completed requests are archived in [docs/CHANGES.md](docs/CHANGES.md).
+No active requests yet.
 <!-- CHANGE_REQUESTS:END -->
 
 ## How to write a request

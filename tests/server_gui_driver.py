@@ -25,8 +25,9 @@ def poll():
                 if command=='snapshot':
                     data={'widgets':{},'messages':[]}
                     for name,w in app.widgets.items():
-                        if name=='messages':data['messages']=[list(w.item(i,'values')) for i in w.get_children()]
-                        elif name in ('requests','message-detail'):continue
+                        if w.winfo_class()=='Treeview':data[name]=[list(w.item(i,'values')) for i in w.get_children()]
+                        elif w.winfo_class()=='TNotebook':continue
+                        elif isinstance(w,tk.Text):data['widgets'][name]={'text':w.get('1.0','end-1c')}
                         else:data['widgets'][name]={'text':w.get() if hasattr(w,'get') else str(w.cget('text'))}
                 elif command=='click':
                     w=app.widgets[request['widget']]
@@ -34,6 +35,11 @@ def poll():
                     w.invoke()
                 elif command=='fill':
                     w=app.widgets[request['widget']];w.delete(0,'end');w.insert(0,request['text'])
+                    if request['widget']=='user-filter':w.focus_force();w.event_generate('<KeyRelease>')
+                elif command=='row':
+                    w=app.widgets[request['widget']];w.selection_set(request['iid']);w.event_generate('<<TreeviewSelect>>')
+                elif command=='tab':
+                    w=app.widgets[request['widget']];w.select(next(t for t in w.tabs() if w.tab(t,'text')==request['text']))
                 elif command=='close':
                     root.tk.call(root.protocol('WM_DELETE_WINDOW'))
                     emit({'type':'result','id':request['id'],'ok':True,'data':{}})

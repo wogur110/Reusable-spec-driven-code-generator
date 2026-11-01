@@ -222,3 +222,62 @@ class ServerGuiTests(unittest.TestCase):
         finally:
             if child.poll() is None:child.kill();child.wait(timeout=3)
             child.stdout.close();child.stderr.close()
+
+    def test_DIR03_select_filter_refresh_and_receipt_categories(self):
+        origin=self.start();w=self.w
+        # Tests operate actual tabs, entries, tree selection and buttons.
+        tabs=w['server-tabs'];tabs.select(next(t for t in tabs.tabs() if tabs.tab(t,'text')=='Users'));self.root.update()
+        for name in ['alice','bob']:
+            self.assertEqual(self.http(origin,'/api/v1/users',{'username':name})[0],200)
+        message=self.message();self.http(origin,'/api/v1/messages',message)
+        self.wait(lambda:'bob' in w['users'].get_children())
+        w['users'].selection_set('bob');w['users'].event_generate('<<TreeviewSelect>>')
+        self.wait(lambda:self.text('user-queued-count')=='1')
+        self.assertEqual(self.text('user-received-count'),'0');self.assertEqual(self.text('user-sent-count'),'0')
+        w['user-refresh'].invoke();self.root.update()
+        self.assertEqual(self.text('user-queued-count'),'1')
+        self.http(origin,'/api/v1/messages?recipient=bob&after=0')
+        w['user-refresh'].invoke();self.root.update()
+        self.assertEqual(self.text('user-queued-count'),'1')
+        self.assertIn('Offline client queues: unknown',self.text('queue-notice'))
+        activity=w['activity-tabs'];activity.select(next(t for t in activity.tabs() if activity.tab(t,'text')=='Queued'));self.root.update()
+        iid='alice:'+message['message_id'];w['user-queued'].selection_set(iid);w['user-queued'].event_generate('<<TreeviewSelect>>');self.root.update()
+        self.assertEqual(w['user-message-detail'].get('1.0','end-1c'),message['text'])
+        self.http(origin,'/api/v1/receipts',{'recipient':'bob','through':1})
+        self.wait(lambda:self.text('user-received-count')=='1')
+        self.assertEqual(self.text('user-queued-count'),'0')
+        w['users'].selection_set('alice');w['users'].event_generate('<<TreeviewSelect>>')
+        self.wait(lambda:self.text('user-sent-count')=='1')
+        self.assertEqual(w['user-sent'].item(iid,'values')[3],'received')
+        self.fill('user-filter','BO');w['user-filter'].focus_force();w['user-filter'].event_generate('<KeyRelease>');self.root.update()
+        self.assertEqual(w['users'].get_children(),('bob',));self.assertEqual(self.text('selected-user'),'')
+        self.assertEqual(self.text('user-sent-count'),'0')
+
+    def test_DIR03_per_user_history_exceeds_global_window(self):
+        origin=self.start();w=self.w
+        for n in range(205):self.http(origin,'/api/v1/messages',self.message(str(n)))
+        self.wait(lambda:'bob' in w['users'].get_children())
+        w['users'].selection_set('bob');w['users'].event_generate('<<TreeviewSelect>>')
+        self.wait(lambda:self.text('user-queued-count')=='205')
+        self.assertEqual(len(w['user-queued'].get_children()),205)
+        self.http(origin,'/api/v1/receipts',{'recipient':'bob','through':200})
+        self.wait(lambda:self.text('user-received-count')=='200')
+        self.assertEqual(self.text('user-queued-count'),'5')
+        self.assertEqual(len(w['messages'].get_children()),200)
+
+    def test_DIR08_restart_clears_directory_acknowledgments_and_selection(self):
+        origin=self.start();w=self.w
+        self.http(origin,'/api/v1/messages',self.message())
+        self.http(origin,'/api/v1/receipts',{'recipient':'bob','through':1})
+        self.wait(lambda:'bob' in w['users'].get_children())
+        w['users'].selection_set('bob');w['users'].event_generate('<<TreeviewSelect>>')
+        self.wait(lambda:self.text('user-received-count')=='1')
+        w['stop-button'].invoke();self.wait(lambda:self.text('server-status')=='Stopped')
+        self.assertEqual(w['users'].get_children(),());self.assertEqual(self.text('selected-user'),'')
+        self.assertEqual(self.text('user-received-count'),'0')
+        origin=self.start();self.assertEqual(json.loads(self.http(origin,'/api/v1/users')[1]),{'users':[]})
+        self.http(origin,'/api/v1/messages',self.message())
+        self.wait(lambda:'bob' in w['users'].get_children())
+        w['users'].selection_set('bob');w['users'].event_generate('<<TreeviewSelect>>')
+        self.wait(lambda:self.text('user-queued-count')=='1')
+        self.assertEqual(self.text('user-received-count'),'0')

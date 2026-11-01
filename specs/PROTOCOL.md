@@ -66,7 +66,7 @@ Under the same store lock, return at most the first 100 messages with sequence g
 {"messages":[{"message_id":"11111111-1111-4111-8111-111111111111","sender":"alice","recipient":"bob","text":"Hi Bob, I have something important to tell you","sequence":1}],"next_after":1}
 ```
 
-There is no separate recipient acknowledgment endpoint; GET does not imply receipt was durably stored.
+The registered [DIRECTORY.md](DIRECTORY.md) extension adds an explicit durable-recipient acknowledgment endpoint. GET alone still does not imply durable receipt.
 
 ### Other requests and static assets
 
@@ -124,3 +124,7 @@ Malformed pages, GET transport/errors other than a valid 409 CURSOR_INVALID, or 
 Development offline mode blocks new requests before dispatch, while enqueue and snapshots continue. An in-flight request may already have reached the server; its uncertainty uses normal retry/deduplication behavior. External faults must exercise that same path. Only explicit reset invalidates all old asynchronous responses; a reset completion must not be followed by a stale write.
 
 Server process restart discards all streams, receipts, and counters. Even when an old cursor happens to be numerically valid on a new server, this version cannot reconcile sessions. A fresh server session requires explicit fresh/reset client stores. There is no cross-session delivery guarantee.
+
+## Active CHG-003 extension
+
+[DIRECTORY.md](DIRECTORY.md) adds users/receipts routes, Error fields username/through, INVALID_RECEIPT, and serialized auxiliary work after the original send/receive cycle. Its exact scheduling, validation and acknowledgment rules supersede the baseline two-request-only cycle above. Legacy message payloads, health version, send acceptance states and client storage schemas remain unchanged. Server restart here includes Stop/Start inside the management process.

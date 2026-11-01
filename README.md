@@ -2,12 +2,14 @@
 
 A reusable agentic harness that turns written specifications into independent Python and TypeScript clients. A local messaging application provides a concrete example of offline queues, durable client state, and interoperability.
 
-**Status: CHG-001 and CHG-002 complete.** All 65 acceptance tests and nine harness guards pass. Clean regeneration passed the same 65 tests inside the harness and again standalone. The user confirmed that both changes work well; detailed manual observations remain unrecorded. [Status and evidence](docs/STATUS.md) records actual results.
+**Status: CHG-001, CHG-002 and CHG-003 complete.** All 80 acceptance tests and nine harness guards pass. Clean regeneration passed the same 80 tests inside the harness and again standalone. CHG-003 manual review remains pending. [Status and evidence](docs/STATUS.md) records actual results.
 
 ## Change summary
 
 - **CHG-001:** Replaced the Python terminal interface with a desktop GUI, preserved existing stored data and the headless interface, and added GUI tests and setup instructions. Automated verification and clean regeneration passed.
 - **CHG-002:** Added a desktop window to start, stop, and monitor the local server, with session status, message activity, and GUI integration tests. Automated verification and clean regeneration passed.
+
+- **CHG-003:** Adds shared recipient discovery, click-to-address, and per-user server activity with durable receipt acknowledgments. Offline client queues remain unknown to the server. See [manual verification](TESTING.md#shared-directory-and-user-activity-chg-003).
 
 See [docs/CHANGES.md](docs/CHANGES.md) for the full change history and verification evidence.
 

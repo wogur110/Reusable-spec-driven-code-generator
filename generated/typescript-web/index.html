@@ -1,16 +1,13 @@
 <!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Local Messenger</title><link rel="stylesheet" href="./styles.css"></head>
-<body><main data-testid="app-ready" data-ready="false">
-<header><h1>Local Messenger</h1><p>Durable messages for one local server session.</p></header>
-<p data-testid="connection-status" data-state="unknown" role="status">Unknown connection</p>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Local Messenger</title><link rel="stylesheet" href="./styles.css"></head>
+<body><main data-testid="app-ready" data-ready="false"><header><h1>Local Messenger</h1><p>Persistent messages for one local server session.</p></header>
 <p data-testid="error-message" role="alert"></p>
-<form id="login-form"><label>Username<input data-testid="username-input" autocomplete="off" spellcheck="false"></label><button data-testid="login-button" disabled>Log in</button></form>
-<p id="identity" hidden>Signed in as <strong data-testid="current-user"></strong></p>
-<form id="send-form"><label>Recipient<input data-testid="recipient-input" autocomplete="off" spellcheck="false" disabled></label><label>Message<textarea data-testid="message-input" rows="4" disabled></textarea></label><button data-testid="send-button" disabled>Send</button></form>
-<p>Accepted by server is not delivery or read confirmation.</p>
-<div class="settings"><label>Development transport <select data-testid="transport-mode"><option value="online">online</option><option value="offline">offline</option></select></label><button type="button" data-testid="reset-button" disabled>Reset local store</button></div>
-<section id="reset-panel" hidden><p>Clear this application's identity and all local messages? Use fresh stores after a server restart.</p><button type="button" data-testid="reset-confirm">Confirm reset</button><button type="button" data-testid="reset-cancel">Cancel</button></section>
-<div class="columns"><section><h2>Inbox</h2><div data-testid="inbox"></div></section><section><h2>Outgoing messages</h2><div data-testid="outbox"></div></section></div>
-<footer>Use one active tab per identity. Keep this server running: restarting it loses server messages. Browser storage is specific to this origin and profile. Closed tabs do not synchronize.</footer>
-</main><script type="module" src="./main.js"></script></body></html>
+<form id="login-form"><label>Username <input data-testid="username-input" autocomplete="username"></label><button data-testid="login-button">Log in</button></form>
+<p>Current user: <strong data-testid="current-user"></strong></p>
+<div class="toolbar"><label>Development transport <select data-testid="transport-mode"><option value="online">online</option><option value="offline">offline</option></select></label><span data-testid="connection-status" data-state="unknown">unknown</span><button data-testid="reset-button" type="button">Reset local store</button></div>
+<div id="reset-panel" hidden><p>Clear this application's identity and all local messages?</p><button data-testid="reset-confirm">Confirm reset</button><button id="reset-cancel">Cancel</button></div>
+<section><h2>Known recipients</h2><label>Filter users <input data-testid="user-filter"></label><button data-testid="user-refresh">Refresh</button><p>Directory: <span data-testid="directory-status">loading</span></p><div data-testid="user-directory"></div><p>Durable receipt report: <span data-testid="receipt-status">unknown</span></p><p id="feature-detail"></p></section>
+<form id="compose"><h2>Compose</h2><label>Recipient <input data-testid="recipient-input" autocomplete="off" disabled></label><label>Message <textarea data-testid="message-input" rows="4" disabled></textarea></label><button data-testid="send-button" disabled>Send</button></form>
+<div class="columns"><section><h2>Inbox</h2><div data-testid="inbox"></div></section><section><h2>Outgoing</h2><div data-testid="outbox"></div></section></div>
+<footer>Server acceptance is not delivery or read confirmation. Receipt reports describe durable storage, not reading. Use one active tab per identity. After restarting the server, reset client stores. Assets must be reachable to reload this page.</footer>
+</main><script type="module" src="./src/main.js"></script></body></html>

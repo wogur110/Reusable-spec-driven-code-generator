@@ -57,10 +57,20 @@ One running server instance defines a demonstration session; a GUI Stop followed
 
 The receive guarantee is one visible inbox row per `(sender,message_id)` under a continuing server session and intact local store, despite retries and normal restarts. It does not promise exactly-once network delivery, server crash recovery, or delivery after local state is lost. Messages accepted by the server remain available when their recipient is offline.
 
-An already-loaded browser page can queue during an API outage; first load or reload requires its local assets to be reachable. Closed-tab/closed-process delivery and reliable background-tab timing are excluded. Reopening or activating a client resumes synchronization. Unknown wire fields are rejected until an extension is explicitly registered and reconciled. No labels, search, attachments, or group feature is selected.
+An already-loaded browser page can queue during an API outage; first load or reload requires its local assets to be reachable. Closed-tab/closed-process delivery and reliable background-tab timing are excluded. Reopening or activating a client resumes synchronization. Unknown wire fields are rejected until an extension is explicitly registered and reconciled. No message labels, message-content search, attachments, or group feature is selected; CHG-003 adds only local username filtering.
 
 Platform contracts: [PYTHON.md](PYTHON.md), [TYPESCRIPT.md](TYPESCRIPT.md). Requirement coverage: [ACCEPTANCE.md](ACCEPTANCE.md).
 
 ## CHG-002 server operation
 
 REQ-SERVER-UI-01: Provide an optional local Tkinter/ttk server control window for starting, stopping, and monitoring the same retained HTTP server. Follow [SERVER.md](SERVER.md) for lifecycle, controls, monitoring, and error behavior. The terminal server, wire protocol, independent clients, and client stores remain compatible. Each new server instance starts empty, even within one GUI process. Source: explicit CHG-002; no USER preference cell changes.
+
+## CHG-003 directory and activity requirements
+
+REQ-DIR-01: All three GUIs show the shared session directory, allow local username filtering and refresh, and distinguish advisory recent presence from reachability. Both clients allow click-to-address without automatic send, preserving manual addressing and drafts.
+
+REQ-RECEIPT-01: Clients report only durably committed receive progress through idempotent cumulative acknowledgments. GET, server acceptance, online status and operator inspection are not receipt/read confirmation.
+
+REQ-ACTIVITY-01: Server selection exposes that user’s accepted Sent, acknowledged Received, and inbound Queued messages with exact details. The user explicitly chose queued=server-accepted awaiting recipient acknowledgment; offline client queues are unknown. No outbox telemetry or account/message administration.
+
+These requirements are defined by the registered [DIRECTORY.md](DIRECTORY.md) extension. P10’s source cell stays blank; the later explicit request supplies this feature. Both earlier GUI requests remain implemented. Existing client version-1 data and messaging behavior must survive regeneration without migration.

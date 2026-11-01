@@ -105,3 +105,7 @@ An error result is `{"type":"result","id":"send-1","ok":false,"error":{"code":"S
 Emit ready exactly once after successful initialization: `{"type":"event","event":"ready","username":null,"transport":"online","cursor":0}` (use actual restored values). After committed identity/outbox/inbox changes, emit `{"type":"event","event":"state_changed","revision":1}` with a process-local increasing revision; coalescing changes is allowed. Events may interleave with results; send success still implies committed enqueue. Emit `{"type":"event","event":"shutdown"}` before ordinary exit, after storage closes. Tests observe snapshots rather than depend on exact event counts. No separate test-only messaging implementation or mutation API is allowed.
 
 Verification coverage is defined in [ACCEPTANCE.md](ACCEPTANCE.md), including both human usability and machine-driven behavior.
+
+## CHG-003 directory and receipt extension
+
+Implement the explicitly registered [DIRECTORY.md](DIRECTORY.md) contract and its platform-specific selectors. It extends serialized scheduling and GUI observation, without changing version-1 durable storage, existing selectors, or the machine interface. Keep auxiliary errors separate from ordinary messaging errors and apply the same reset-generation guard to every response. Receipt progress comes only from committed inbox/cursor metadata; never infer it from display or a downloaded page.

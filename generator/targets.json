@@ -5,7 +5,9 @@
     "PROTOCOL.md",
     "ACCEPTANCE.md"
   ],
-  "extensions": [],
+  "extensions": [
+    "DIRECTORY.md"
+  ],
   "context_files": [
     "Instruction_for_Agent.md",
     "README.md",

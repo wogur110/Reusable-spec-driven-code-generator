@@ -23,3 +23,7 @@ Refresh within one second while running. Count completed HTTP responses and resp
 ## Retained automation contract
 
 `server.gui.ServerApp(root, port=8765, static_dir=None)` builds the production controls; main launches this same class. `app.widgets` exposes actual widgets: port-input, static-input, start-button, stop-button, open-browser, server-status, server-url, session-id, session-notice, error-message, message-count, response-count, error-count, messages, message-detail, requests. The messages Treeview has columns sender, recipient, message_id, sequence, text; requests columns method, path, status. Read-only observation is permitted; tests invoke real widget actions, not internal start/stop methods. Window closing exercises the production WM_DELETE_WINDOW callback. Existing client drivers remain independent.
+
+## CHG-003 Users view
+
+The registered [DIRECTORY.md](DIRECTORY.md) contract adds a shared directory and observational per-user Sent/Received/Queued views with filtering and refresh. It defines cumulative durable receipt reports and the exact new GUI controls. Preserve this document’s lifecycle, startup, error, close and global Overview contracts. The selected user activity comes from one locked snapshot; Stop/Start clears all directory/receipt observations.

@@ -37,23 +37,37 @@ async function server() {
 }
 
 async function proxy(origin) {
-  const mode = {}; const history = []; const assetHistory = []; const timers = new Set();
+  const mode = {}; const history = []; const apiHistory = []; const auxiliaryHistory = []; const assetHistory = []; const timers = new Set();
   const listener = http.createServer(async (req, res) => {
     const chunks = []; for await (const chunk of req) chunks.push(chunk);
     const body = Buffer.concat(chunks);
     const api = req.url.startsWith('/api/');
+    const route=req.url.split('?')[0];
+    const messageApi=route==='/api/v1/messages';
+    const directory=route==='/api/v1/users';
+    const acknowledgment=route==='/api/v1/receipts';
     const entry = { method: req.method, url: req.url, body: body.toString(), failed: false };
-    if (api) history.push(entry); else assetHistory.push(entry);
+    // Preserve existing message-only fault assertions; expose every API attempt separately.
+    if (api) { apiHistory.push(entry); (messageApi ? history : auxiliaryHistory).push(entry); } else assetHistory.push(entry);
     const fail = (error) => { entry.failed = true; entry.error = error ? {code:error.code,message:error.message} : {code:'INJECTED_OUTAGE'}; if (!res.writableEnded && !res.destroyed) req.socket.destroy(); };
     if (api && mode.offline) return fail();
     const reply = (status, value, headers = {}) => {
       const data = typeof value === 'string' ? value : JSON.stringify(value);
       res.writeHead(status, { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data), ...headers }); res.end(data);
     };
-    if (api && req.method === 'POST' && mode.postStatus) {
+    if (acknowledgment && mode.blockReceipts) return fail();
+    if (acknowledgment && mode.ackStatus) return reply(mode.ackStatus,{error:{code:'INVALID_RECEIPT',message:'Injected receipt failure.',field:'through'}});
+    if (directory && req.method==='POST' && mode.announceStatus) return reply(mode.announceStatus,{error:{code:'INTERNAL_ERROR',message:'Injected announcement failure.',field:null}});
+    if (directory && req.method==='GET' && mode.usersPage !== undefined) {
+      const value=mode.usersPage;
+      const deliver=()=>{entry.delivered=true;if(!res.destroyed)reply(mode.usersStatus || 200,value);};
+      if(mode.directoryDelay){entry.held=true;entry.response=JSON.stringify(value);const timer=setTimeout(()=>{timers.delete(timer);deliver();},mode.directoryDelay);timers.add(timer);return;}
+      return deliver();
+    }
+    if (messageApi && req.method === 'POST' && mode.postStatus) {
       return reply(mode.postStatus, mode.errorBody ?? {error:{code:'INVALID_TEXT',message:'Injected rejection.',field:'text'}}, mode.postStatus === 302 ? {Location:'/api/v1/messages'} : {});
     }
-    if (api && req.method === 'GET' && mode.page) return reply(mode.getStatus || 200, typeof mode.page === 'function' ? mode.page(req.url) : mode.page);
+    if (messageApi && req.method === 'GET' && mode.page) return reply(mode.getStatus || 200, typeof mode.page === 'function' ? mode.page(req.url) : mode.page);
     const forward = () => {
       // The retained server closes each response; never pool its upstream sockets.
       const upstream = http.request(new URL(req.url, origin), { agent: false, method: req.method, headers: {...req.headers, host: new URL(origin).host, connection:'close'} }, response => {
@@ -62,10 +76,11 @@ async function proxy(origin) {
           entry.status = response.statusCode;
           const payload = Buffer.concat(data); if (api) entry.response = payload.toString();
           // Static diagnostics must not expose another client's source to repairs.
-          if (api && req.method === 'POST' && mode.dropAck) { mode.dropAck = false; return fail(); }
-          if (api && req.method === 'POST' && mode.receipt !== undefined) return reply(201, mode.receipt);
+          if (acknowledgment && mode.dropReceiptAck) { mode.dropReceiptAck=false; return fail(); }
+          if (messageApi && req.method === 'POST' && mode.dropAck) { mode.dropAck = false; return fail(); }
+          if (messageApi && req.method === 'POST' && mode.receipt !== undefined) return reply(201, mode.receipt);
           const deliver = () => { entry.delivered = true; if (!res.destroyed) { res.writeHead(response.statusCode, response.headers); res.end(payload); } };
-          if (api && req.method === 'GET' && mode.getResponseDelay) {
+          if (messageApi && req.method === 'GET' && mode.getResponseDelay) {
             entry.held = true;
             const timer = setTimeout(() => { timers.delete(timer); deliver(); }, mode.getResponseDelay); timers.add(timer);
           } else deliver();
@@ -74,12 +89,12 @@ async function proxy(origin) {
       upstream.on('error', fail); req.on('error', () => upstream.destroy());
       upstream.end(body);
     };
-    if (api && req.method === 'POST' && mode.delay) {
+    if (messageApi && req.method === 'POST' && mode.delay) {
       const timer = setTimeout(() => { timers.delete(timer); if (!res.destroyed) forward(); }, mode.delay); timers.add(timer);
     } else forward();
   });
   await new Promise(resolve => listener.listen(0, '127.0.0.1', resolve));
-  return { mode, history, assetHistory, origin:`http://127.0.0.1:${listener.address().port}`,
+  return { mode, history, apiHistory, auxiliaryHistory, assetHistory, origin:`http://127.0.0.1:${listener.address().port}`,
     async close() { for (const t of timers) clearTimeout(t); listener.closeAllConnections(); await new Promise(r => listener.close(r)); } };
 }
 

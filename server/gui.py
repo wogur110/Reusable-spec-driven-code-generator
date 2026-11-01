@@ -56,6 +56,12 @@ class ServerApp:
         w['session-notice'].grid(row=9,column=0,columnspan=2,sticky='ew',pady=8)
         w['error-message'] = ttk.Label(frame,text='',foreground='#a00000',wraplength=950)
         w['error-message'].grid(row=10,column=0,columnspan=2,sticky='ew')
+        frame.rowconfigure(11, weight=1)
+        tabs = w['server-tabs'] = ttk.Notebook(frame)
+        tabs.grid(row=11, column=0, columnspan=2, sticky='nsew')
+        overview = ttk.Frame(tabs); users_panel = ttk.Frame(tabs)
+        tabs.add(overview, text='Overview'); tabs.add(users_panel, text='Users')
+        frame = overview; frame.columnconfigure(1, weight=1)
         for row, name, title, columns in [(11,'messages','Latest 200 accepted messages',('sender','recipient','message_id','sequence','text')),(14,'requests','Latest 200 HTTP responses',('method','path','status'))]:
             box = ttk.LabelFrame(frame,text=title,padding=4)
             box.grid(row=row,column=0,columnspan=2,sticky='nsew',pady=6)
@@ -79,8 +85,98 @@ class ServerApp:
         hs=ttk.Scrollbar(detailbox,orient='horizontal',command=w['message-detail'].xview);hs.grid(row=1,column=0,sticky='ew')
         w['message-detail'].configure(yscrollcommand=vs.set,xscrollcommand=hs.set)
         w['messages'].bind('<<TreeviewSelect>>',self.show_detail)
+        self.build_users(users_panel)
         self.set_state('Stopped')
         self.after_id = root.after(50,self.poll)
+
+    def build_users(self, parent):
+        import tkinter as tk
+        from tkinter import ttk
+        w=self.widgets
+        parent.columnconfigure(1,weight=1);parent.rowconfigure(2,weight=1)
+        bar=ttk.Frame(parent,padding=5);bar.grid(row=0,column=0,columnspan=2,sticky='ew')
+        ttk.Label(bar,text='Filter known users').pack(side='left')
+        w['user-filter']=ttk.Entry(bar);w['user-filter'].pack(side='left',fill='x',expand=True,padx=6)
+        w['user-filter'].bind('<KeyRelease>',lambda _:self.refresh() if self.state=='Running' else None)
+        w['user-refresh']=ttk.Button(bar,text='Refresh',command=lambda:self.refresh() if self.state=='Running' else None)
+        w['user-refresh'].pack(side='left')
+        w['directory-status']=ttk.Label(bar,text='stopped');w['directory-status'].pack(side='left',padx=6)
+        w['queue-notice']=ttk.Label(parent,text='Queued = accepted, awaiting recipient acknowledgment. Received = recipient-reported durable storage, not read confirmation. Offline client queues: unknown.',wraplength=950)
+        w['queue-notice'].grid(row=1,column=0,columnspan=2,sticky='ew',padx=5,pady=5)
+        usersbox=ttk.Frame(parent,padding=5);usersbox.grid(row=2,column=0,sticky='nsew')
+        usersbox.rowconfigure(0,weight=1);usersbox.columnconfigure(0,weight=1)
+        tree=w['users']=ttk.Treeview(usersbox,columns=('username','presence'),show='headings',selectmode='browse',height=8)
+        tree.heading('username',text='Username');tree.heading('presence',text='Recent activity')
+        tree.column('username',width=100);tree.column('presence',width=130)
+        tree.grid(row=0,column=0,sticky='nsew')
+        scroll=ttk.Scrollbar(usersbox,orient='vertical',command=tree.yview);scroll.grid(row=0,column=1,sticky='ns');tree.configure(yscrollcommand=scroll.set)
+        tree.bind('<<TreeviewSelect>>',lambda _:self.refresh() if self.state=='Running' else None)
+        right=ttk.Frame(parent,padding=5);right.grid(row=2,column=1,sticky='nsew');right.columnconfigure(0,weight=1);right.rowconfigure(1,weight=1)
+        summary=ttk.Frame(right);summary.grid(row=0,column=0,sticky='ew')
+        ttk.Label(summary,text='Selected user:').pack(side='left')
+        w['selected-user']=ttk.Label(summary,text='');w['selected-user'].pack(side='left',padx=5)
+        for name in ('sent','received','queued'):
+            ttk.Label(summary,text=name.title()+':').pack(side='left',padx=(7,0))
+            w['user-'+name+'-count']=ttk.Label(summary,text='0');w['user-'+name+'-count'].pack(side='left')
+        tabs=w['activity-tabs']=ttk.Notebook(right);tabs.grid(row=1,column=0,sticky='nsew',pady=5)
+        for name in ('sent','received','queued'):
+            box=ttk.Frame(tabs);tabs.add(box,text=name.title());box.rowconfigure(0,weight=1);box.columnconfigure(0,weight=1)
+            columns=('peer','message_id','sequence','state','text')
+            tree=w['user-'+name]=ttk.Treeview(box,columns=columns,show='headings',height=8)
+            for col in columns:
+                tree.heading(col,text=col.replace('_',' ').title());tree.column(col,width=230 if col in ('message_id','text') else 100,stretch=True)
+            tree.grid(row=0,column=0,sticky='nsew')
+            vs=ttk.Scrollbar(box,orient='vertical',command=tree.yview);vs.grid(row=0,column=1,sticky='ns')
+            hs=ttk.Scrollbar(box,orient='horizontal',command=tree.xview);hs.grid(row=1,column=0,sticky='ew')
+            tree.configure(yscrollcommand=vs.set,xscrollcommand=hs.set)
+            tree.bind('<<TreeviewSelect>>',self.show_user_detail)
+        tabs.bind('<<NotebookTabChanged>>',self.show_user_detail)
+        box=ttk.LabelFrame(parent,text='Selected activity — exact message text',padding=5)
+        box.grid(row=3,column=0,columnspan=2,sticky='nsew',padx=5,pady=5);parent.rowconfigure(3,weight=1)
+        box.rowconfigure(0,weight=1);box.columnconfigure(0,weight=1)
+        text=w['user-message-detail']=tk.Text(box,height=4,wrap='none',state='disabled');text.grid(row=0,column=0,sticky='nsew')
+        vs=ttk.Scrollbar(box,orient='vertical',command=text.yview);vs.grid(row=0,column=1,sticky='ns')
+        hs=ttk.Scrollbar(box,orient='horizontal',command=text.xview);hs.grid(row=1,column=0,sticky='ew')
+        text.configure(yscrollcommand=vs.set,xscrollcommand=hs.set)
+
+    def selected_username(self):
+        selection=self.widgets['users'].selection()
+        if selection and self.widgets['user-filter'].get().lower() in selection[0].lower():return selection[0]
+        return None
+
+    @staticmethod
+    def replace_rows(tree, rows):
+        desired=[(iid,tuple(str(value) for value in values)) for iid,values in rows]
+        actual=[(iid,tree.item(iid,'values')) for iid in tree.get_children()]
+        if desired==actual:return
+        selection=tree.selection()
+        for iid in tree.get_children():tree.delete(iid)
+        for iid,values in rows:tree.insert('','end',iid=iid,values=values)
+        if selection and tree.exists(selection[0]):tree.selection_set(selection[0])
+
+    def render_users(self, data, selected):
+        w=self.widgets;query=w['user-filter'].get().lower()
+        users=[row for row in data['users'] if query in row['username'].lower()]
+        self.replace_rows(w['users'],[(row['username'],(row['username'],'recently seen' if row['online'] else 'not recently seen')) for row in users])
+        selected=selected if selected in {row['username'] for row in users} else None
+        w['selected-user'].configure(text=selected or '')
+        w['directory-status'].configure(text='current')
+        for name in ('sent','received','queued'):
+            messages=data['activity'][name] if selected else []
+            w['user-'+name+'-count'].configure(text=str(len(messages)))
+            self.replace_rows(w['user-'+name],[(m['sender']+':'+m['message_id'],
+                (m['recipient'] if name=='sent' else m['sender'],m['message_id'],m['sequence'],m['state'],m['text'])) for m in messages])
+        self.show_user_detail()
+
+    def show_user_detail(self, event=None):
+        w=self.widgets
+        if 'user-message-detail' not in w:return
+        tabs=w['activity-tabs'];current=tabs.select()
+        name=tabs.tab(current,'text').lower() if current else 'sent'
+        tree=w['user-'+name]
+        if event is not None and event.widget not in (tabs,tree):return
+        selected=tree.selection();body=tree.item(selected[0],'values')[4] if selected else ''
+        text=w['user-message-detail'];text.configure(state='normal');text.delete('1.0','end');text.insert('1.0',body);text.configure(state='disabled')
 
     def set_state(self, state):
         self.state=state
@@ -88,7 +184,7 @@ class ServerApp:
         editable=state in ('Stopped','Error') and not self.closing
         for name in ('start-button','port-input','static-input'):
             self.widgets[name].configure(state='normal' if editable else 'disabled')
-        for name in ('stop-button','open-browser'):
+        for name in ('stop-button','open-browser','user-refresh'):
             self.widgets[name].configure(state='normal' if state=='Running' and not self.closing else 'disabled')
 
     def start(self):
@@ -152,6 +248,14 @@ class ServerApp:
             for iid in tree.get_children():tree.delete(iid)
         self.last_messages=None;self.last_requests=None
         self.show_detail()
+        self.widgets['user-filter'].delete(0,'end')
+        for name in ('users','user-sent','user-received','user-queued'):
+            tree=self.widgets[name]
+            for iid in tree.get_children():tree.delete(iid)
+        self.widgets['selected-user'].configure(text='')
+        self.widgets['directory-status'].configure(text='stopped')
+        for name in ('sent','received','queued'):self.widgets['user-'+name+'-count'].configure(text='0')
+        self.show_user_detail()
 
     def show_detail(self, event=None):
         tree=self.widgets['messages'];selection=tree.selection()
@@ -160,7 +264,9 @@ class ServerApp:
         detail.delete('1.0','end');detail.insert('1.0',text);detail.configure(state='disabled')
 
     def refresh(self):
-        data=self.server.snapshot()
+        selected=self.selected_username()
+        data=self.server.snapshot(selected)
+        self.render_users(data,selected)
         for name,key in [('message-count','message_count'),('response-count','responses'),('error-count','errors')]:
             self.widgets[name].configure(text=str(data[key]))
         messages=[tuple(row[k] for k in ('sender','recipient','message_id','sequence','text')) for row in data['messages']]

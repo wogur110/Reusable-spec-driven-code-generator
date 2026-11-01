@@ -78,3 +78,7 @@ Tkinter/ttk supplies the Python desktop window. The GUI and retained --machine i
 ## CHG-002 retained server control window
 
 The optional server/gui.py Tkinter window owns one retained Server per Start/Stop session. Binding, serving, and shutdown run outside the Tk event loop; widget updates occur only on that loop. Locked bounded snapshots expose recent responses and accepted messages without affecting protocol state. Each new instance starts empty, including restarts inside the same GUI process. This management UI is retained parent-agent code, not generated client code. See [the server contract](specs/SERVER.md).
+
+## CHG-003 directory and receipt design
+
+One retained Store lock protects messages, session-known users, explicit announcement times and cumulative recipient acknowledgments. Shared directory observations are returned over new version-1 routes; the server GUI reads the same state locally. Clients serialize receipt/announcement/directory calls after normal message synchronization and acknowledge only committed cursors. No schema migration or per-message receipt table is needed. GUI caches are transient, guarded by identity/reset generation, and cannot prevent manual sending. Server per-user views show observational receipt status; unseen offline outboxes remain unknown. See specs/DIRECTORY.md for exact contracts.

@@ -2,6 +2,12 @@
 
 Updated 2026-11-01 (America/Los_Angeles). The agent authored specifications and retained infrastructure/tests; actual isolated Codex harness calls authored both clients. Blank USER preferences are not user-authored answers, and automated/agent checks do not fill manual observations.
 
+## CHG-003 complete
+
+Both generated clients and the retained server implement shared recipient discovery, click-to-address and per-user message activity. Queue semantics follow the explicit user clarification: server-accepted messages awaiting recipient acknowledgment are queued; offline client queues are unknown. Generation 20261101T213828695226Z passed 80/80 and published both clients after one bounded repair. Its initial 79/80 failure caught an existing Python reset regression and remains recorded. All new cases passed on that initial attempt. Nine harness guards pass.
+
+Clean proof 20261101T215733141945Z regenerated both clients without prior source, passed 80/80 inside the harness and 80/80 standalone, and preserved the original tree. Each target used two calls (initial plus one repair); the initial clean candidate also passed 79/80 and failed the existing Python reset-display check. The generic generator core/runner/prompt and USER blocks are unchanged. The original request and evidence were archived in CHANGES before removal from FUTURE. Agent visual inspection of the server Users view and both client directory screens passed; user review of CHG-003 and a current archive remain pending.
+
 ## CHG-002 complete
 
 The retained server desktop passes 65/65 acceptance cases and nine harness guards. Clean proof 20261101T204250502871Z recreated both clients with the unchanged harness, passed 65/65 inside it and 65/65 standalone, and preserved the original tree. Published clients, wire protocol, target configuration and generic runner/prompt remain unchanged. The request and evidence were archived in CHANGES before removal from FUTURE. The user confirmed CHG-002 works well on 2026-11-01; detailed scenario observations remain unrecorded.
@@ -19,18 +25,18 @@ Earlier clean proof 20261101T143710332729Z remains FAIL: TypeScript's initial co
 | Area | State | Evidence / remaining work |
 |---|---|---|
 | Stage 1 documentation | COMPLETE | All 16 required documents, source comparison, catalog forms, and contracts completed; current docs reconciled with implementation |
-| Preferences | COMPLETE | All 26 optional cells unchanged/blank; effective defaults and explicit CHG-001 override in DECISIONS; no unresolved user-choice conflict |
+| Preferences | COMPLETE | All 26 optional cells unchanged/blank; effective defaults and explicit CHG-001–003 decisions in DECISIONS; no unresolved user-choice conflict |
 | Environment | VERIFIED for this environment | Ubuntu 22.04.5/WSL2 x86_64; Python 3.10.12, SQLite 3.37.2, Node 22.17.0, npm 10.9.2, Git 2.34.1; Tk 8.6.12; native GUI prerequisites installed by the user |
 | Coding-tool access | PASS | Project-local Codex 0.166.0, requested gpt-6-astra, effective UNREPORTED; authenticated writable preflight and real generation calls |
 | Implementation | COMPLETE | Retained components and generated clients build; actual generation, required checks, clean proof, and operating documentation complete |
-| Automated baseline | PASS | 65 tests: nine protocol, four machine interface, 31 existing client/browser, 11 client desktop, eight server GUI and two server/client integration cases; zero failures/skips/flaky results |
+| Automated baseline | PASS | 80 tests: 13 protocol, four machine interface, 31 existing client/browser, 11 client desktop, 11 server GUI, two server/client integration and eight directory cases; zero failures/skips/flaky results |
 | Harness guards | PASS | Nine AT-18 tests, including inventory/path violations, incomplete events, invalid reports, timeout, input allowlisting, and publication rollback |
-| Clean regeneration | PASS | Run 20261101T204250502871Z recreated both clients, passed 65 tests in the harness and again standalone, and preserved the original tree |
-| Evolution | PASS — CHG-001 and CHG-002 | Client desktop evolution and retained server GUI compatibility verified; unchanged generic runner/prompt; no CHG-002 client/wire/storage change |
+| Clean regeneration | PASS | Run 20261101T215733141945Z recreated both clients, passed 80 tests in the harness and again standalone, and preserved the original tree |
+| Evolution | PASS — CHG-001, CHG-002 and CHG-003 | Client desktop, server GUI, directory and durable receipts verified; generic runner/prompt unchanged; storage remains version 1 |
 | Optional storage/crash injections | NOT_RUN — deferred | OF-01/OF-02 remain disclosed optional executions; normal restart, malformed-page rollback, and unsupported-store checks pass |
 | User manual review | GENERAL CONFIRMATION RECEIVED — CHG-001 and CHG-002 | The user confirmed CHG-002: “I found it works well.” Detailed M01–M06 observations were not supplied; source cells remain blank. |
-| Review archive | PRIOR REVISION VERIFIED; CURRENT NOT_CREATED | Earlier CHG-001 archive passed source/history restoration. Package the final committed CHG-002 revision separately; prior manifests do not cover it. |
-| Final release readiness | NOT_READY — manual observations and current archive pending | CHG-002 implementation/automated checks are complete. Detailed user observations and an archive of the final CHG-002 revision remain pending. |
+| Review archive | PRIOR REVISION VERIFIED; CURRENT NOT_CREATED | Earlier CHG-001 archive passed source/history restoration. Package the final committed CHG-003 revision separately; prior manifests do not cover it. |
+| Final release readiness | NOT_READY — manual observations and current archive pending | CHG-003 implementation/automated checks are complete; its manual review is pending. Detailed user observations and an archive of the final CHG-003 revision remain pending. |
 
 Baseline Stage 2 implementation completion requires generation, builds, required acceptance/guard checks, clean regeneration, and truthful operating documentation. Pending user observations and unrequested evolution remain separate; neither is silently marked passed.
 

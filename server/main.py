@@ -53,11 +53,14 @@ def validate(data):
 
 
 class Store:
-    def __init__(self):
+    def __init__(self, clock=None):
         self.lock = threading.Lock()
         self.streams = {}
         self.receipts = {}
         self.recent = deque(maxlen=200)
+        self.clock = clock or time.monotonic
+        self.users = {}
+        self.acknowledged = {}
 
     def send(self, data):
         validate(data)
@@ -77,11 +80,57 @@ class Store:
                 self.receipts[key] = message
                 self.recent.append(message)
                 status = 201
+            self.users.setdefault(data['sender'], None)
+            self.users.setdefault(data['recipient'], None)
             return status, {k: message[k] for k in ('message_id', 'sender', 'recipient', 'sequence')}
 
-    def snapshot(self):
+    def _directory_locked(self):
+        now = self.clock()
+        return [{'username': name, 'online': seen is not None and now - seen < 15}
+                for name, seen in sorted(self.users.items())]
+
+    def announce(self, data):
+        if not isinstance(data, dict) or set(data) != {'username'}:
+            raise Problem(400, 'INVALID_FIELDS')
+        name = data['username']
+        if not isinstance(name, str) or not NAME.fullmatch(name):
+            raise Problem(400, 'INVALID_USERNAME', 'username')
         with self.lock:
-            return len(self.receipts), [dict(message) for message in self.recent]
+            self.users[name] = self.clock()
+        return {'username': name}
+
+    def directory(self):
+        with self.lock:
+            return {'users': self._directory_locked()}
+
+    def acknowledge(self, data):
+        if not isinstance(data, dict) or set(data) != {'recipient', 'through'}:
+            raise Problem(400, 'INVALID_FIELDS')
+        recipient, through = data['recipient'], data['through']
+        if not isinstance(recipient, str) or not NAME.fullmatch(recipient):
+            raise Problem(400, 'INVALID_USERNAME', 'recipient')
+        if type(through) not in (int, float) or not 0 <= through <= MAX_INT or int(through) != through:
+            raise Problem(400, 'INVALID_RECEIPT', 'through')
+        through = int(through)
+        with self.lock:
+            if through > len(self.streams.get(recipient, [])):
+                raise Problem(409, 'CURSOR_INVALID', 'through')
+            self.users.setdefault(recipient, None)
+            self.acknowledged[recipient] = max(self.acknowledged.get(recipient, 0), through)
+            return {'recipient': recipient, 'through': self.acknowledged[recipient]}
+
+    def snapshot(self, selected_user=None):
+        with self.lock:
+            activity = {'sent': [], 'received': [], 'queued': []}
+            if selected_user in self.users:
+                for message in self.receipts.values():
+                    state = 'received' if message['sequence'] <= self.acknowledged.get(message['recipient'], 0) else 'queued'
+                    if message['sender'] == selected_user:
+                        activity['sent'].append(dict(message, state=state))
+                    if message['recipient'] == selected_user:
+                        activity[state].append(dict(message, state=state))
+            return dict(message_count=len(self.receipts), messages=[dict(m) for m in self.recent],
+                        users=self._directory_locked(), activity=activity)
 
     def receive(self, recipient, after):
         with self.lock:
@@ -96,8 +145,8 @@ class Server(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = True
 
-    def __init__(self, address, static_dir):
-        self.store = Store()
+    def __init__(self, address, static_dir, clock=None):
+        self.store = Store(clock)
         self.monitor_lock = threading.Lock()
         self.responses = 0
         self.errors = 0
@@ -114,11 +163,11 @@ class Server(ThreadingHTTPServer):
             self.errors += int(status >= 400)
             self.recent_responses.append((method, path, status))
 
-    def snapshot(self):
-        count, messages = self.store.snapshot()
+    def snapshot(self, selected_user=None):
+        data = self.store.snapshot(selected_user)
         with self.monitor_lock:
-            return dict(message_count=count, messages=messages, responses=self.responses,
-                        errors=self.errors, requests=list(self.recent_responses))
+            data.update(responses=self.responses, errors=self.errors, requests=list(self.recent_responses))
+        return data
 
     def process_request(self, request, address):
         with self.connection_lock:
@@ -185,16 +234,39 @@ class Handler(BaseHTTPRequestHandler):
             raise Problem(413, 'PAYLOAD_TOO_LARGE')
         return size
 
+    def read_json(self):
+        length = self.length(required=True)
+        media = self.headers.get('Content-Type', '')
+        if self.headers.get('Content-Encoding') or not re.fullmatch(r'application/json(?:\s*;\s*charset\s*=\s*(?:utf-8|"utf-8"))?\s*', media, re.I):
+            raise Problem(415, 'UNSUPPORTED_MEDIA_TYPE')
+        deadline = time.monotonic() + 5
+        chunks = bytearray()
+        while len(chunks) < length:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise Problem(400, 'INVALID_REQUEST')
+            self.connection.settimeout(remaining)
+            chunk = self.rfile.read1(length - len(chunks))
+            if not chunk:
+                raise Problem(400, 'INVALID_REQUEST')
+            chunks.extend(chunk)
+        try:
+            data = json.loads(chunks.decode('utf-8'), object_pairs_hook=pairs_unique, parse_constant=invalid_constant)
+        except (ValueError, UnicodeError, RecursionError):
+            raise Problem(400, 'INVALID_JSON')
+        return data
+
     def dispatch(self):
         route = urlsplit(self.path)
         path = route.path
-        known = path in ('/api/v1/messages', '/health')
-        if known:
-            allowed = ('GET', 'POST') if path == '/api/v1/messages' else ('GET',)
+        routes = {'/api/v1/messages': ('GET', 'POST'), '/api/v1/users': ('GET', 'POST'),
+                  '/api/v1/receipts': ('POST',), '/health': ('GET',)}
+        if path in routes:
+            allowed = routes[path]
             if self.command not in allowed:
                 self.allowed = ', '.join(allowed)
                 raise Problem(405, 'METHOD_NOT_ALLOWED')
-            if path == '/health' or self.command == 'POST':
+            if path in ('/health', '/api/v1/users') or self.command == 'POST':
                 if route.query:
                     raise Problem(400, 'INVALID_QUERY')
             if self.command == 'GET':
@@ -202,6 +274,8 @@ class Handler(BaseHTTPRequestHandler):
                     raise Problem(400, 'INVALID_REQUEST')
                 if path == '/health':
                     return self.reply(200, {'status': 'ok', 'protocol_version': 1})
+                if path == '/api/v1/users':
+                    return self.reply(200, self.server.store.directory())
                 if re.search(r'%(?![0-9a-fA-F]{2})', route.query):
                     raise Problem(400, 'INVALID_QUERY')
                 try:
@@ -217,25 +291,11 @@ class Handler(BaseHTTPRequestHandler):
                 if not re.fullmatch(r'0|[1-9][0-9]*', after, re.ASCII) or len(after) > 16 or int(after) > MAX_INT:
                     raise Problem(400, 'INVALID_QUERY', 'after')
                 return self.reply(200, self.server.store.receive(query['recipient'], int(after)))
-            length = self.length(required=True)
-            media = self.headers.get('Content-Type', '')
-            if self.headers.get('Content-Encoding') or not re.fullmatch(r'application/json(?:\s*;\s*charset\s*=\s*(?:utf-8|"utf-8"))?\s*', media, re.I):
-                raise Problem(415, 'UNSUPPORTED_MEDIA_TYPE')
-            deadline = time.monotonic() + 5
-            chunks = bytearray()
-            while len(chunks) < length:
-                remaining = deadline - time.monotonic()
-                if remaining <= 0:
-                    raise Problem(400, 'INVALID_REQUEST')
-                self.connection.settimeout(remaining)
-                chunk = self.rfile.read1(length - len(chunks))
-                if not chunk:
-                    raise Problem(400, 'INVALID_REQUEST')
-                chunks.extend(chunk)
-            try:
-                data = json.loads(chunks.decode('utf-8'), object_pairs_hook=pairs_unique, parse_constant=invalid_constant)
-            except (ValueError, UnicodeError, RecursionError):
-                raise Problem(400, 'INVALID_JSON')
+            data = self.read_json()
+            if path == '/api/v1/users':
+                return self.reply(200, self.server.store.announce(data))
+            if path == '/api/v1/receipts':
+                return self.reply(200, self.server.store.acknowledge(data))
             status, receipt = self.server.store.send(data)
             return self.reply(status, receipt)
         if path.startswith('/api/'):

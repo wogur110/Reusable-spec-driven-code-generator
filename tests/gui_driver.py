@@ -47,9 +47,12 @@ def snapshot():
         outbox.append(dict(message_id=iid, recipient=recipient, text=body,
                            state='accepted' if state == 'accepted by server' else state,
                            visible_state=state, error=error or None, local_order=int(order)))
-    state = dict(ready=bool(app.ready), inbox=inbox, outbox=outbox, widgets={})
+    users=[]
+    if 'user-directory' in widgets:
+        users=[dict(username=iid,presence=widgets['user-directory'].item(iid,'values')[1]) for iid in widgets['user-directory'].get_children('')]
+    state = dict(ready=bool(app.ready), inbox=inbox, outbox=outbox, users=users, widgets={})
     for key, widget in widgets.items():
-        if key in ('inbox', 'outbox'):
+        if key in ('inbox', 'outbox', 'user-directory'):
             continue
         state['widgets'][key] = dict(text=text(widget), visible=bool(widget.winfo_ismapped()),
                                     enabled=str(widget.cget('state')) != 'disabled' if 'state' in widget.keys() else True)
@@ -92,6 +95,7 @@ def poll():
                             widget.delete('1.0', 'end'); widget.insert('1.0', request['text'])
                         else:
                             widget.delete(0, 'end'); widget.insert(0, request['text'])
+                            if request['widget']=='user-filter':widget.focus_force();widget.event_generate('<KeyRelease>')
                     elif command == 'click':
                         if not widget.winfo_ismapped() or str(widget.cget('state')) == 'disabled':
                             raise AssertionError('Cannot click a hidden or disabled widget')

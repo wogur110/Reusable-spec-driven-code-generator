@@ -1,15 +1,15 @@
-"""Version-one durable store. Every mutation owns one short transaction."""
+"""Version-one durable state; all transactions use one application lock."""
 from contextlib import contextmanager
 from pathlib import Path
 import sqlite3
 import threading
 import uuid
-from protocol import Failure, MAX, username, message_text
+from protocol import ClientError, MAX, username, text_valid
 
-SCHEMA = [
- 'CREATE TABLE metadata (id INTEGER PRIMARY KEY CHECK(id=1), username TEXT, server_origin TEXT, receive_cursor INTEGER DEFAULT 0, next_local_order INTEGER DEFAULT 1)',
- "CREATE TABLE outbox (message_id TEXT PRIMARY KEY, sender TEXT NOT NULL, recipient TEXT NOT NULL, text TEXT NOT NULL, local_order INTEGER UNIQUE, state TEXT CHECK(state IN ('queued','accepted','failed')), server_sequence INTEGER, error_code TEXT, error_message TEXT)",
- 'CREATE TABLE inbox (sender TEXT, message_id TEXT, recipient TEXT NOT NULL, text TEXT NOT NULL, sequence INTEGER UNIQUE, PRIMARY KEY(sender,message_id))']
+COLUMNS = {
+    'metadata': ['id', 'username', 'server_origin', 'receive_cursor', 'next_local_order'],
+    'outbox': ['message_id', 'sender', 'recipient', 'text', 'local_order', 'state', 'server_sequence', 'error_code', 'error_message'],
+    'inbox': ['sender', 'message_id', 'recipient', 'text', 'sequence']}
 
 class Store:
     def __init__(self, directory, server):
@@ -18,39 +18,36 @@ class Store:
         try:
             directory = Path(directory)
             directory.mkdir(parents=True, exist_ok=True)
-            self.db = sqlite3.connect(directory / 'messages.sqlite3', check_same_thread=False, isolation_level=None, timeout=1)
+            path = directory / 'messages.sqlite3'
+            existed = path.exists()
+            self.db = sqlite3.connect(str(path), check_same_thread=False, isolation_level=None, timeout=1)
             self.db.row_factory = sqlite3.Row
             version = self.db.execute('PRAGMA user_version').fetchone()[0]
             tables = self.db.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
-            if version != 1 and (version != 0 or tables):
-                raise Failure('STORE_VERSION_UNSUPPORTED', 'Unsupported store version; select a fresh store or explicitly reset.')
+            if existed and (version != 1):
+                raise ClientError('STORE_VERSION_UNSUPPORTED', 'Unsupported store version; choose a fresh store or explicitly reset this one.')
             self.db.execute('PRAGMA foreign_keys=ON')
             self.db.execute('PRAGMA synchronous=FULL')
-            if version == 0:
+            if not existed:
                 with self.transaction():
-                    for statement in SCHEMA:
-                        self.db.execute(statement)
-                    self.db.execute('INSERT INTO metadata VALUES (1,NULL,?,0,1)', (server,))
+                    self.db.execute('CREATE TABLE metadata (id INTEGER PRIMARY KEY CHECK(id=1), username TEXT, server_origin TEXT NOT NULL, receive_cursor INTEGER NOT NULL DEFAULT 0, next_local_order INTEGER NOT NULL DEFAULT 1)')
+                    self.db.execute("CREATE TABLE outbox (message_id TEXT PRIMARY KEY, sender TEXT NOT NULL, recipient TEXT NOT NULL, text TEXT NOT NULL, local_order INTEGER UNIQUE NOT NULL, state TEXT NOT NULL CHECK(state IN ('queued','accepted','failed')), server_sequence INTEGER, error_code TEXT, error_message TEXT)")
+                    self.db.execute('CREATE TABLE inbox (sender TEXT NOT NULL, message_id TEXT NOT NULL, recipient TEXT NOT NULL, text TEXT NOT NULL, sequence INTEGER UNIQUE NOT NULL, PRIMARY KEY(sender,message_id))')
+                    self.db.execute('INSERT INTO metadata VALUES(1,NULL,?,0,1)', (server,))
                     self.db.execute('PRAGMA user_version=1')
-            expected = {
-                'metadata': 'id username server_origin receive_cursor next_local_order',
-                'outbox': 'message_id sender recipient text local_order state server_sequence error_code error_message',
-                'inbox': 'sender message_id recipient text sequence'}
-            for table, columns in expected.items():
-                actual = {r['name'] for r in self.db.execute('PRAGMA table_info(' + table + ')')}
-                if actual != set(columns.split()):
-                    raise Failure('STORAGE_UNAVAILABLE', 'Incompatible SQLite schema; select a fresh store.')
-            meta = self.metadata()
-            if not meta or self.db.execute('SELECT count(*) FROM metadata').fetchone()[0] != 1:
-                raise Failure('STORAGE_UNAVAILABLE', 'Invalid store metadata.')
+            for table, columns in COLUMNS.items():
+                actual = [r['name'] for r in self.db.execute('PRAGMA table_info(' + table + ')')]
+                if set(actual) != set(columns):
+                    raise ClientError('STORAGE_UNAVAILABLE', 'Incompatible SQLite schema; choose a fresh store.')
+            meta = self.meta()
             if meta['server_origin'] != server:
-                raise Failure('STORE_ORIGIN_MISMATCH', 'Stored server differs; choose an explicitly fresh state directory.')
-        except Exception as e:
+                raise ClientError('STORE_ORIGIN_MISMATCH', 'This store belongs to a different server origin; choose a fresh state directory.')
+        except Exception as exc:
             if self.db:
                 self.db.close()
-            if isinstance(e, Failure):
+            if isinstance(exc, ClientError):
                 raise
-            raise Failure('STORAGE_UNAVAILABLE', 'Cannot open store: ' + str(e))
+            raise ClientError('STORAGE_UNAVAILABLE', 'Cannot open the state store: ' + str(exc)) from exc
 
     @contextmanager
     def transaction(self):
@@ -59,86 +56,97 @@ class Store:
                 self.db.execute('BEGIN IMMEDIATE')
                 yield
                 self.db.execute('COMMIT')
-            except Exception as e:
+            except Exception as exc:
                 if self.db.in_transaction:
                     self.db.execute('ROLLBACK')
-                if isinstance(e, Failure):
+                if isinstance(exc, ClientError):
                     raise
-                raise Failure('STORAGE_UNAVAILABLE', 'Storage transaction failed: ' + str(e))
+                raise ClientError('STORAGE_UNAVAILABLE', 'Could not commit local state: ' + str(exc)) from exc
 
-    def metadata(self):
+    def meta(self):
         with self.lock:
-            row = self.db.execute('SELECT * FROM metadata WHERE id=1').fetchone()
-            return dict(row) if row else None
+            try:
+                rows = self.db.execute('SELECT * FROM metadata').fetchall()
+                if len(rows) != 1 or rows[0]['id'] != 1:
+                    raise ValueError('Invalid metadata singleton')
+                return dict(rows[0])
+            except (sqlite3.Error, ValueError) as exc:
+                raise ClientError('STORAGE_UNAVAILABLE', 'Cannot read local metadata: ' + str(exc)) from exc
 
     def login(self, name):
-        username(name)
+        if not username(name):
+            raise ClientError('INVALID_USERNAME', 'Use 1–32 lowercase ASCII letters, digits or underscores, beginning with a letter.')
         with self.transaction():
-            old = self.metadata()['username']
-            if old is not None and old != name:
-                raise Failure('IDENTITY_LOCKED', 'Reset the local store to change identity.')
+            saved = self.meta()['username']
+            if saved is not None and saved != name:
+                raise ClientError('IDENTITY_LOCKED', 'Reset the local store before changing identity.')
             self.db.execute('UPDATE metadata SET username=? WHERE id=1', (name,))
         return {'username': name}
 
     def enqueue(self, recipient, text):
         with self.transaction():
-            meta = self.metadata()
+            meta = self.meta()
             sender = meta['username']
             if sender is None:
-                raise Failure('IDENTITY_REQUIRED', 'Log in first.')
-            username(recipient)
-            if sender == recipient:
-                raise Failure('SELF_SEND', 'Choose a different recipient.')
-            message_text(text)
+                raise ClientError('IDENTITY_REQUIRED', 'Log in before sending.')
+            if not username(recipient):
+                raise ClientError('INVALID_USERNAME', 'Enter a valid lowercase recipient username.')
+            if recipient == sender:
+                raise ClientError('SELF_SEND', 'Choose a different recipient.')
+            if not text_valid(text):
+                raise ClientError('INVALID_TEXT', 'Message must contain 1–4096 UTF-8 bytes of Unicode scalar text.')
             order = meta['next_local_order']
             if order >= MAX:
-                raise Failure('LOCAL_ORDER_EXHAUSTED', 'Local message order exhausted; use a fresh store.')
+                raise ClientError('LOCAL_ORDER_EXHAUSTED', 'Local message order is exhausted; use an explicit fresh store.')
             while True:
-                key = str(uuid.uuid4())
-                if not self.db.execute('SELECT 1 FROM outbox WHERE message_id=?', (key,)).fetchone():
+                mid = str(uuid.uuid4())
+                if not self.db.execute('SELECT 1 FROM outbox WHERE message_id=?', (mid,)).fetchone():
                     break
-            self.db.execute("INSERT INTO outbox VALUES (?,?,?,?,?,'queued',NULL,NULL,NULL)", (key, sender, recipient, text, order))
-            self.db.execute('UPDATE metadata SET next_local_order=? WHERE id=1', (order+1,))
-        return {'message_id': key, 'state': 'queued', 'local_order': order}
+            self.db.execute("INSERT INTO outbox VALUES(?,?,?,?,?,'queued',NULL,NULL,NULL)", (mid, sender, recipient, text, order))
+            self.db.execute('UPDATE metadata SET next_local_order=? WHERE id=1', (order + 1,))
+        return {'message_id': mid, 'state': 'queued', 'local_order': order}
 
     def snapshot(self):
         with self.lock:
-            meta = self.metadata()
-            incoming = [dict(r) for r in self.db.execute('SELECT message_id,sender,recipient,text,sequence FROM inbox ORDER BY sequence')]
-            outgoing = []
-            for row in self.db.execute('SELECT * FROM outbox ORDER BY local_order'):
-                r = dict(row)
-                code, msg = r.pop('error_code'), r.pop('error_message')
-                r['error'] = {'code': code, 'message': msg} if code else None
-                outgoing.append(r)
-            return meta, incoming, outgoing
+            try:
+                meta = self.meta()
+                inbox = [dict(r) for r in self.db.execute('SELECT * FROM inbox ORDER BY sequence')]
+                outbox = []
+                for row in self.db.execute('SELECT * FROM outbox ORDER BY local_order'):
+                    row = dict(row)
+                    code, message = row.pop('error_code'), row.pop('error_message')
+                    row['error'] = {'code': code, 'message': message} if code else None
+                    outbox.append(row)
+                return meta, inbox, outbox
+            except sqlite3.Error as exc:
+                raise ClientError('STORAGE_UNAVAILABLE', 'Cannot read stored messages: ' + str(exc)) from exc
 
-    def outcome(self, key, state, sequence, error):
+    def outcome(self, mid, state, sequence=None, error=None):
         with self.transaction():
-            self.db.execute('UPDATE outbox SET state=?,server_sequence=?,error_code=?,error_message=? WHERE message_id=?', (state, sequence, error.code if error else None, error.message if error else None, key))
+            self.db.execute('UPDATE outbox SET state=?,server_sequence=?,error_code=?,error_message=? WHERE message_id=? AND state=\'queued\'',
+                            (state, sequence, error.code if error else None, error.message if error else None, mid))
 
-    def receive(self, rows, cursor):
+    def receive(self, messages, after, next_after):
         with self.transaction():
-            for row in rows:
-                existing = self.db.execute('SELECT message_id,sender,recipient,text,sequence FROM inbox WHERE sender=? AND message_id=?', (row['sender'],row['message_id'])).fetchone()
-                if existing:
-                    if dict(existing) != row:
-                        raise Failure('PROTOCOL_ERROR', 'Conflicting incoming message; store unchanged.')
+            if self.meta()['receive_cursor'] != after:
+                raise ClientError('PROTOCOL_ERROR', 'Stale receive page; retry from the durable cursor.')
+            for msg in messages:
+                old = self.db.execute('SELECT * FROM inbox WHERE sender=? AND message_id=?', (msg['sender'], msg['message_id'])).fetchone()
+                if old:
+                    if dict(old) != msg:
+                        raise ClientError('PROTOCOL_ERROR', 'Conflicting duplicate inbox message.')
                 else:
-                    clash = self.db.execute('SELECT 1 FROM inbox WHERE sequence=?', (row['sequence'],)).fetchone()
-                    if clash:
-                        raise Failure('PROTOCOL_ERROR', 'Conflicting incoming sequence; store unchanged.')
-                    self.db.execute('INSERT INTO inbox VALUES (?,?,?,?,?)', (row['sender'],row['message_id'],row['recipient'],row['text'],int(row['sequence'])))
-            self.db.execute('UPDATE metadata SET receive_cursor=? WHERE id=1', (cursor,))
+                    if self.db.execute('SELECT 1 FROM inbox WHERE sequence=?', (msg['sequence'],)).fetchone():
+                        raise ClientError('PROTOCOL_ERROR', 'Conflicting inbox sequence.')
+                    self.db.execute('INSERT INTO inbox(sender,message_id,recipient,text,sequence) VALUES(?,?,?,?,?)', tuple(msg[k] for k in ('sender','message_id','recipient','text','sequence')))
+            self.db.execute('UPDATE metadata SET receive_cursor=? WHERE id=1', (next_after,))
+
+    def reset(self):
+        with self.transaction():
+            self.db.execute('DELETE FROM inbox')
+            self.db.execute('DELETE FROM outbox')
+            self.db.execute('UPDATE metadata SET username=NULL,receive_cursor=0,next_local_order=1 WHERE id=1')
 
     def close(self):
         with self.lock:
             self.db.close()
-
-def reset_files(directory):
-    try:
-        for suffix in ('', '-journal', '-wal', '-shm'):
-            path = Path(directory) / ('messages.sqlite3' + suffix)
-            path.unlink(missing_ok=True)
-    except OSError as e:
-        raise Failure('STORAGE_UNAVAILABLE', 'Reset failed: ' + str(e))

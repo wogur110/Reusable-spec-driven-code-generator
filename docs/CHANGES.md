@@ -138,3 +138,55 @@ Follow [the server GUI walkthrough](../TESTING.md#server-gui-manual-verification
 ### User confirmation — 2026-11-01
 
 The user stated: “I found it works well.” This records general confirmation of CHG-002 after trying the application. Individual test results, environment details, and browser-launch observations were not specified, so M01–M06 remain unchanged. The confirmation and concise README status are included in the single local CHG-002 commit at the user’s request to commit and established preference for one commit per change. No application code or test assertions changed.
+
+
+## CHG-003 — Shared user directory and per-user message activity
+
+State: COMPLETE — automated implementation and clean regeneration verified. CHG-001 and CHG-002 dependencies were complete and verified before work began. User manual review of this change is not yet recorded.
+
+### Original request (verbatim)
+
+```text
+CHG-003: Add a shared user directory, click-to-message, and per-user server activity views
+- State: PROPOSED
+- Change: Display a shared list of available recipients in the Python client GUI, TypeScript client GUI, and server GUI. Let client users select a recipient and send a message. Let the server operator select users and inspect their sent, received, and queued messages.
+- Scope: Both generated clients, the retained server and its GUI, user-directory and message-receipt contracts, current specifications, retained tests, and operating documentation.
+- Dependencies: CHG-001 and CHG-002 completed and verified. If either is unmet, report the dependency and keep this request pending unless the user explicitly selects those requests too.
+- Priority: Normal. Apply after the two GUI requests.
+- Management scope: Listing, searching/filtering, selecting users, refreshing observations, and inspecting message activity. Account deletion, username renaming, banning, message editing/purging, and forced delivery are not requested by this item.
+```
+
+User clarification (verbatim): “Show server-accepted messages awaiting recipient acknowledgment as queued; label offline client queues as unknown.”
+
+### Decisions, compatibility, and preserved inputs
+
+All 26 USER preferences and six manual-observation cells are unchanged, including their previous blank values and wording. P10's previous effective default was no additional essential feature; the explicit CHG-003 adds the directory and activity views. D02 still selects one small local in-memory server. Existing language/interface choices, original quoted exchange, independent offline queues, local runtime, and no-messaging-SDK constraints remain satisfied.
+
+The registered specs/DIRECTORY.md extension defines username announcements and advisory 15-second recent presence, a sorted session-known directory, and cumulative recipient acknowledgments after durable inbox storage. Clients filter/select recipients without sending or changing drafts; manual unlisted recipients remain valid. New endpoints are POST/GET /api/v1/users and POST /api/v1/receipts. Legacy message objects, health response, version-1 storage schemas and messaging endpoints are preserved. Auxiliary failures do not block messaging. Reset guards discard old-identity results; acknowledgment responses never advance a local receive cursor.
+
+The server Users tab filters/selects users and displays all their Sent, Received and Queued activity with exact text. Queued means accepted but not recipient-acknowledged; Received means reported durable receipt, not human reading. Offline client queues are unknown. Operator inspection never acknowledges or mutates delivery state. Directory, messages and receipts disappear on server restart; fresh/reset stores are still required. No account administration or persistent server database was added.
+
+Requirements REQ-DIR-01, REQ-RECEIPT-01 and REQ-ACTIVITY-01 map to DIR-01–08. Shared/platform/server contracts, decisions, DESIGN, GENERATE, and manual guidance were reconciled first. Retained tests were authored independently before implementation/generation. The test delta is four protocol cases, three server GUI cases and eight client directory cases, preserving 65 existing cases. Proxy history now separates message routes from auxiliary routes so prior message assertions keep their meaning. Driver additions operate actual controls. The generic generator core, runner and prompt are unchanged; targets.json registers DIRECTORY.md. Both clients were produced through actual harness calls; no manual client patches were used.
+
+### Actual checks
+
+| Command / check | Result |
+|---|---|
+| Pre-implementation protocol cases | Expected failure for four new cases before Server supported the contract; old nine passed. red-protocol.json retained. |
+| New directory case against old clients | Expected FAIL: recipient list empty. red-clients-command.json retained. |
+| python3 scripts/verify.py --suite protocol | PASS 13/13. |
+| python3 scripts/verify.py --suite server-gui | PASS 11/11. |
+| python3 scripts/verify.py --suite harness | PASS 9/9. |
+| python3 generator/run.py --target all | PASS 20261101T213828695226Z; both clients generated and published after 80/80 passed. Two calls per target (initial plus one repair). |
+| Initial candidate validation | FAIL 79/80: existing GUI-04 found a stale outbox after reset/login became visible. All new CHG-003 tests passed. Repaired under frozen contracts/tests; failed report preserved. |
+| python3 scripts/regenerate_check.py | PASS 20261101T215733141945Z; fresh generation 20261101T215744753116Z, calls per target {'python': 2, 'typescript': 2}. 80/80 inside harness and 80/80 standalone, zero failures/skips/flaky results in final checks; original tree preserved. |
+| Clean-generation repair diagnostics | Initial clean candidates passed 79/80; the same Python GUI-04 reset-display regression required ordinary bounded repair. All new CHG-003 cases passed. clean-initial-acceptance.json retains the failure. |
+| Local setup/build after publication | PASS; rebuilt disposable assets for local launch. |
+| Agent visual inspection | Server Users view shows correct counts, activity tabs, exact Unicode/multiline detail and offline-queue notice. Actual Python/browser screens show the shared directory, selection and message exchange. Initial preview could not start without newly published build assets; setup/build resolved this. Not user evidence. |
+| Integrity and documents | USER blocks and generic orchestration/prompt preserved; prior browser assertions unchanged. Verified source/spec/test fingerprints recorded in EVIDENCE.json; final evidence-only documentation edits follow the proof. |
+
+Base revision: `193b939f86f124a0d484f05b57d74fdbcae45526` plus the authorized working-tree changes. EVIDENCE.json records exact frozen inputs, generated output hashes, requested/effective model, tool identity and repair counts. Requested model: gpt-6-astra; effective: UNREPORTED; tool: codex-cli 0.166.0. Earlier failed runs remain failures; no whole-test retry, skip, deadline increase or weakened assertion was used.
+
+### Manual verification and limits
+
+Follow [TESTING.md](../TESTING.md#shared-directory-and-user-activity-chg-003) for directory filtering/selection, offline sends, server per-user activity, durable acknowledgment, reopen and session reset. README keeps the change summary brief. Existing python3-tk, xvfb, x11-xkb-utils and x11-utils packages suffice. Presence is advisory; usernames and receipt claims are unauthenticated in this local demo. Receiving means durable client storage, not a read receipt. Native Windows/macOS and optional OF-01/OF-02 remain unverified. User CHG-001/002 confirmations do not imply CHG-003 sign-off; M01–M06 are untouched. A current release archive remains pending.

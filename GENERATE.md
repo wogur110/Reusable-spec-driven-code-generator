@@ -16,7 +16,9 @@ The following matches generator/targets.json. The project-local CLI and requeste
     "PROTOCOL.md",
     "ACCEPTANCE.md"
   ],
-  "extensions": [],
+  "extensions": [
+    "DIRECTORY.md"
+  ],
   "context_files": [
     "Instruction_for_Agent.md",
     "README.md",
@@ -171,7 +173,7 @@ Report final PASS/FAIL/BLOCKED, times, commands as argument vectors, exits/timeo
 
 Implemented proof command: `python3 scripts/regenerate_check.py`. Make a fresh retained-input copy with no generated source or indirect source copies, Git history, previous agent sessions, transcripts, builds, or client stores. Standard installed interpreters/dependency download caches may be reused only if they cannot contain client implementations; record this environment reuse. Assert target directories are absent before generation. Freeze retained manifests, run setup, actual generator --target all, setup/build, and standalone baseline verification. Compare inventories/hashes afterward and preserve the original project. Record all command outcomes; this outer proof is never called by baseline verification itself.
 
-Evolution execution is deferred. If a selected FUTURE request or separate explicit experiment is authorized, first define its spec delta, affected targets, intended independent test changes, migration checks, and any retained server support. Freeze that revised contract; run the ordinary harness with registered extensions, baseline checks where applicable, and new checks. Verify generic runner/adapter/prompt hashes are unchanged to demonstrate adaptation from specs/configuration alone. Retain the reproducible delta/evidence. An isolated experiment must leave baseline source and the FUTURE queue unchanged. Do not pre-create an unrequested feature specification.
+CHG-001 through CHG-003 demonstrate executed evolution; results are recorded in docs/CHANGES.md. For another selected FUTURE request or separately authorized experiment, first define its spec delta, affected targets, intended independent test changes, migration checks, and any retained server support. Freeze that revised contract; run the ordinary harness with registered extensions, baseline checks where applicable, and new checks. Verify generic runner/adapter/prompt hashes are unchanged to demonstrate adaptation from specs/configuration alone. Retain the reproducible delta/evidence. An isolated experiment must leave baseline source and the FUTURE queue unchanged. Do not pre-create an unrequested feature specification.
 
 ## CHG-001 desktop inputs
 
@@ -179,4 +181,8 @@ The Python target now requires main.py and gui.py and reads the revised register
 
 ## Retained server management coverage (CHG-002)
 
-The optional server desktop is retained infrastructure specified in specs/SERVER.md. It is not a generated target or a client protocol extension; targets.json and the generic runner/prompt remain unchanged. The full verification command now includes server-gui lifecycle/monitoring checks and desktop/browser interoperability against a GUI-managed server. Clean regeneration recreates both clients in the retained-only workspace and reruns those same assertions. Published client sources need no targeted replacement for this server-only change.
+The optional server desktop is retained infrastructure specified in specs/SERVER.md. It is not a generated target or a client protocol extension; CHG-002 left targets.json and the generic runner/prompt unchanged. The full verification command now includes server-gui lifecycle/monitoring checks and desktop/browser interoperability against a GUI-managed server. Clean regeneration recreates both clients in the retained-only workspace and reruns those same assertions. Published client sources need no targeted replacement for this server-only change.
+
+## CHG-003 registered shared extension
+
+DIRECTORY.md is explicitly registered for both targets. It adds user announcements, directory observations and durable-receipt reports, plus GUI selectors. Both clients require actual harness regeneration; no manual behavioral patches. Generic orchestration and prompt templates remain unchanged. Expanded retained tests are frozen before each generation run and included in clean regeneration.
