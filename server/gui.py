@@ -103,10 +103,12 @@ class ServerApp:
         w['directory-status']=ttk.Label(bar,text='stopped');w['directory-status'].pack(side='left',padx=6)
         w['queue-notice']=ttk.Label(parent,text='Queued = accepted, awaiting recipient acknowledgment. Received = recipient-reported durable storage, not read confirmation. Offline client queues: unknown.',wraplength=950)
         w['queue-notice'].grid(row=1,column=0,columnspan=2,sticky='ew',padx=5,pady=5)
+        w['presence-notice']=ttk.Label(parent,text='Online: heartbeat within the last 15 seconds. Offline: no recent heartbeat. Disconnections may take 15 seconds to appear.',wraplength=950)
+        w['presence-notice'].grid(row=4,column=0,columnspan=2,sticky='ew',padx=5,pady=5)
         usersbox=ttk.Frame(parent,padding=5);usersbox.grid(row=2,column=0,sticky='nsew')
         usersbox.rowconfigure(0,weight=1);usersbox.columnconfigure(0,weight=1)
         tree=w['users']=ttk.Treeview(usersbox,columns=('username','presence'),show='headings',selectmode='browse',height=8)
-        tree.heading('username',text='Username');tree.heading('presence',text='Recent activity')
+        tree.heading('username',text='Username');tree.heading('presence',text='Status')
         tree.column('username',width=100);tree.column('presence',width=130)
         tree.grid(row=0,column=0,sticky='nsew')
         scroll=ttk.Scrollbar(usersbox,orient='vertical',command=tree.yview);scroll.grid(row=0,column=1,sticky='ns');tree.configure(yscrollcommand=scroll.set)
@@ -157,7 +159,7 @@ class ServerApp:
     def render_users(self, data, selected):
         w=self.widgets;query=w['user-filter'].get().lower()
         users=[row for row in data['users'] if query in row['username'].lower()]
-        self.replace_rows(w['users'],[(row['username'],(row['username'],'recently seen' if row['online'] else 'not recently seen')) for row in users])
+        self.replace_rows(w['users'],[(row['username'],(row['username'],'Online' if row['online'] else 'Offline')) for row in users])
         selected=selected if selected in {row['username'] for row in users} else None
         w['selected-user'].configure(text=selected or '')
         w['directory-status'].configure(text='current')

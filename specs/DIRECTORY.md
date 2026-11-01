@@ -60,7 +60,7 @@ Preserve the existing overview and lifecycle controls. Add a Users tab with the 
 
 Server app.widgets additions:
 - server-tabs: ttk.Notebook with Overview and Users tabs; activity-tabs: ttk.Notebook with Sent, Received, Queued tabs.
-- user-filter Entry (KeyRelease filters); user-refresh Button; users Treeview iid=username, values=(username,presence); directory-status Label current/stopped.
+- user-filter Entry (KeyRelease filters); user-refresh Button; users Treeview iid=username, values=(username,presence); directory-status Label current/stopped. The server presence column is titled Status with Online/Offline values from the existing boolean, as specified in SERVER.md; a presence-notice Label explains the 15-second heartbeat timeout. Client presence wording remains as specified above.
 - selected-user Label exact username or empty; user-sent-count, user-received-count, user-queued-count numeric Labels.
 - user-sent, user-received, user-queued Treeviews: iid=sender+":"+message_id, values=(peer,message_id,sequence,state,text). peer is recipient for Sent and sender otherwise; state is queued/received.
 - user-message-detail readonly Text: selection in any activity table shows exact text.

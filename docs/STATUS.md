@@ -2,6 +2,10 @@
 
 Updated 2026-11-01 (America/Los_Angeles). The agent authored specifications and retained infrastructure/tests; actual isolated Codex harness calls authored both clients. Blank USER preferences are not user-authored answers, and automated/agent checks do not fill manual observations.
 
+## Server presence display follow-up
+
+The Users table now displays Online/Offline with a visible 15-second heartbeat explanation. Focused server GUI verification passed 12/12, including automatic expiry and recovery. This is a retained server presentation change; clients and wire behavior are unchanged. Full-suite and clean-regeneration results below describe the preceding CHG-003 baseline, not a rerun of this follow-up. See TESTING for manual checks.
+
 ## CHG-003 complete
 
 Both generated clients and the retained server implement shared recipient discovery, click-to-address and per-user message activity. Queue semantics follow the explicit user clarification: server-accepted messages awaiting recipient acknowledgment are queued; offline client queues are unknown. Generation 20261101T213828695226Z passed 80/80 and published both clients after one bounded repair. Its initial 79/80 failure caught an existing Python reset regression and remains recorded. All new cases passed on that initial attempt. Nine harness guards pass.

@@ -281,3 +281,29 @@ class ServerGuiTests(unittest.TestCase):
         w['users'].selection_set('bob');w['users'].event_generate('<<TreeviewSelect>>')
         self.wait(lambda:self.text('user-queued-count')=='1')
         self.assertEqual(self.text('user-received-count'),'0')
+
+
+    def test_DIR_online_offline_status_expires_and_recovers_without_refresh(self):
+        origin = self.start()
+        now = [100.0]
+        self.app.server.store.clock = lambda: now[0]
+        self.http(origin, '/api/v1/messages', self.message())
+        self.wait(lambda: 'alice' in self.w['users'].get_children())
+        self.assertEqual(self.w['users'].heading('presence', 'text'), 'Status')
+        self.assertIn('15 seconds', self.text('presence-notice'))
+        self.assertEqual(self.w['users'].item('alice', 'values')[1], 'Offline')
+        self.http(origin, '/api/v1/users', {'username': 'alice'})
+        self.wait(lambda: self.w['users'].item('alice', 'values')[1] == 'Online')
+        self.w['users'].selection_set('alice')
+        self.w['users'].event_generate('<<TreeviewSelect>>')
+        now[0] = 114.999
+        self.w['user-refresh'].invoke()
+        self.assertEqual(self.w['users'].item('alice', 'values')[1], 'Online')
+        now[0] = 115.0
+        self.wait(lambda: self.w['users'].item('alice', 'values')[1] == 'Offline')
+        self.assertEqual(self.w['users'].selection(), ('alice',))
+        self.assertEqual(self.text('user-sent-count'), '1')
+        self.assertEqual(self.w['users'].item('bob', 'values')[1], 'Offline')
+        self.http(origin, '/api/v1/users', {'username': 'alice'})
+        self.wait(lambda: self.w['users'].item('alice', 'values')[1] == 'Online')
+        self.assertEqual(self.app.server.store.acknowledged, {})

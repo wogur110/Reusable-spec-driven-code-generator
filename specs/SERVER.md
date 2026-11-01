@@ -27,3 +27,8 @@ Refresh within one second while running. Count completed HTTP responses and resp
 ## CHG-003 Users view
 
 The registered [DIRECTORY.md](DIRECTORY.md) contract adds a shared directory and observational per-user Sent/Received/Queued views with filtering and refresh. It defines cumulative durable receipt reports and the exact new GUI controls. Preserve this document’s lifecycle, startup, error, close and global Overview contracts. The selected user activity comes from one locked snapshot; Stop/Start clears all directory/receipt observations.
+
+
+### Server user Online/Offline display
+
+The Users directory's presence column is titled **Status** and displays **Online** for online=true and **Offline** for online=false. These labels use the existing 15-second announcement timeout, not guaranteed network reachability. Show a visible presence notice explaining that Online means a heartbeat within the last 15 seconds and Offline means none; detection may lag a disconnection. Known users who never announced are Offline. Automatic refresh updates expiry/reconnection without operator intervention and preserves user selection/activity. Add a `presence-notice` Label to app.widgets. This server-only presentation refinement leaves client labels, wire behavior, and receipt classification unchanged.

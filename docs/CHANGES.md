@@ -190,3 +190,12 @@ Base revision: `193b939f86f124a0d484f05b57d74fdbcae45526` plus the authorized wo
 ### Manual verification and limits
 
 Follow [TESTING.md](../TESTING.md#shared-directory-and-user-activity-chg-003) for directory filtering/selection, offline sends, server per-user activity, durable acknowledgment, reopen and session reset. README keeps the change summary brief. Existing python3-tk, xvfb, x11-xkb-utils and x11-utils packages suffice. Presence is advisory; usernames and receipt claims are unauthenticated in this local demo. Receiving means durable client storage, not a read receipt. Native Windows/macOS and optional OF-01/OF-02 remain unverified. User CHG-001/002 confirmations do not imply CHG-003 sign-off; M01–M06 are untouched. A current release archive remains pending.
+
+
+### Server presence display follow-up
+
+Direct user request: “I also want to show that the user is currently offline or online. (In Server GUI)”
+
+The server Users table now has a Status column showing Online/Offline from the existing presence boolean. A visible notice explains the 15-second heartbeat window and delayed disconnect detection. The protocol, generated clients, client labels, queue classification, and USER blocks are unchanged. SERVER/DIRECTORY contracts and manual instructions describe the server-specific wording. No new change-request ID or FUTURE entry was invented.
+
+Validation: `python3 scripts/verify.py --suite server-gui --report artifacts/presence-labels/server-gui.json` passed 12/12, including a new real-widget/HTTP test with a controlled presence clock. It checks never-announced users, the exact expiry boundary, automatic refresh, reconnection, selection retention, and unchanged receipt state. No client regeneration was needed for this server-only presentation update. The earlier 80-case full suite and clean proof remain historical CHG-003 evidence; neither was rerun for this follow-up. User manual confirmation is pending.
