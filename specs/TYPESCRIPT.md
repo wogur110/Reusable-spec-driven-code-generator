@@ -1,12 +1,12 @@
 # TypeScript browser client contract
 
-Status: Stage 1 specification. Builds, browser launches, and runtime checks are NOT_RUN. Shared behavior is defined by [PRODUCT.md](PRODUCT.md) and [PROTOCOL.md](PROTOCOL.md).
+Status: current implemented browser contract; builds and baseline browser checks pass. Shared behavior is defined by [PRODUCT.md](PRODUCT.md) and [PROTOCOL.md](PROTOCOL.md).
 
 ## Source, build, and origin
 
 Generated boundary: `generated/typescript-web/`. Required source: `index.html`, `styles.css`, `src/main.ts`, `tsconfig.json`, `package.json`, and any local build helper. The trusted package manager creates package-lock.json; the coding agent must not fabricate it. Use plain TypeScript/HTML/CSS, exact development dependency `typescript: 5.9.3`, and no browser runtime dependencies. No messaging SDK, runtime CDN, external fonts/assets, service worker, or Python messaging source.
 
-PLANNED — not implemented or verified:
+Supported build commands:
 
 ```sh
 npm --prefix generated/typescript-web ci

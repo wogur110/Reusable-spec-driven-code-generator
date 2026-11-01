@@ -1,6 +1,6 @@
 # Acceptance contract
 
-Status: Stage 1 test specifications only. Every runtime case is NOT_RUN. Retained executable tests are created in Stage 2 before client generation; generated clients may not edit the tests.
+Status: retained executable tests implement this contract. The expanded baseline has 44 passing tests and nine harness guards pass; clean regeneration passes with the same frozen assertions. Tests were authored before the generation run they validate; generated clients may not edit them.
 
 ## Your acceptance expectations
 
@@ -54,7 +54,7 @@ Rows may expand into several executable tests. Reports must map collected tests 
 | AT-07 | Proxy forwards a POST, receives successful acceptance, then drops its response before the client sees it | Client retries identical ID/payload; server responds 200 on replay; recipient and server each contain one message. Test both senders. |
 | AT-08 | Direct exact replay, changed text, changed valid recipient, same ID under another sender, and concurrent exact requests | 201 first, 200 exact original receipt, 409 conflicts with no allocation; another sender independent; concurrent exact requests allocate one sequence only. |
 | AT-09 | Queue behind blocked API; restart CLI / reload page with assets available and same store/origin; recover; then restart after receiving | Identity, pending ID/text/order/state survive; eventual one delivery; inbox and cursor persist and do not duplicate. Test both platforms. |
-| AT-10 | Seed 205 incoming messages while recipient inactive, then start it | All 205 exact ordered entries, cursor 205; page boundaries 100/200/205, each page at most 100. Repeat for both recipients. |
+| AT-10 | Seed 205 incoming messages while recipient inactive, then start it; separately seed 100 texts each containing 4,096 NUL scalar characters | All 205 exact ordered entries, cursor 205; page boundaries 100/200/205, each page at most 100. The maximum-size escaped page also arrives intact with cursor 100. Repeat both checks for both recipients. |
 | AT-11 | Empty text, invalid recipient, self-send, 4,097 ASCII bytes, 1,025 emoji, lone surrogate where interface permits; valid whitespace, 4,096 ASCII bytes, 1,024 emoji | Invalid submissions show error, preserve browser draft, create no durable row/network POST. Valid boundaries preserve text and enqueue. API enforces the same limits. Test representable UI values and machine/wire scalar boundaries. |
 | AT-12 | Actual browser network offline after loading; also exercise both development transport controls | Already-loaded page can enqueue; request genuinely fails and entry stays queued; restore transport and observe one delivery. Mode controls do not bypass production storage/transport logic. |
 | AT-13 | Per client: POST timeout, 408, 429, 500, redirect, malformed/mismatched 201 receipt, permanent 400/409; GET wrong recipient/gapped sequence/bad next_after; valid CURSOR_INVALID | Uncertain sends keep IDs queued; permanent sends fail and later entries proceed; malformed pages preserve complete inbox/cursor; later valid page recovers; cursor error pauses both directions and demands reset. |

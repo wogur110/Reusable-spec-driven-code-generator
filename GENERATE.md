@@ -1,54 +1,126 @@
 # Generation harness contract
 
-Status: Stage 1 plan. Every project command/configuration path in this document is PLANNED — not implemented or verified. The runtime application contract lives in specs/; this document defines reusable orchestration.
+Status: Stage 2 implementation complete. Actual all-target generation, targeted Python regeneration, and fresh-workspace clean regeneration passed. Both clean-proof acceptance runs passed all 44 tests without assertion changes. The runtime application contract lives in specs/; this document defines reusable orchestration.
 
 ## Inputs and target configuration
 
 Implement generator/run.py using Python standard-library orchestration. Options: --spec-root specs, --config generator/targets.json, --target all|python|typescript (default all), optional --model and --codex overrides. Paths resolve against the project root. Validate configuration before invoking an agent: version, nonempty targets, declared spec existence, safe relative paths, unique non-overlapping output directories directly under generated/, required-output paths, bounded timeouts/repair rounds, and nonempty argument-vector commands. Reject unknown target or missing registered input as BLOCKED with nonzero exit. Semantic contradictions are reconciled from the decision/spec inventory before execution; do not pretend path validation proves semantic consistency.
 
-The following is the complete initial configuration shape to implement in Stage 2; it is a Markdown example, not an existing manifest. Tool/model resolution fills the null model only after a successful preflight and records the choice in decisions/configuration.
+The following matches generator/targets.json. The project-local CLI and requested model were selected after a successful authenticated writable preflight on 2026-11-01. Effective model identity was UNREPORTED.
 
 ```json
 {
   "version": 1,
-  "shared_specs": ["PRODUCT.md", "PROTOCOL.md", "ACCEPTANCE.md"],
+  "shared_specs": [
+    "PRODUCT.md",
+    "PROTOCOL.md",
+    "ACCEPTANCE.md"
+  ],
   "extensions": [],
-  "context_files": ["Instruction_for_Agent.md", "README.md", "AGENTS.md", "DESIGN.md", "GENERATE.md", "TESTING.md", "docs/DECISIONS.md"],
-  "agent": {"tool": "codex", "binary": "codex", "model": null, "timeout_seconds": 600, "template": "generator/prompts/client.md"},
+  "context_files": [
+    "Instruction_for_Agent.md",
+    "README.md",
+    "AGENTS.md",
+    "DESIGN.md",
+    "GENERATE.md",
+    "TESTING.md",
+    "docs/DECISIONS.md"
+  ],
+  "agent": {
+    "tool": "codex",
+    "binary": "generator/codex/node_modules/.bin/codex",
+    "model": "gpt-6-astra",
+    "timeout_seconds": 600,
+    "template": "generator/prompts/client.md"
+  },
   "repair_rounds": 3,
   "total_timeout_seconds": 5400,
-  "dependency_policy": {"python": "standard library only, Python >=3.10", "node": ">=22", "typescript": "5.9.3", "playwright": "1.56.1", "browser_runtime": "no dependencies or CDN"},
+  "dependency_policy": {
+    "python": "standard library only, Python >=3.10",
+    "node": ">=22",
+    "typescript": "5.9.3",
+    "playwright": "1.56.1",
+    "browser_runtime": "no dependencies or CDN"
+  },
   "targets": {
     "python": {
-      "specs": ["PYTHON.md"],
+      "specs": [
+        "PYTHON.md"
+      ],
       "output": "generated/python-client",
-      "required_files": ["main.py"],
+      "required_files": [
+        "main.py"
+      ],
       "managed_lockfiles": [],
-      "checks": [["{python}", "scripts/build.py", "--target", "python"], ["{python}", "scripts/verify.py", "--suite", "python-interface"]]
+      "checks": [
+        [
+          "{python}",
+          "scripts/build.py",
+          "--target",
+          "python"
+        ],
+        [
+          "{python}",
+          "scripts/verify.py",
+          "--suite",
+          "python-interface"
+        ]
+      ]
     },
     "typescript": {
-      "specs": ["TYPESCRIPT.md"],
+      "specs": [
+        "TYPESCRIPT.md"
+      ],
       "output": "generated/typescript-web",
-      "required_files": ["index.html", "styles.css", "src/main.ts", "package.json", "package-lock.json", "tsconfig.json"],
-      "managed_lockfiles": ["package-lock.json"],
-      "checks": [["{python}", "scripts/build.py", "--target", "typescript"]]
+      "required_files": [
+        "index.html",
+        "styles.css",
+        "src/main.ts",
+        "package.json",
+        "package-lock.json",
+        "tsconfig.json"
+      ],
+      "managed_lockfiles": [
+        "package-lock.json"
+      ],
+      "checks": [
+        [
+          "{python}",
+          "scripts/build.py",
+          "--target",
+          "typescript"
+        ]
+      ]
     }
   },
-  "setup_command": ["{python}", "scripts/setup.py", "--skip-browser-install"],
-  "verify_command": ["{python}", "scripts/verify.py", "--suite", "all", "--report", "{report}"],
+  "setup_command": [
+    "{python}",
+    "scripts/setup.py",
+    "--skip-browser-install"
+  ],
+  "verify_command": [
+    "{python}",
+    "scripts/verify.py",
+    "--suite",
+    "all",
+    "--report",
+    "{report}"
+  ],
   "verify_timeout_seconds": 600
 }
 ```
 
-Use argument arrays without shell interpolation. {python} is the current interpreter; {report} is an owned report path. Freeze config after any authorized readiness reconciliation. Config/prompt hashes identify the exact invocation. Only the selected platform specification is passed with shared inputs. An extension is active only when explicitly listed; its documented delta supersedes the stated baseline clauses and no others. Contradictory/undeclared deltas must be resolved before a run. No feature-specific code in the generic runner or prompt.
+Use argument arrays without shell interpolation. {python} is the current interpreter; {report} is an owned report path. Freeze config after any authorized readiness reconciliation. Trusted snapshots allow root Markdown/.gitignore, generator/server/tests/scripts/specs/docs, and explicitly registered context/spec paths; private auth/environment/key files and unregistered files are excluded. Guard checks still detect retained-root changes during execution. A valid test report requires passed equal to the positive collected count, with no failures, skips, or flaky results. Config/prompt hashes identify the exact invocation. Only the selected platform specification is passed with shared inputs. An extension is active only when explicitly listed; its documented delta supersedes the stated baseline clauses and no others. Contradictory/undeclared deltas must be resolved before a run. No feature-specific code in the generic runner or prompt.
 
 ## Coding-tool readiness
 
-Observed on 2026-11-01: global Codex CLI 0.142.5; local `codex exec --help` advertises stdin prompts, --sandbox workspace-write, --ephemeral, --skip-git-repo-check, --json, --color, -C, and --model. Version/help exited 0 with a read-only PATH-alias warning. This is interface evidence only. No model call, authentication readiness, sandbox write, or generation has been tested for this repository.
+Stage 2 verified Codex 0.166.0 with requested model gpt-6-astra: exit 0, turn.completed, and the requested readiness file created. The global 0.142.5 default gpt-5.5 request failed with model_not_found. Normal CLI-state access required approved execution outside the parent read-only home restriction; the child workspace-write sandbox and enterprise requirements stayed enabled. No account switch or credential copy was needed. The local CLI is pinned in generator/codex/package.json and its real npm lock. Reports are under artifacts/readiness/.
+
+Historical Stage 1 observation on 2026-11-01: global Codex CLI 0.142.5; local `codex exec --help` advertises stdin prompts, --sandbox workspace-write, --ephemeral, --skip-git-repo-check, --json, --color, -C, and --model. Version/help exited 0 with a read-only PATH-alias warning. This is interface evidence only. At that Stage 1 inspection, model access and writable generation were still unverified; the Stage 2 evidence above supersedes that readiness state.
 
 In Stage 2, choose an actually accessible binary/model using the same account/environment as the harness. An installed CLI's configured model is merely a candidate. Perform one minimal noninteractive request in an isolated disposable workspace, require successful completion, and then record binary/version/requested model and any reported effective model. If the service omits its effective ID, record UNREPORTED. If a compatible local CLI installation is necessary, use this project's own development-tool directory and a real exact lock; never copy another project's implementation or credentials. Account or sandbox failures block actual generation, not independent retained implementation work. Do not start an interactive login inside a child run or assume a paid/account entitlement.
 
-Planned adapter invocation, with a verified model substituted as an argument:
+Adapter invocation, with the verified model supplied as an argument:
 
 ```text
 codex exec --sandbox workspace-write --ephemeral --skip-git-repo-check --json --color never -C <candidate-workspace> --model <verified-model> -
@@ -75,7 +147,7 @@ Disposable integrity exceptions are explicit: trusted checks may create target-l
 
 ## Prompt template contract
 
-Stage 2 creates generator/prompts/client.md with configuration-driven substitutions. It must identify selected target/output, complete input inventory, active extensions, authored required outputs, dependency policy, target checks run by the parent, and actual repair diagnostics. State that only selected output is editable and that no old implementation is supplied or to be searched for. Require complete code, independent implementation, normal storage/transport for test interfaces, and truthful check/blocker reporting. Do not embed messaging algorithms, feature names, finished source, or hard-coded messages in generic prompts. Do not ask a candidate to install dependencies or author fake locks; trusted setup owns these steps.
+generator/prompts/client.md exists with configuration-driven substitutions. It must identify selected target/output, complete input inventory, active extensions, authored required outputs, dependency policy, target checks run by the parent, and actual repair diagnostics. State that only selected output is editable and that no old implementation is supplied or to be searched for. Require complete code, independent implementation, normal storage/transport for test interfaces, and truthful check/blocker reporting. Do not embed messaging algorithms, feature names, finished source, or hard-coded messages in generic prompts. Do not ask a candidate to install dependencies or author fake locks; trusted setup owns these steps.
 
 ## Execution bounds and reports
 
@@ -96,6 +168,6 @@ Report final PASS/FAIL/BLOCKED, times, commands as argument vectors, exits/timeo
 
 ## Clean regeneration and authorized evolution
 
-PLANNED — not implemented or verified: `python3 scripts/regenerate_check.py`. Make a fresh retained-input copy with no generated source or indirect source copies, Git history, previous agent sessions, transcripts, builds, or client stores. Standard installed interpreters/dependency download caches may be reused only if they cannot contain client implementations; record this environment reuse. Assert target directories are absent before generation. Freeze retained manifests, run setup, actual generator --target all, setup/build, and standalone baseline verification. Compare inventories/hashes afterward and preserve the original project. Record all command outcomes; this outer proof is never called by baseline verification itself.
+Implemented proof command: `python3 scripts/regenerate_check.py`. Make a fresh retained-input copy with no generated source or indirect source copies, Git history, previous agent sessions, transcripts, builds, or client stores. Standard installed interpreters/dependency download caches may be reused only if they cannot contain client implementations; record this environment reuse. Assert target directories are absent before generation. Freeze retained manifests, run setup, actual generator --target all, setup/build, and standalone baseline verification. Compare inventories/hashes afterward and preserve the original project. Record all command outcomes; this outer proof is never called by baseline verification itself.
 
-Evolution execution is deferred. If a selected FUTURE request or separate explicit experiment is authorized, first define its spec delta, affected targets, intended independent test changes, migration checks, and any retained server support. Freeze that revised contract; run the ordinary harness with registered extensions, baseline checks where applicable, and new checks. Verify generic runner/adapter/prompt hashes are unchanged to demonstrate adaptation from specs/configuration alone. Retain the reproducible delta/evidence. An isolated experiment must leave baseline source and the FUTURE queue unchanged. Do not pre-create a label or other feature specification in this Stage 1.
+Evolution execution is deferred. If a selected FUTURE request or separate explicit experiment is authorized, first define its spec delta, affected targets, intended independent test changes, migration checks, and any retained server support. Freeze that revised contract; run the ordinary harness with registered extensions, baseline checks where applicable, and new checks. Verify generic runner/adapter/prompt hashes are unchanged to demonstrate adaptation from specs/configuration alone. Retain the reproducible delta/evidence. An isolated experiment must leave baseline source and the FUTURE queue unchanged. Do not pre-create an unrequested feature specification.

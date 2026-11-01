@@ -1,6 +1,6 @@
 # Product specification
 
-Status: Stage 1 contract. Implementation and runtime verification are NOT_STARTED / NOT_RUN. Read [the decision record](../docs/DECISIONS.md) for effective choices and provenance.
+Status: current implemented contract. See STATUS for executed acceptance, regeneration, and pending manual evidence. Read [the decision record](../docs/DECISIONS.md) for effective choices and provenance.
 
 ## Your product choices
 

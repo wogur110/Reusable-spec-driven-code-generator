@@ -1,6 +1,6 @@
 # Design and ownership
 
-Status: Stage 1 architecture and rationale. Runtime behavior is specified, not demonstrated. [Decisions](docs/DECISIONS.md) record provenance; [status](docs/STATUS.md) separates readiness and evidence.
+Status: implemented architecture. The expanded 44-test baseline and nine harness guards pass; clean-regeneration proof passes with unchanged assertions. [Decisions](docs/DECISIONS.md) record provenance; [status](docs/STATUS.md) separates readiness and evidence.
 
 ## Your design priorities
 
@@ -53,20 +53,20 @@ No authentication, production security, network exactly-once guarantee, server d
 
 ## Dependency rationale
 
-Python 3.10+ standard libraries cover server, harness, SQLite client, and unittest. Node.js 22+ runs build/test tooling. Select exact TypeScript 5.9.3 and retained `@playwright/test` 1.56.1 with its matching Chromium for a reproducible compiler/browser test pair. Their upstream releases exist; compatibility in this repository is not yet tested. See [TypeScript release](https://github.com/microsoft/TypeScript/releases/tag/v5.9.3) and [Playwright release](https://github.com/microsoft/playwright/releases/tag/v1.56.1).
+Python 3.10+ standard libraries cover server, harness, SQLite client, and unittest. Node.js 22+ runs build/test tooling. Select exact TypeScript 5.9.3 and retained `@playwright/test` 1.56.1 with its matching Chromium for a reproducible compiler/browser test pair. Their upstream releases exist; the selected compiler/browser pair is installed and the expanded baseline passes. See [TypeScript release](https://github.com/microsoft/TypeScript/releases/tag/v5.9.3) and [Playwright release](https://github.com/microsoft/playwright/releases/tag/v1.56.1).
 
-Stage 2 creates real package-manager locks and records actual versions. The generation CLI is a separate development dependency; select and pin a version only after an authenticated readiness check in the harness environment. Do not infer current account access from installed binaries or successful work in another project. No runtime package or cloud messaging service is required.
+Real package-manager locks are committed; tested versions are recorded in STATUS. The generation CLI is a separate development dependency; select and pin a version only after an authenticated readiness check in the harness environment. Do not infer current account access from installed binaries or successful work in another project. No runtime package or cloud messaging service is required.
 
 ## Authorship and regeneration ownership
 
 | Artifact | Ownership boundary | Actual authorship/evidence |
 |---|---|---|
 | Instruction_for_Agent.md | Retained construction guide | User-supplied guide revised by the agent with user authorization; commit 216ef72 |
-| Root docs, specs/, docs/ | Retained contracts and workflow | Agent-authored during this Stage 1 from the guide and compared external requirements; no user field values were invented |
+| Root docs, specs/, docs/ | Retained contracts and workflow | Agent-authored in Stage 1 and reconciled with actual Stage 2 implementation/evidence; no user field values were invented |
 | USER preference cells | User-owned inputs | All 26 blank; adjacent defaults resolved separately |
 | M01–M06 | User-owned factual observations | Blank; no manual results recorded |
-| generator/, server/, tests/, scripts/ | Retained during client generation | NOT_STARTED; record real contributors and milestones in Stage 2 |
-| generated/python-client/, generated/typescript-web/ | Deletion/regeneration boundaries | NOT_STARTED; must be actual separate harness generation runs |
-| Dependency locks / compiled assets | Locks committed / builds disposable | NOT_CREATED; distinguish package-manager/compiler output from authored source |
+| generator/, server/, tests/, scripts/ | Retained during client generation | Parent coding agent authored retained infrastructure/tests; actual commits record milestones |
+| generated/python-client/, generated/typescript-web/ | Deletion/regeneration boundaries | Separate actual Codex 0.166.0 / requested gpt-6-astra harness calls; Python regenerated for the page-limit regression |
+| Dependency locks / compiled assets | Locks committed / builds disposable | npm created committed locks; TypeScript/Node produced disposable browser assets |
 
 Retained does not mean human-written. Do not invent authors, dates, commits, verification runs, or an old project lineage. Stage 2 records actual commands, input/test hashes, repairs, and generated source provenance. A release archive includes authentic history and excludes credentials, stores, caches, and old source-bearing transcripts; verify restoration before marking archive completion.

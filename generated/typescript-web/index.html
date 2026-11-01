@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Local Messenger</title><link rel="stylesheet" href="./styles.css"></head>
+<body><main data-testid="app-ready" data-ready="false">
+<header><h1>Local Messenger</h1><p>Durable messages for one local server session.</p></header>
+<p data-testid="connection-status" data-state="unknown" role="status">Unknown connection</p>
+<p data-testid="error-message" role="alert"></p>
+<form id="login-form"><label>Username<input data-testid="username-input" autocomplete="off" spellcheck="false"></label><button data-testid="login-button" disabled>Log in</button></form>
+<p id="identity" hidden>Signed in as <strong data-testid="current-user"></strong></p>
+<form id="send-form"><label>Recipient<input data-testid="recipient-input" autocomplete="off" spellcheck="false" disabled></label><label>Message<textarea data-testid="message-input" rows="4" disabled></textarea></label><button data-testid="send-button" disabled>Send</button></form>
+<p>Accepted by server is not delivery or read confirmation.</p>
+<div class="settings"><label>Development transport <select data-testid="transport-mode"><option value="online">online</option><option value="offline">offline</option></select></label><button type="button" data-testid="reset-button" disabled>Reset local store</button></div>
+<section id="reset-panel" hidden><p>Clear this application's identity and all local messages? Use fresh stores after a server restart.</p><button type="button" data-testid="reset-confirm">Confirm reset</button><button type="button" data-testid="reset-cancel">Cancel</button></section>
+<div class="columns"><section><h2>Inbox</h2><div data-testid="inbox"></div></section><section><h2>Outgoing messages</h2><div data-testid="outbox"></div></section></div>
+<footer>Use one active tab per identity. Keep this server running: restarting it loses server messages. Browser storage is specific to this origin and profile. Closed tabs do not synchronize.</footer>
+</main><script type="module" src="./main.js"></script></body></html>

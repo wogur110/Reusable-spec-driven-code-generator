@@ -1,0 +1,6 @@
+{
+  "name": "generation-cli-tool",
+  "private": true,
+  "version": "1.0.0",
+  "devDependencies": {"@openai/codex": "0.166.0"}
+}

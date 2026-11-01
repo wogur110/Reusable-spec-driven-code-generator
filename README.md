@@ -2,11 +2,11 @@
 
 A reusable agentic harness that turns written specifications into independent Python and TypeScript clients. A local messaging application provides a concrete example of offline queues, durable client state, and interoperability.
 
-**Status: Stage 1 specifications complete. Implementation has not started.** The commands below are **PLANNED — not implemented or verified**. No application, harness, package manifests, or executable tests have been created in this repository. [Status and evidence](docs/STATUS.md) distinguishes document checks from future runtime checks.
+**Status: Stage 2 implementation complete.** The expanded 44-test acceptance suite and nine harness guard tests pass. Clean regeneration and archive/history restoration are verified; user manual review is pending. [Status and evidence](docs/STATUS.md) records actual runs and limitations.
 
 ## Start here
 
-For this project, Stage 1 has already created the documents. Read [the resolved choices](docs/DECISIONS.md), review the edit map below, and leave the preference cells blank if the defaults fit. You do not need to fill every field, write technical specifications, or run terminal commands now.
+To try the committed application, follow the local demonstration below and [TESTING.md](TESTING.md). Read [the resolved choices](docs/DECISIONS.md) and the edit map if you want to change behavior. Leave preference cells blank when the defaults fit; you do not need to author wire protocols or database schemas.
 
 The defaults are a Python terminal client, a plain TypeScript browser client, a small local Python server, and Codex-driven generation. Both clients persist identity and messages. The server retains data only while its process runs; each new server session requires explicit fresh/reset demo client stores. No extra feature or evolution experiment is active.
 
@@ -60,7 +60,7 @@ These are messages to the coding agent, not shell commands. Reviewing a document
 
 ## Where everything belongs
 
-Only Markdown files exist at this stage. Implementation paths are planned destinations.
+The implementation paths below exist. Only the two generated client directories are replacement boundaries.
 
 | Location | Role / regeneration ownership |
 |---|---|
@@ -81,13 +81,15 @@ Only Markdown files exist at this stage. Implementation paths are planned destin
 
 Do not delete the server, tests, scripts, specs, or harness when checking regeneration. Source must be recreated through the coding tool; restoring previous clients from Git or an archive does not prove generation. The clean proof uses a separate retained-input workspace and preserves your current tree.
 
-## Planned setup, generation, and verification
+## Setup, generation, and verification
 
-**PLANNED — not implemented or verified. Do not run these during Stage 1.** Prerequisites are Python >=3.10 with sqlite3, Node >=22/npm, Git, and a compatible authenticated Codex CLI for generation. No coding-tool authentication is needed to run committed clients. Stage 2 must test actual model access in the harness environment; the installed CLI's name/version alone does not establish it. [GENERATE.md](GENERATE.md#coding-tool-readiness) defines that check.
+Verified environment: Ubuntu 22.04/WSL2, Python 3.10.12, Node 22.17.0, npm 10.9.2, and Chromium 141.0.7390.37. Setup installs exact TypeScript/Playwright and project-local Codex 0.166.0 dependencies from real npm locks. It can extract missing Ubuntu NSS/NSPR browser libraries into /tmp/reusable-spec-native without system installation. Other operating systems are unverified.
+
+Generation uses requested model gpt-6-astra, successfully checked with the current account; the service did not report an effective model identifier. Each harness run repeats a bounded authenticated preflight. On another machine, authenticate the local CLI if needed with `generator/codex/node_modules/.bin/codex login`. Running committed clients requires no model access. [GENERATE.md](GENERATE.md#coding-tool-readiness) explains the distinction.
 
 ```sh
-python3 scripts/check_environment.py
 python3 scripts/setup.py
+python3 scripts/check_environment.py
 python3 generator/run.py --target all
 python3 scripts/setup.py
 python3 scripts/verify.py --suite all
@@ -97,16 +99,17 @@ python3 scripts/regenerate_check.py
 
 Select an individual target with --target python or --target typescript. Candidate failures preserve published clients. A target-only run without the other client explicitly reports interoperability NOT_RUN. Reports and nonzero failure/blocker exits are part of the contract. Exact interfaces, timeouts, isolation, lock generation, and publication rules are in [GENERATE.md](GENERATE.md).
 
-## Planned local demonstration
+## Run the local demonstration
 
-**PLANNED — not implemented or verified.** After Stage 2, build and start the demo in the project directory:
+Open a terminal in this project directory and run:
 
 ```sh
+python3 scripts/setup.py
 python3 scripts/build.py --target all
 python3 scripts/demo.py --port 8765
 ```
 
-Keep that terminal open. The demo prints a browser URL and a complete Python command for a second terminal with a fresh store. In VS Code open another terminal with +, use the same project directory, paste the printed Python command, and enter alice at the client's Username prompt. Open the printed local URL in a fresh private browser window and enter bob. See [the exact launch steps](TESTING.md#planned-manual-launch-two-terminals-and-one-browser).
+Keep that terminal open. The demo prints a browser URL and a complete Python command for a second terminal with a fresh store. In VS Code open another terminal with +, use the same project directory, paste the printed Python command, and enter alice at the client's Username prompt. Open the printed local URL in a fresh private browser window and enter bob. See [the exact launch steps](TESTING.md#manual-launch-two-terminals-and-one-browser).
 
 Alice types `send bob Hi Bob, I have something important to tell you` at the running client's prompt. Bob sees it in the browser inbox and replies to alice with `What is it?`. CLI commands inbox/outbox/status and browser rows show messages and queued/accepted by server/failed states. Follow [the eight-step offline walkthrough](TESTING.md#manual-interoperability-walkthrough), including the final Alice reconnect. Manual development toggles control each client independently; automated tests additionally fail real API transport without shutting down the server.
 
@@ -137,6 +140,6 @@ Examples are not an active queue. Documentation-only requests use document check
 
 Runtime is local and unauthenticated; sender names are not secure identities. Client persistence does not provide server crash recovery. Keep one server session alive during outage testing, use fresh/reset client stores after restarting the server, and do not expect offline browser asset loading or closed-app delivery. One active instance per identity is supported. These limits and deferred coverage are specified in PRODUCT/ACCEPTANCE and TESTING.
 
-The user provided direction and the construction guide; the agent authored these Stage 1 contracts. Retained does not mean human-authored. No client generation or runtime test success is claimed yet. See [authorship](DESIGN.md#authorship-and-regeneration-ownership), [source provenance](docs/ASSIGNMENT.md), and [review mapping](docs/ASSIGNMENT_REVIEW.md).
+The user provided direction and the construction guide. The parent coding agent authored specifications and retained infrastructure/tests; actual isolated Codex harness calls authored both clients. The Python client was regenerated after a valid maximum-size response regression was reproduced. Retained does not mean human-authored. Actual run counts, hashes, and limitations are recorded in STATUS. See [authorship](DESIGN.md#authorship-and-regeneration-ownership), [source provenance](docs/ASSIGNMENT.md), and [review mapping](docs/ASSIGNMENT_REVIEW.md).
 
-Stage 2 must preserve actual incremental history and package committed source plus restorable Git history through the planned `python3 scripts/package.py`. Verify source inventory and history restoration. A review archive can be prepared with pending human observations; final readiness must report those outstanding checks honestly. Never include credentials, live client stores, caches, or previous generation transcripts in the source archive.
+Authentic incremental commits record the implementation and generation milestones. `python3 scripts/package.py` packages committed source plus a Git bundle, verifies source inventory, and checks history restoration in a fresh clone. It requires a clean working tree. A review archive can be prepared with pending human observations; final readiness must report those outstanding checks honestly. Never include credentials, live client stores, caches, or previous generation transcripts in the source archive.

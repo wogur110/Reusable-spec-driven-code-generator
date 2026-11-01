@@ -1,6 +1,6 @@
 # Python client contract
 
-Status: Stage 1 specification; commands below are PLANNED — not implemented or verified. Shared behavior is authoritative in [PRODUCT.md](PRODUCT.md) and [PROTOCOL.md](PROTOCOL.md).
+Status: current implemented Python contract; the commands below are supported. Shared behavior is authoritative in [PRODUCT.md](PRODUCT.md) and [PROTOCOL.md](PROTOCOL.md).
 
 ## Source and entry point
 

@@ -17,16 +17,16 @@ Private source paths and commissioning details are intentionally absent. NOT_INC
 
 ## Verified obligations
 
-| ID | Source obligation | Project realization / future evidence |
+| ID | Source obligation | Project realization / evidence |
 |---|---|---|
-| SRC-01 | Deliver a reusable generator driven by a written specification through Codex or Claude Code. | Codex selected by W01; declared harness contract in GENERATE.md, actual execution deferred. |
+| SRC-01 | Deliver a reusable generator driven by a written specification through Codex or Claude Code. | Codex selected by W01; declared harness contract in GENERATE.md, actual generation evidence in STATUS. |
 | SRC-02 | Deleting the marked generated client source and invoking the generator recreates working clients. | Two explicit generated boundaries; fresh workspace proof AT-15 with unchanged acceptance tests. |
 | SRC-03 | Implement two clients in different languages without shared messaging source. | Python and TypeScript selected; common written protocol, independently generated implementations. |
 | SRC-04 | Identify a user by name, send addressed text, queue locally during outage, flush on reconnect, and display incoming messages. | PRODUCT requirements and PROTOCOL state/retry/durability contract. |
 | SRC-05 | Support the specified Alice/Bob exchange and independent offline sequence. | Exact first two texts and original seven steps retained in ACCEPTANCE; explicit final Alice reconnect adds verification. |
 | SRC-06 | Application runs locally without external runtime services or turnkey messaging SDKs; general-purpose libraries are allowed. | Local stdlib Python server, local browser assets, SQLite/IndexedDB clients. Generation-time tool authentication is separate. |
 | SRC-07 | Keep the server small; in-memory operation is sufficient. | One process and locked memory streams/receipts; explicit client reset for new server sessions. |
-| SRC-08 | Provide repository archive(s) with generated source and meaningful authentic commit history. | Single repository, source/lock inclusion, defined archive restoration proof; runtime evidence deferred. |
+| SRC-08 | Provide repository archive(s) with generated source and meaningful authentic commit history. | Single repository, source/lock inclusion, defined archive restoration proof; archive verification recorded in STATUS. |
 | SRC-09 | Make harness, specs, generator usage, generated boundaries, server, and actual authorship easy to find. | README navigation, DESIGN ownership, AGENTS and GENERATE workflows. |
 | SRC-10 | Demonstrate design judgment, quality, interoperability, authoritative specs, and suitability for evolving specifications. | Independent test plan and criterion mapping; distinguish baseline proof from deferred executed evolution. |
 

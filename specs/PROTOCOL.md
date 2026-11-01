@@ -1,6 +1,6 @@
 # Messaging protocol version 1
 
-Status: complete Stage 1 wire and synchronization contract; no server or client has been implemented in this repository. This specializes [PRODUCT.md](PRODUCT.md).
+Status: current wire and synchronization contract, implemented by the server and generated clients. This specializes [PRODUCT.md](PRODUCT.md).
 
 ## Transport and address
 
@@ -26,6 +26,8 @@ The server accepts at most 32,768 request-body bytes. POST requires one nonnegat
 | Error | Exactly `error`, whose object has exactly `code` (one code below), `message` (nonempty English string), `field` (null or a field name below). Error prose is not stable; tests assert code/field/status. |
 
 Error fields are `message_id`, `sender`, `recipient`, `text`, `after`, or null. Error messages contain no credentials or internal traceback.
+
+The 32,768-byte limit applies to request bodies, not receive pages. A valid page containing 100 texts of 4,096 control characters expands to approximately 2.47 MB when JSON-escaped by this server. Clients must accept every maximum-size page the server can emit; if imposing a response-buffer cap, allow at least 4 MiB. Validate the decoded message count and text-byte limits independently.
 
 ## Routes
 
@@ -106,7 +108,7 @@ Before networking, atomically allocate local order, generate a previously unused
 | 200/201 with JSON Receipt, matching all three submitted identity/address fields and a valid sequence | accepted with that sequence; never send this entry again |
 | Connection failure, five-second total deadline, HTTP 408/429/5xx | queued with an actionable error; retry the same payload |
 | Other HTTP 4xx, even with a malformed/non-JSON error body | failed; use the valid Error when available, otherwise a local HTTP_ERROR explanation |
-| Redirect, other HTTP status, wrong content type, malformed success JSON, mismatched/invalid Receipt | queued; PROTOCOL_ERROR, because acceptance is uncertain |
+| Redirect, other HTTP status, wrong content type, malformed success JSON, mismatched/invalid Receipt | queued; PROTOCOL_ERROR when distinguishable, because acceptance is uncertain. Browser fetch with redirect:error may expose a redirect only as TypeError; TRANSPORT_ERROR is allowed for that indistinguishable failure. |
 | Failure to commit accepted/failed state | Preserve the last committed queued record; report STORAGE_UNAVAILABLE and permit idempotent retry |
 
 No queued item is dropped for retry count. Failed rows are retained and excluded from future sends; the user can submit a new message as a new ID. A response body/content-type failure must not obscure a known permanent HTTP 4xx status. Local validation never consumes a message ID/order in durable storage.

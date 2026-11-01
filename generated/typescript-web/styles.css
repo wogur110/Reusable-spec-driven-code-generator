@@ -1,0 +1,12 @@
+:root { font-family: system-ui, sans-serif; color: #182936; background: #f3f6f8; line-height: 1.5; }
+body { margin: 0; } main { max-width: 1000px; margin: auto; padding: 2rem; }
+h1,h2 { line-height: 1.2; } form { display: grid; gap: .8rem; max-width: 40rem; }
+label { display: grid; gap: .3rem; } input,textarea,select,button { font: inherit; padding: .6rem; border: 1px solid #8095a4; border-radius: .3rem; }
+textarea { resize: vertical; } button { cursor: pointer; background: #174f70; color: white; } button:disabled { opacity: .5; cursor: default; }
+:focus-visible { outline: 3px solid #dd9d1c; outline-offset: 2px; }
+.columns { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; } .settings { display: flex; gap: 1rem; align-items: end; flex-wrap: wrap; }
+article { background: white; padding: 1rem; border: 1px solid #c3d0d8; border-radius: .4rem; margin: .8rem 0; overflow-wrap: anywhere; }
+[data-testid="message-text"] { white-space: pre-wrap; } [data-testid="error-message"], [data-testid="message-error"] { color: #9a241b; }
+[data-testid="connection-status"] { font-weight: 600; } [data-state="queued"] { border-left: 4px solid #a66c00; } [data-state="accepted"] { border-left: 4px solid #287446; } [data-state="failed"] { border-left: 4px solid #ad3026; }
+footer { color: #485b68; margin-top: 2rem; } [hidden] { display: none !important; }
+@media(max-width: 650px) { .columns { grid-template-columns: 1fr; gap: .5rem; } main { padding: 1rem; } }

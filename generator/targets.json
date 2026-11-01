@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "shared_specs": [
+    "PRODUCT.md",
+    "PROTOCOL.md",
+    "ACCEPTANCE.md"
+  ],
+  "extensions": [],
+  "context_files": [
+    "Instruction_for_Agent.md",
+    "README.md",
+    "AGENTS.md",
+    "DESIGN.md",
+    "GENERATE.md",
+    "TESTING.md",
+    "docs/DECISIONS.md"
+  ],
+  "agent": {
+    "tool": "codex",
+    "binary": "generator/codex/node_modules/.bin/codex",
+    "model": "gpt-6-astra",
+    "timeout_seconds": 600,
+    "template": "generator/prompts/client.md"
+  },
+  "repair_rounds": 3,
+  "total_timeout_seconds": 5400,
+  "dependency_policy": {
+    "python": "standard library only, Python >=3.10",
+    "node": ">=22",
+    "typescript": "5.9.3",
+    "playwright": "1.56.1",
+    "browser_runtime": "no dependencies or CDN"
+  },
+  "targets": {
+    "python": {
+      "specs": [
+        "PYTHON.md"
+      ],
+      "output": "generated/python-client",
+      "required_files": [
+        "main.py"
+      ],
+      "managed_lockfiles": [],
+      "checks": [
+        [
+          "{python}",
+          "scripts/build.py",
+          "--target",
+          "python"
+        ],
+        [
+          "{python}",
+          "scripts/verify.py",
+          "--suite",
+          "python-interface"
+        ]
+      ]
+    },
+    "typescript": {
+      "specs": [
+        "TYPESCRIPT.md"
+      ],
+      "output": "generated/typescript-web",
+      "required_files": [
+        "index.html",
+        "styles.css",
+        "src/main.ts",
+        "package.json",
+        "package-lock.json",
+        "tsconfig.json"
+      ],
+      "managed_lockfiles": [
+        "package-lock.json"
+      ],
+      "checks": [
+        [
+          "{python}",
+          "scripts/build.py",
+          "--target",
+          "typescript"
+        ]
+      ]
+    }
+  },
+  "setup_command": [
+    "{python}",
+    "scripts/setup.py",
+    "--skip-browser-install"
+  ],
+  "verify_command": [
+    "{python}",
+    "scripts/verify.py",
+    "--suite",
+    "all",
+    "--report",
+    "{report}"
+  ],
+  "verify_timeout_seconds": 600
+}
