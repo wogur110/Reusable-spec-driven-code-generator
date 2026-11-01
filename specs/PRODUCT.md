@@ -1,6 +1,6 @@
 # Product specification
 
-Status: implemented and verified CHG-001 desktop contract. See STATUS for executed acceptance, regeneration, and pending manual evidence. Read [the decision record](../docs/DECISIONS.md) for effective choices and provenance.
+Status: current product contract includes CHG-001 client desktop and CHG-002 retained server desktop behavior. See STATUS for executed acceptance, regeneration, and pending manual evidence. Read [the decision record](../docs/DECISIONS.md) for effective choices and provenance.
 
 ## Your product choices
 
@@ -26,7 +26,7 @@ Edit only `Your input` to change a preference. Blank, whitespace-only, `TBD`, an
 
 The deliverable is a configurable generation harness; local messaging demonstrates its behavior. CHG-001 resolves the Python interface to a Tkinter desktop GUI alongside the plain TypeScript/HTML/CSS browser client, independently implemented against [PROTOCOL.md](PROTOCOL.md). CHG-001 changes presentation and lifecycle; no protocol extension is active. The original blank preference cells remain preserved; the explicit request overrides the P04/P08 CLI defaults as recorded in DECISIONS.
 
-One server process defines a demonstration session. One running client instance per username and one browser tab per identity are supported. Different clients use different identities and stores. There is no registration service, authentication, authorization, production hosting, or protection against impersonation. Client persistence assumes a writable store that the user/browser has not deleted or evicted. Network requests cannot guarantee exactly-once transmission.
+One running server instance defines a demonstration session; a GUI Stop followed by Start begins a new session in the same process. One running client instance per username and one browser tab per identity are supported. Different clients use different identities and stores. There is no registration service, authentication, authorization, production hosting, or protection against impersonation. Client persistence assumes a writable store that the user/browser has not deleted or evicted. Network requests cannot guarantee exactly-once transmission.
 
 ## Resolved requirements
 
@@ -48,7 +48,7 @@ One server process defines a demonstration session. One running client instance 
 | REQ-RECEIVE-01 | Fetch contiguous recipient pages and commit inbox rows and cursor atomically. Validate an entire page before committing. Failure never skips uncommitted messages. | P07; derived durability |
 | REQ-PERSIST-01 | Normal client restart retains identity, original pending IDs/payloads/order, accepted/failed outbox rows, inbox, and cursor. Unsupported store versions fail visibly without clearing data. | P07; A01 |
 | REQ-FAILURE-01 | Invalid commands/drafts do not enqueue. Storage failures remain visible; acceptance-write failure leaves the original queued entry available for retry. Invalid receive pages leave storage unchanged. | A03; derived failure behavior |
-| REQ-SESSION-01 | The server retains accepted messages for its process lifetime. After restarting it, explicitly reset demo client stores; automatic cross-session reconciliation is excluded. CURSOR_INVALID pauses synchronization until reset. | D04 |
+| REQ-SESSION-01 | The server retains accepted messages for one running server instance (one Start/Stop session in the server GUI). After restarting it, explicitly reset demo client stores; automatic cross-session reconciliation is excluded. CURSOR_INVALID pauses synchronization until reset. | D04 |
 | REQ-UI-01 | Both clients show incoming sender/exact text and outgoing recipient/text/state/error. Automatic synchronization must not block input. Both provide graphical login, compose, inbox/outgoing, transport, and confirmed-reset controls; Python uses PYTHON.md and browser uses TYPESCRIPT.md. | P04–P05; A04 |
 | REQ-TEST-01 | Test actual clients, desktop and browser interactions, independent transport faults, reversed roles, and the fixed scenario. Observable transitions have 30-second deadlines; required tests cannot be skipped or weakened during repair. | Source requirements; A01–A05; W04 |
 | REQ-RELEASE-01 | Record authorship separately from generated/retained ownership. Preserve real incremental commits, committed client source/locks, verification evidence, and an archive with restorable Git history. | Source requirements |
@@ -60,3 +60,7 @@ The receive guarantee is one visible inbox row per `(sender,message_id)` under a
 An already-loaded browser page can queue during an API outage; first load or reload requires its local assets to be reachable. Closed-tab/closed-process delivery and reliable background-tab timing are excluded. Reopening or activating a client resumes synchronization. Unknown wire fields are rejected until an extension is explicitly registered and reconciled. No labels, search, attachments, or group feature is selected.
 
 Platform contracts: [PYTHON.md](PYTHON.md), [TYPESCRIPT.md](TYPESCRIPT.md). Requirement coverage: [ACCEPTANCE.md](ACCEPTANCE.md).
+
+## CHG-002 server operation
+
+REQ-SERVER-UI-01: Provide an optional local Tkinter/ttk server control window for starting, stopping, and monitoring the same retained HTTP server. Follow [SERVER.md](SERVER.md) for lifecycle, controls, monitoring, and error behavior. The terminal server, wire protocol, independent clients, and client stores remain compatible. Each new server instance starts empty, even within one GUI process. Source: explicit CHG-002; no USER preference cell changes.

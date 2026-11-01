@@ -2,6 +2,12 @@
 
 Updated 2026-11-01 (America/Los_Angeles). The agent authored specifications and retained infrastructure/tests; actual isolated Codex harness calls authored both clients. Blank USER preferences are not user-authored answers, and automated/agent checks do not fill manual observations.
 
+## CHG-002 complete
+
+The retained server desktop passes 65/65 acceptance cases and nine harness guards. Clean proof 20261101T204250502871Z recreated both clients with the unchanged harness, passed 65/65 inside it and 65/65 standalone, and preserved the original tree. Published clients, wire protocol, target configuration and generic runner/prompt remain unchanged. The request and evidence were archived in CHANGES before removal from FUTURE. The user confirmed CHG-002 works well on 2026-11-01; detailed scenario observations remain unrecorded.
+
+The first full run passed 64/65 and timed out during SG-06 teardown; all its messaging assertions had passed. The fixture now recognizes already-signaled child processes instead of waiting for a second exit. The focused cases and corrected full suite pass. Earlier native checks exposed a fixture window-title collision and Tk/socket cleanup issues, corrected before the final snapshot. Failed reports remain recorded, without automatic whole-test retries, skips, deadline increases or weakened assertions. Agent visual inspection passed and is separate from user evidence.
+
 ## CHG-001 complete
 
 The Python desktop client was generated through the actual harness and passed 55 acceptance tests; nine harness guards also pass. Independent GUI checks cover both-role messaging, exact text, legacy stores, restart, actual held-response reset, validation, responsiveness and shutdown. Agent visual inspection passed; user observations remain separate. Clean proof 20261101T151017779910Z recreated both clients and passed 55 tests inside the harness and again standalone while preserving the original tree. The original request and actual evidence were archived in [CHANGES](CHANGES.md) before removing its completed active entry.
@@ -17,14 +23,14 @@ Earlier clean proof 20261101T143710332729Z remains FAIL: TypeScript's initial co
 | Environment | VERIFIED for this environment | Ubuntu 22.04.5/WSL2 x86_64; Python 3.10.12, SQLite 3.37.2, Node 22.17.0, npm 10.9.2, Git 2.34.1; Tk 8.6.12; native GUI prerequisites installed by the user |
 | Coding-tool access | PASS | Project-local Codex 0.166.0, requested gpt-6-astra, effective UNREPORTED; authenticated writable preflight and real generation calls |
 | Implementation | COMPLETE | Retained components and generated clients build; actual generation, required checks, clean proof, and operating documentation complete |
-| Automated baseline | PASS | 55 tests: nine protocol, four machine interface, 31 existing client/browser cases, 11 desktop cases; zero failures/skips/flaky results |
+| Automated baseline | PASS | 65 tests: nine protocol, four machine interface, 31 existing client/browser, 11 client desktop, eight server GUI and two server/client integration cases; zero failures/skips/flaky results |
 | Harness guards | PASS | Nine AT-18 tests, including inventory/path violations, incomplete events, invalid reports, timeout, input allowlisting, and publication rollback |
-| Clean regeneration | PASS | Run 20261101T151017779910Z recreated both clients, passed 55 tests in the harness and again standalone, and preserved the original tree |
-| Evolution | PASS — CHG-001 | Revised desktop contracts/tests/configuration pass through the unchanged generic runner/prompt; no protocol extension or SQLite migration |
+| Clean regeneration | PASS | Run 20261101T204250502871Z recreated both clients, passed 65 tests in the harness and again standalone, and preserved the original tree |
+| Evolution | PASS — CHG-001 and CHG-002 | Client desktop evolution and retained server GUI compatibility verified; unchanged generic runner/prompt; no CHG-002 client/wire/storage change |
 | Optional storage/crash injections | NOT_RUN — deferred | OF-01/OF-02 remain disclosed optional executions; normal restart, malformed-page rollback, and unsupported-store checks pass |
-| User manual review | GENERAL CONFIRMATION RECEIVED | On 2026-11-01 the user stated “I confirmed that it works well.” Detailed M01–M06 observations were not supplied; source cells remain blank. |
-| Review archive | VERIFIED | CHG-001 source inventory (63 files), byte equality, Git bundle restoration and git fsck pass; run 20261101T153354714666Z. Packaging is rerun after final evidence commits; each manifest identifies its exact revision. |
-| Final release readiness | NOT_READY — detailed observations and current archive pending | General user confirmation received; detailed M01–M06 observations remain blank. Existing archive verification applies to the recorded pre-squash revision; the consolidated revision has not been packaged. |
+| User manual review | GENERAL CONFIRMATION RECEIVED — CHG-001 and CHG-002 | The user confirmed CHG-002: “I found it works well.” Detailed M01–M06 observations were not supplied; source cells remain blank. |
+| Review archive | PRIOR REVISION VERIFIED; CURRENT NOT_CREATED | Earlier CHG-001 archive passed source/history restoration. Package the final committed CHG-002 revision separately; prior manifests do not cover it. |
+| Final release readiness | NOT_READY — manual observations and current archive pending | CHG-002 implementation/automated checks are complete. Detailed user observations and an archive of the final CHG-002 revision remain pending. |
 
 Baseline Stage 2 implementation completion requires generation, builds, required acceptance/guard checks, clean regeneration, and truthful operating documentation. Pending user observations and unrequested evolution remain separate; neither is silently marked passed.
 
@@ -73,3 +79,7 @@ The user can follow [the two-terminal walkthrough](../TESTING.md#manual-launch-t
 ## CHG-001 history consolidation
 
 At the user’s request, the five CHG-001 commits after baseline `2b2d205` were consolidated with the README summary and general user confirmation into one commit. Historical revision IDs in test evidence identify the actual pre-squash execution snapshots; their reports are unchanged. The original history is preserved in the verified local bundle `artifacts/history/CHG-001-before-squash.bundle`. See [CHANGES](CHANGES.md) for the consolidation record. No application code or test assertions changed during consolidation.
+
+## CHG-002 execution references
+
+Published-client acceptance: artifacts/changes/CHG-002/acceptance.json (65/65). Guards: artifacts/changes/CHG-002/harness.json (9/9). Clean proof: artifacts/regeneration/20261101T204250502871Z/report.json, inner generation 20261101T204302588941Z, calls per target {"python": 3, "typescript": 3}. See CHANGES and EVIDENCE.json for frozen input/output hashes and failed-run history. The actual server screenshot is artifacts/changes/CHG-002/server-desktop.png; this is agent evidence only.

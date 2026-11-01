@@ -88,3 +88,53 @@ At the user's explicit request, these five commits were combined with the README
 The original history is preserved in `artifacts/history/CHG-001-before-squash.bundle`, verified with `git bundle verify` before consolidation. This is a local backup excluded from source publication. Historical hashes above and in EVIDENCE.json continue to identify the original tested snapshots; they are not hashes of the consolidated commit. Earlier project history is preserved. No remote push is part of this consolidation. Existing archive verification remains evidence for its original revision, not the newly consolidated revision.
 
 Consolidation checks: documentation whitespace validation, unchanged application/specification/test trees, preserved USER blocks, and a single commit after the unchanged baseline. Runtime checks were not rerun for this documentation/history-only operation.
+
+## CHG-002 — Local server desktop GUI — COMPLETE
+
+Completed 2026-11-01T13:08:15.988378-08:00 (America/Los_Angeles). Required automated checks and clean regeneration passed. The user subsequently confirmed that CHG-002 works well, as recorded below; detailed scenario observations remain unrecorded. This record is written before removing the selected request from FUTURE.md.
+
+### Original request (verbatim)
+
+```text
+CHG-002: Add a desktop GUI for the local Python server
+- State: PROPOSED
+- Change: Add a local desktop GUI for starting, stopping, and monitoring the existing Python messaging server.
+- Reason: The user should be able to operate the server and inspect its status and message activity without interacting with a terminal.
+- Scope: The retained server, its management interface and lifecycle, relevant specifications, server/GUI integration tests, and launch/testing documentation.
+- Dependency: An implemented baseline server and clients. CHG-001 is not required; validate with the current clients, including the Python GUI if it has already been applied.
+- Priority: Normal. Suggested after CHG-001.
+```
+
+### Decisions, scope, and compatibility
+
+The retained server now has an optional Tkinter/ttk control window (`python3 server/gui.py`) with Start, Stop, Open browser, session/address/status, response/error counts, recent responses, accepted messages, and exact selected-message text. The original terminal server remains available and uses the same Server/Handler. Listening stays loopback-only. Background startup/shutdown, tracked connection closure, and Tk-thread-only widget updates keep lifecycle actions responsive. Counts and the latest-200 displays are locked, bounded snapshots and do not consume messages or alter protocol state.
+
+P10 remains blank (previous effective default: no extra essential feature); the later explicit CHG-002 adds server management. D02 remains blank with its small local in-memory-process default; the GUI uses the same process with one running Server per Start/Stop session. P04/P08 retain the CHG-001 client choices. All 26 preferences and M01–M06 USER blocks are unchanged. REQ-SESSION-01 clarifies that every new Server instance starts empty, including a GUI restart inside the same process. Fresh/reset client stores are still required. This is compatible with the local-runtime/small-server requirements and adds no cloud service, wire endpoint, database migration, or client behavior change.
+
+Contracts were updated before implementation: REQ-SERVER-UI-01, specs/SERVER.md, PRODUCT/ACCEPTANCE, DESIGN and DECISIONS. Independent SG-01–SG-06 tests were written first and initially failed because server.gui was absent. Retained changes are server/gui.py, server/main.py, tests/server_gui/, tests/server_gui_driver.py, tests/browser/server-desktop.spec.js, tests/browser/fixtures.js and scripts/verify.py. README, TESTING and GENERATE document actual operations. No generated client was hand-patched or replaced; no targeted client regeneration was needed for this server-only delta. The actual clean proof nevertheless recreated both clients through the unchanged harness and ran the expanded suite.
+
+### Actual checks and evidence
+
+| Command / observation | Result |
+|---|---|
+| Pre-implementation retained test import | Expected FAIL: server.gui absent; artifacts/changes/CHG-002/red.json. |
+| Initial native test attempt | Sandbox Xvfb socket denial, zero tests; not accepted as a pass. Authorized native execution then ran the tests. |
+| First native GUI run | 7/8; production-window discovery matched the fixture window. Test fixture title corrected without weakening visibility checks. Pending Tk timer cleanup and closed-socket response handling were also corrected. |
+| First expanded suite | 64/65; all application assertions passed, but SG-06 cleanup waited for a second exit from an already-signaled subprocess. Retained stop helper now recognizes signalCode. This failed report remains FAIL. |
+| Focused server/client recheck | 2/2 PASS after the fixture correction; artifacts/changes/CHG-002/focused-restart.json. |
+| python3 scripts/verify.py --suite all --report artifacts/changes/CHG-002/acceptance.json | PASS 65/65: 55 preserved cases + eight server-widget/HTTP tests + two GUI-managed client cases; zero failures/skips/flaky cases. |
+| python3 scripts/verify.py --suite harness --report artifacts/changes/CHG-002/harness.json | PASS 9/9. |
+| python3 scripts/regenerate_check.py | PASS 20261101T204250502871Z; actual all-client generation 20261101T204302588941Z, calls per target {"python": 3, "typescript": 3}. 65/65 inside the harness and 65/65 standalone, zero failures/skips/flaky cases; original tree preserved. |
+| Clean-generation repair | Initial Python candidate changed a queued row error field during intentional offline restart; unchanged AT-01/AT-09 snapshot assertion failed. The next candidate passed 63/65 but failed two existing GUI-04 reset assertions (stale outbox and prematurely visible login). All new server GUI checks passed. Further ordinary bounded repair used the same frozen contracts/tests before the successful results above. |
+| Agent visual inspection | PASS: actual control window, accepted messages/counts, and full Unicode/multiline detail; artifacts/changes/CHG-002/server-desktop.png. Not user manual evidence. |
+| Document/source checks | USER blocks, published client hashes, protocol, generic generator/config/prompt preserved; local links and whitespace checked. Final documentation/evidence edits do not change the verified code, specs or tests. |
+
+The verification snapshot was based on `d6fdcd50c850a9e9e1445de784f329eed2c07813` plus the authorized CHG-002 working-tree changes. Exact frozen inputs, call counts, output hashes and reports are recorded in EVIDENCE.json. Original generated source is identical to the pre-change snapshot; fresh generated source exists only in the disposable proof workspace. The generic runner, prompt and target configuration hashes are unchanged. Historical pre-squash revision IDs remain historical evidence, not newly invented commits.
+
+### Manual verification and limits
+
+Follow [the server GUI walkthrough](../TESTING.md#server-gui-manual-verification-chg-002): launch, Start, exchange messages with the current Python desktop/browser clients, inspect activity, Stop, then restart with fresh stores. README contains only a brief change summary. Native packages are unchanged: python3-tk, xvfb, x11-xkb-utils and x11-utils. Tests use isolated Xvfb; interactive use requires a working desktop display. The external browser-launch call is tested with a mock opener; actual browser launch on the user's desktop still needs manual confirmation. Native Windows/macOS remain unverified. Session monitoring is local/in-memory; no delivery/read receipt or online-user count is claimed. A new release archive must identify its own committed revision; old package verification does not establish the new archive.
+
+### User confirmation — 2026-11-01
+
+The user stated: “I found it works well.” This records general confirmation of CHG-002 after trying the application. Individual test results, environment details, and browser-launch observations were not specified, so M01–M06 remain unchanged. The confirmation and concise README status are included in the single local CHG-002 commit at the user’s request to commit and established preference for one commit per change. No application code or test assertions changed.

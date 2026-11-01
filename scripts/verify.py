@@ -10,14 +10,14 @@ from gui_support import virtual_display
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--suite', choices=['all', 'protocol', 'python-interface', 'harness'], default='all')
+    parser.add_argument('--suite', choices=['all', 'protocol', 'python-interface', 'server-gui', 'harness'], default='all')
     parser.add_argument('--report', type=str)
     args = parser.parse_args()
     directory = ROOT/'artifacts/verification'/run_id(); directory.mkdir(parents=True)
     destination = Path(args.report).resolve() if args.report else directory/'report.json'
     report = {'status': 'IN_PROGRESS', 'suite': args.suite, 'started': now(), 'input_hashes': input_hashes(), 'commands': [], 'collected': 0, 'passed': 0, 'failed': 0, 'skipped': 0, 'flaky': 0}
     write_json(destination, report)
-    if args.suite == 'all':
+    if args.suite in ('all', 'server-gui'):
         readiness=execute([PYTHON,'scripts/check_environment.py'],timeout=60)
         report['commands'].append(readiness)
         if readiness['exit_code'] or readiness['timeout']:
@@ -27,7 +27,7 @@ def main():
         report['commands'].append(record)
         if record['exit_code'] or record['timeout']:
             report.update(status='BLOCKED' if record['exit_code']==2 else 'FAIL', finished=now());write_json(destination,report);print(record['stdout']+record['stderr']);return 2 if record['exit_code']==2 else 1
-    suites = ['protocol', 'python_interface'] if args.suite == 'all' else [args.suite.replace('-', '_')]
+    suites = ['protocol', 'python_interface', 'server_gui'] if args.suite == 'all' else [args.suite.replace('-', '_')]
     for name in suites:
         subreport = directory/(name+'.json')
         record = execute([PYTHON, 'tests/run_unittest.py', 'tests/'+name, '--report', str(subreport)], timeout=120)

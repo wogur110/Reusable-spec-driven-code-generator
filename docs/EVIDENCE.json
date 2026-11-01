@@ -266,29 +266,32 @@
   ],
   "clean_regeneration": {
     "status": "PASS",
-    "change_request": "CHG-001",
-    "run_id": "20261101T151017779910Z",
-    "started": "2026-11-01T15:10:17.780642+00:00",
-    "finished": "2026-11-01T15:30:32.659104+00:00",
-    "input_revision": "aeb24419579fcdc8ad7fe11288eaaa3caf9c431b",
+    "change_request": "CHG-002",
+    "run_id": "20261101T204250502871Z",
+    "started": "2026-11-01T20:42:50.503668+00:00",
+    "finished": "2026-11-01T21:07:12.184274+00:00",
+    "input_revision": "d6fdcd50c850a9e9e1445de784f329eed2c07813",
+    "input_revision_note": "Authorized working-tree CHG-002 snapshot based on this revision; exact frozen inputs below, not a claim that the base revision contains this change.",
     "input_hashes": {
       ".gitignore": "2a684861dab09e69362b7260d322912bfa246aa2c0a9d5e43701fa547b520bfc",
-      "DESIGN.md": "a6211e43ba12c1317ab13658a63f62c016dba1d91456178fd546e2abab3da5b6",
-      "README.md": "2c8b8c02914915ac9c66d841802f8444a30b804c43b23eafe1f6ad54c68faa9a",
-      "AGENTS.md": "8dfe61351606dc9bf71a0cf1a55f0d2234a10da6cd2e0314eb5a7268174769a4",
-      "TESTING.md": "b4a028678ecfa9789efae83e2ac048e3d75bd6b11ed26ae43f7bdad2e8c3f6db",
-      "FUTURE.md": "5a02863030c84f2310a338a6ee442d492ee398f69e2a8e0284ebd23614299b49",
-      "GENERATE.md": "4880f9f452e7a4e83fa8c9d7770614c5f38f6d129455eba8aab9d3046225e60e",
+      "DESIGN.md": "55e26704603020cfcbc145325b2bcc19e30133d7836c89193febd9f917faa6f9",
+      "README.md": "e7bea3403dd4468b90e028d0d48e658b10764111fff8a402c2c6ee339a14b784",
+      "AGENTS.md": "aa8a68917a978090f7c87196e6c44e6d59a9caf8825755167df7fb8c7fc566ca",
+      "TESTING.md": "301719d4e91cacc13437104382cf69118549ac2ea8867e9c8d46005f9212e478",
+      "FUTURE.md": "1257b6572cf33f4737d772ee79a99f8c9c64ff19b0d2d81f52be1bebf63f631c",
+      "GENERATE.md": "c58536a76aa2106aedc48b4e678ea015a75265da3e7975ae94bc358a8cccb48f",
       "Instruction_for_Agent.md": "190a384ffce70396fa93fb02c6722b73f6a74bae5185e1ba9b0f540da5eda5fc",
-      "specs/ACCEPTANCE.md": "89cb2d2121a986e5249fb0d121fcb8faeeab1b7862892b722e74c82e12afa72b",
-      "specs/PRODUCT.md": "885326bcaf04f747ec8d2595ed5199a06f372dda25fc69af88789c3e820bfc6c",
+      "specs/ACCEPTANCE.md": "74d5de40bbe184fc3314adb15780bb0fef189fcc8665c6797a5c324c765e99c5",
+      "specs/PRODUCT.md": "721e077f50c6f83d934088b376d4e3f913d05b590a7eaaa8cd124bb707ef7327",
       "specs/TYPESCRIPT.md": "ca6d88f469ecad0e84e5a240897ad55ca2a3272481b13dbdf8e50642cb8ea6c9",
-      "specs/PYTHON.md": "5ce9aede5526ba149554e2e38a7ef5b15c3459d9bf0342adad8002fe52b04e83",
+      "specs/PYTHON.md": "2d524db9ddfdb921463151c32f74dfbdd310587c517e0d52aa72f36e929481cd",
+      "specs/SERVER.md": "36b21ad0717de8d52a0acde058435dcf3dd29e02b89d4269c75fae03133cdf5f",
       "specs/PROTOCOL.md": "9a7fded8ece6c0e444886bede9542f79300690d685db17ebef45fb072de3cee5",
       "tests/package-lock.json": "bf25085969ac29c0a94033aac75b729e22584f3306ba493525e770cd0384c19d",
       "tests/package.json": "3667bfd58dca0a5ebf772d85a23ac89c5c0b27e3a782c3b6a40684f321119006",
       "tests/gui_driver.py": "6a1fee2f57325c30b3092fdcab2ee8e9c87c684c8c533c7f6672d633da2148c3",
       "tests/playwright.config.js": "b9c9cf4dd550188d6dbf7da25719c92eec018023826e5ba0db79c7005ade9152",
+      "tests/server_gui_driver.py": "8bcc7292197ba430fa8796e81c3141b5a226adb89388046a322f8536008ee583",
       "tests/run_unittest.py": "95c06b54821dbe8978fb834d10275205ffc11ef312f0cecc3160a10bcb4a959e",
       "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "tests/python_interface/test_cli.py": "70d6857a443c22316908c161b859017baf60e11159e8b568c3afccb67636c05a",
@@ -297,25 +300,29 @@
       "tests/protocol/test_protocol.py": "0f219013ae5aea6808387e10b0a0280045947514e5d23e3e93ec2eb3b6483433",
       "tests/harness/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "tests/harness/test_guards.py": "6b96fd79e773157ae134b7d6c0cc07de39efdd40ac814a07c66286a821b1b13b",
+      "tests/server_gui/test_server_gui.py": "a54391c8f19c184a1bd8f0b5cb3bb737f4704a48fecf549a81bca54f9eafa7ff",
+      "tests/server_gui/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "tests/browser/acceptance.spec.js": "41f86bd7ac182a0671f5da568fcc53b05007602d117785dd5e70b72603b44823",
       "tests/browser/desktop.spec.js": "9fd0896606cc9c0be006bb63136c9b48947c3290e77852c4a7ab3502532ec2a4",
-      "tests/browser/fixtures.js": "76242a60fed73a3996e1f8c5266fdbd30884cd920c549ef59e069d1ec30f0d22",
-      "server/main.py": "c704758e95aaa54876e514ef7bf37d4f20d4dc8a82ef9a484234caf33b83f30b",
+      "tests/browser/server-desktop.spec.js": "779846635667591c305dd97e922b68991c5c76c82136bf8fdec2ba2d69e1a284",
+      "tests/browser/fixtures.js": "a86c51ed01e50def3222e1c619f2b01215987f8ebe4daad19ccc4595a179ea88",
+      "server/gui.py": "89802c81750bde23f91c162217627f004f38162913da366cff3ebe6bdef6e596",
+      "server/main.py": "4a8dce926d048db499b62f53724eddd5703dd875b4acc4aedbec11bd04f99b6a",
       "scripts/demo.py": "aa0a2cecbf818cc70c5ae81d0fde5dbaee730c622bfa2873236de10d02024c58",
       "scripts/build.py": "2e6b5137841fe41aaf8e1b98c791ff7bde214f0cc2502d201dd1747b42093101",
       "scripts/package.py": "83eff1e03fea9b7b2e50f03b8b0169743ad6abc13b4f79d99df9a5c133d5971c",
       "scripts/common.py": "ce3aba6a31509ebedaa88983b49524168951c9ae3399b9ef6504e27ea534db56",
       "scripts/check_environment.py": "19a0110d8765992574c52338bc3a5fc1ea2ae3ae9e330ee6f53fe4bfc6826855",
       "scripts/setup.py": "70e8260a0036c45e0d62d460198414ff27cb4c6977c9922c8e3f164174f4639e",
-      "scripts/verify.py": "c28b26c4e16fe9e763f0e329df68423db0a8677a79bea0ef2aabcd5cc56d4c01",
+      "scripts/verify.py": "8af77acff652e5e0fa033fbf36e6610a6f8ca223931f7513d09768d38153adb9",
       "scripts/regenerate_check.py": "9ab0aa31dd179670896d7831908afe731e9ba15fba890ccbb7c58e9fd5ef14ff",
       "scripts/gui_support.py": "e53c3d857332d12b4563c5ef2ef116d6c31bb046cf07966dbefc1e90bd4957c3",
-      "docs/DECISIONS.md": "1b3260acd152f292f390e1fd28727ef6babd1ebee5841631170089700692258b",
-      "docs/CHANGES.md": "f58eaa37d90b945053134ed8f06e1ec6ff732c1ee2370e3ac29befa9d8d780f2",
-      "docs/STATUS.md": "241152b38ebdca41772328e8f97b86c8baf90e6a40da3b203203c937a052c801",
-      "docs/ASSIGNMENT_REVIEW.md": "6ee99d08fbebea5e158041b8904c4ba8f4dd0b71dc70d114f74aa78f2262f6a9",
-      "docs/ASSIGNMENT.md": "7a7d99ea1c5178dbb03b705e915beb3c6ad2014204ce92dc22197ce48a6b1930",
-      "docs/EVIDENCE.json": "30e36f2dd882b20a36dfccb219796b29b1ab50f6743c7ec549f34942efe798c9",
+      "docs/DECISIONS.md": "94bf7a6ba0d269c6a175d3b1bf596905783638af52ee3a4d8016677c36062164",
+      "docs/CHANGES.md": "49a99f01d233926f8c45c137e11ffe9c07ee2f2d3967451cafce2f31d53473d1",
+      "docs/STATUS.md": "163e70f0bbe0ecd3df780277456e2a7c13586c9e6fe2044d1021bcd3a9717955",
+      "docs/ASSIGNMENT_REVIEW.md": "a011d140472b45411102770a20436d6d408faa79038a76bb8a3f1cb970d80b81",
+      "docs/ASSIGNMENT.md": "1f1e68ce691ec9d314f362af6c192bf072a9773cf92025695a2a50905e331e4f",
+      "docs/EVIDENCE.json": "6561c4609a6acf71af7bca3d6e4e04c9ed5ae0b6b2989d1a0ddd6874034b4149",
       "generator/core.py": "6325957e7155bcca374ff1e7f897b789b4d9255d638da8b40e0b85c8a40cda43",
       "generator/targets.json": "c91ac8ad9490330fe853a0236189229857a9084017e6bdefe535ef472f90668b",
       "generator/run.py": "990d2723dea67df4856ed6e0add20369bdab262c6ceba482c0b509fea0e576f8",
@@ -324,32 +331,25 @@
       "generator/codex/package-lock.json": "3b9f69e9f1bfed5dc0b76c6ca4eff0e067b01bdd2644865efc065bbfa4476802",
       "generator/codex/package.json": "f30ee2949ef8aa7471f10d2c40212f42f3805b428c5c7275da89cd89144e7335"
     },
-    "inner_generation_run_id": "20261101T151030542008Z",
+    "requested_model": "gpt-6-astra",
+    "effective_model": "UNREPORTED",
+    "tool_version": "codex-cli 0.166.0",
+    "preflight": "PASS",
+    "inner_generation_run_id": "20261101T204302588941Z",
     "rounds": {
-      "python": 2,
-      "typescript": 2
+      "python": 3,
+      "typescript": 3
     },
-    "failed_validation_commands": [
-      {
-        "command": [
-          "scripts/verify.py",
-          "--suite",
-          "python-interface"
-        ],
-        "exit_code": 1,
-        "timeout": false
-      }
-    ],
     "harness_test_counts": {
-      "collected": 55,
-      "passed": 55,
+      "collected": 65,
+      "passed": 65,
       "failed": 0,
       "skipped": 0,
       "flaky": 0
     },
     "standalone_test_counts": {
-      "collected": 55,
-      "passed": 55,
+      "collected": 65,
+      "passed": 65,
       "failed": 0,
       "skipped": 0,
       "flaky": 0
@@ -357,26 +357,26 @@
     "original_tree_preserved": true,
     "fresh_published_hashes": {
       "python": {
-        "gui.py": "3d8bd8420acb6934438e061c0f6cd6215d3a0ff635b1233a17a0366a8617cb66",
-        "main.py": "562d7185d06d85cb6a23035959ae6d87fef7c04022cdf24adf6488eed92c7c0b",
-        "core.py": "33d533c5159c14fb7f2d2e3ad7afee8568a4f667bd4f7c02a1fe72d736f46ae4",
-        "storage.py": "187ddfbbeeb2a701bc8a042bd6e971dc555f35ac56c43e342b827b28ec45a750",
-        "transport.py": "b60085994b1da5f9762b706a171bcfa094f85ed36108e843a5911ac702551102",
-        "validation.py": "a9cda360ee976a677d902457b08d6da3eacb5496cce0252b935f6332f561129c"
+        "gui.py": "6326d8af7c7f2f57e1a075ca3feeb5b7850197519c48211d026ca8bd5ee5bbdd",
+        "main.py": "2a606b4e5a7826d994145491e54aa7b7ed7be2a106ab689d6b15bcaa7a793d78",
+        "core.py": "2c92063a76b6f243b3cd73b3041758a0631e975bd5eb526d4826b5f595b3ff8e",
+        "storage.py": "6478e3610983890151e16f8c2ca10dd093324e4c3f66b06df139617bcda981ab",
+        "transport.py": "4601b37a0390b36bac45da57c592d14b0b414f7f7bb1ad179da07da7b5a5812e",
+        "validation.py": "8ddd011238c4047d1a44989d344a88100ab1d63c4928706c4de28158ac1433ca"
       },
       "typescript": {
         "package-lock.json": "b0ef2025cbd695540122061dbb5a75ce54265ff23e9bf12629edb78acc4578c9",
-        "build.mjs": "8b962e1f7875868c175cdc319f3a7b04c12f0c11f7477ae416937f9a89e6c300",
-        "package.json": "e23d183904fbeeb63244f1ce76458618b895c17e778107ed449eb5b541b12954",
-        "tsconfig.json": "a8daa59ae6cb9f632fddefd47dadaba7064e90374914a7d0c6b95063631f7af8",
-        "styles.css": "6eee6c1e9206d8d0108207c9a780938bfe10bf719ad211cf59d7214203e8ffa6",
-        "index.html": "898c56b39671c0e02b70f5bf7027d46741c874e001b3e1d5e673bb0c36461a61",
-        "src/main.ts": "5b188844676e57e60fa983346ee4336f998af19bfe31e8ecedb6a0dc9d6175f2"
+        "build.mjs": "c341f3965af5f79afafeb51c7f0581115ff81d91af037b97793df8149cdfee82",
+        "package.json": "e53428ff97075fc8113c0445e750053639f130a9b15b97743e2b0462db6795d9",
+        "tsconfig.json": "034cad8e9b3a97e91e5080e9ed5e1d59008a2c9a1f8643dc62462025101f453b",
+        "styles.css": "8b4f613b0865e140c7251ef46b01813617147f314217e9373607e5cd531cdc28",
+        "index.html": "92779f171261a363f841667e17d53dc9ab66ed5067a6ce073bd78c4a1ebae927",
+        "src/main.ts": "08e2405a7efe68bd7a8712e24ca6af8f285bb0250e7fa78408913504a8b150a1"
       }
     },
-    "repair_note": "The initial Python candidate changed the persisted outbox error on an intentional-offline restart; the unchanged machine-interface assertion detected it. One repair round passed all checks."
+    "publication_scope": "Disposable clean-proof workspace only; original published clients unchanged."
   },
-  "manual_review": "GENERAL_CONFIRMATION_RECEIVED",
+  "manual_review": "General confirmation received for CHG-001 and CHG-002; detailed M01\u2013M06 observations remain unrecorded.",
   "evolution": {
     "status": "PASS",
     "request": "CHG-001",
@@ -661,6 +661,118 @@
         "skipped": 0,
         "flaky": 0
       }
+    },
+    {
+      "status": "PASS",
+      "change_request": "CHG-001",
+      "run_id": "20261101T151017779910Z",
+      "started": "2026-11-01T15:10:17.780642+00:00",
+      "finished": "2026-11-01T15:30:32.659104+00:00",
+      "input_revision": "aeb24419579fcdc8ad7fe11288eaaa3caf9c431b",
+      "input_hashes": {
+        ".gitignore": "2a684861dab09e69362b7260d322912bfa246aa2c0a9d5e43701fa547b520bfc",
+        "DESIGN.md": "a6211e43ba12c1317ab13658a63f62c016dba1d91456178fd546e2abab3da5b6",
+        "README.md": "2c8b8c02914915ac9c66d841802f8444a30b804c43b23eafe1f6ad54c68faa9a",
+        "AGENTS.md": "8dfe61351606dc9bf71a0cf1a55f0d2234a10da6cd2e0314eb5a7268174769a4",
+        "TESTING.md": "b4a028678ecfa9789efae83e2ac048e3d75bd6b11ed26ae43f7bdad2e8c3f6db",
+        "FUTURE.md": "5a02863030c84f2310a338a6ee442d492ee398f69e2a8e0284ebd23614299b49",
+        "GENERATE.md": "4880f9f452e7a4e83fa8c9d7770614c5f38f6d129455eba8aab9d3046225e60e",
+        "Instruction_for_Agent.md": "190a384ffce70396fa93fb02c6722b73f6a74bae5185e1ba9b0f540da5eda5fc",
+        "specs/ACCEPTANCE.md": "89cb2d2121a986e5249fb0d121fcb8faeeab1b7862892b722e74c82e12afa72b",
+        "specs/PRODUCT.md": "885326bcaf04f747ec8d2595ed5199a06f372dda25fc69af88789c3e820bfc6c",
+        "specs/TYPESCRIPT.md": "ca6d88f469ecad0e84e5a240897ad55ca2a3272481b13dbdf8e50642cb8ea6c9",
+        "specs/PYTHON.md": "5ce9aede5526ba149554e2e38a7ef5b15c3459d9bf0342adad8002fe52b04e83",
+        "specs/PROTOCOL.md": "9a7fded8ece6c0e444886bede9542f79300690d685db17ebef45fb072de3cee5",
+        "tests/package-lock.json": "bf25085969ac29c0a94033aac75b729e22584f3306ba493525e770cd0384c19d",
+        "tests/package.json": "3667bfd58dca0a5ebf772d85a23ac89c5c0b27e3a782c3b6a40684f321119006",
+        "tests/gui_driver.py": "6a1fee2f57325c30b3092fdcab2ee8e9c87c684c8c533c7f6672d633da2148c3",
+        "tests/playwright.config.js": "b9c9cf4dd550188d6dbf7da25719c92eec018023826e5ba0db79c7005ade9152",
+        "tests/run_unittest.py": "95c06b54821dbe8978fb834d10275205ffc11ef312f0cecc3160a10bcb4a959e",
+        "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/python_interface/test_cli.py": "70d6857a443c22316908c161b859017baf60e11159e8b568c3afccb67636c05a",
+        "tests/python_interface/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/protocol/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/protocol/test_protocol.py": "0f219013ae5aea6808387e10b0a0280045947514e5d23e3e93ec2eb3b6483433",
+        "tests/harness/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/harness/test_guards.py": "6b96fd79e773157ae134b7d6c0cc07de39efdd40ac814a07c66286a821b1b13b",
+        "tests/browser/acceptance.spec.js": "41f86bd7ac182a0671f5da568fcc53b05007602d117785dd5e70b72603b44823",
+        "tests/browser/desktop.spec.js": "9fd0896606cc9c0be006bb63136c9b48947c3290e77852c4a7ab3502532ec2a4",
+        "tests/browser/fixtures.js": "76242a60fed73a3996e1f8c5266fdbd30884cd920c549ef59e069d1ec30f0d22",
+        "server/main.py": "c704758e95aaa54876e514ef7bf37d4f20d4dc8a82ef9a484234caf33b83f30b",
+        "scripts/demo.py": "aa0a2cecbf818cc70c5ae81d0fde5dbaee730c622bfa2873236de10d02024c58",
+        "scripts/build.py": "2e6b5137841fe41aaf8e1b98c791ff7bde214f0cc2502d201dd1747b42093101",
+        "scripts/package.py": "83eff1e03fea9b7b2e50f03b8b0169743ad6abc13b4f79d99df9a5c133d5971c",
+        "scripts/common.py": "ce3aba6a31509ebedaa88983b49524168951c9ae3399b9ef6504e27ea534db56",
+        "scripts/check_environment.py": "19a0110d8765992574c52338bc3a5fc1ea2ae3ae9e330ee6f53fe4bfc6826855",
+        "scripts/setup.py": "70e8260a0036c45e0d62d460198414ff27cb4c6977c9922c8e3f164174f4639e",
+        "scripts/verify.py": "c28b26c4e16fe9e763f0e329df68423db0a8677a79bea0ef2aabcd5cc56d4c01",
+        "scripts/regenerate_check.py": "9ab0aa31dd179670896d7831908afe731e9ba15fba890ccbb7c58e9fd5ef14ff",
+        "scripts/gui_support.py": "e53c3d857332d12b4563c5ef2ef116d6c31bb046cf07966dbefc1e90bd4957c3",
+        "docs/DECISIONS.md": "1b3260acd152f292f390e1fd28727ef6babd1ebee5841631170089700692258b",
+        "docs/CHANGES.md": "f58eaa37d90b945053134ed8f06e1ec6ff732c1ee2370e3ac29befa9d8d780f2",
+        "docs/STATUS.md": "241152b38ebdca41772328e8f97b86c8baf90e6a40da3b203203c937a052c801",
+        "docs/ASSIGNMENT_REVIEW.md": "6ee99d08fbebea5e158041b8904c4ba8f4dd0b71dc70d114f74aa78f2262f6a9",
+        "docs/ASSIGNMENT.md": "7a7d99ea1c5178dbb03b705e915beb3c6ad2014204ce92dc22197ce48a6b1930",
+        "docs/EVIDENCE.json": "30e36f2dd882b20a36dfccb219796b29b1ab50f6743c7ec549f34942efe798c9",
+        "generator/core.py": "6325957e7155bcca374ff1e7f897b789b4d9255d638da8b40e0b85c8a40cda43",
+        "generator/targets.json": "c91ac8ad9490330fe853a0236189229857a9084017e6bdefe535ef472f90668b",
+        "generator/run.py": "990d2723dea67df4856ed6e0add20369bdab262c6ceba482c0b509fea0e576f8",
+        "generator/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "generator/prompts/client.md": "1b3b0e66c959bb39c6926f8884e5958af49b29dc9318c055eb2bbbf5818c8d36",
+        "generator/codex/package-lock.json": "3b9f69e9f1bfed5dc0b76c6ca4eff0e067b01bdd2644865efc065bbfa4476802",
+        "generator/codex/package.json": "f30ee2949ef8aa7471f10d2c40212f42f3805b428c5c7275da89cd89144e7335"
+      },
+      "inner_generation_run_id": "20261101T151030542008Z",
+      "rounds": {
+        "python": 2,
+        "typescript": 2
+      },
+      "failed_validation_commands": [
+        {
+          "command": [
+            "scripts/verify.py",
+            "--suite",
+            "python-interface"
+          ],
+          "exit_code": 1,
+          "timeout": false
+        }
+      ],
+      "harness_test_counts": {
+        "collected": 55,
+        "passed": 55,
+        "failed": 0,
+        "skipped": 0,
+        "flaky": 0
+      },
+      "standalone_test_counts": {
+        "collected": 55,
+        "passed": 55,
+        "failed": 0,
+        "skipped": 0,
+        "flaky": 0
+      },
+      "original_tree_preserved": true,
+      "fresh_published_hashes": {
+        "python": {
+          "gui.py": "3d8bd8420acb6934438e061c0f6cd6215d3a0ff635b1233a17a0366a8617cb66",
+          "main.py": "562d7185d06d85cb6a23035959ae6d87fef7c04022cdf24adf6488eed92c7c0b",
+          "core.py": "33d533c5159c14fb7f2d2e3ad7afee8568a4f667bd4f7c02a1fe72d736f46ae4",
+          "storage.py": "187ddfbbeeb2a701bc8a042bd6e971dc555f35ac56c43e342b827b28ec45a750",
+          "transport.py": "b60085994b1da5f9762b706a171bcfa094f85ed36108e843a5911ac702551102",
+          "validation.py": "a9cda360ee976a677d902457b08d6da3eacb5496cce0252b935f6332f561129c"
+        },
+        "typescript": {
+          "package-lock.json": "b0ef2025cbd695540122061dbb5a75ce54265ff23e9bf12629edb78acc4578c9",
+          "build.mjs": "8b962e1f7875868c175cdc319f3a7b04c12f0c11f7477ae416937f9a89e6c300",
+          "package.json": "e23d183904fbeeb63244f1ce76458618b895c17e778107ed449eb5b541b12954",
+          "tsconfig.json": "a8daa59ae6cb9f632fddefd47dadaba7064e90374914a7d0c6b95063631f7af8",
+          "styles.css": "6eee6c1e9206d8d0108207c9a780938bfe10bf719ad211cf59d7214203e8ffa6",
+          "index.html": "898c56b39671c0e02b70f5bf7027d46741c874e001b3e1d5e673bb0c36461a61",
+          "src/main.ts": "5b188844676e57e60fa983346ee4336f998af19bfe31e8ecedb6a0dc9d6175f2"
+        }
+      },
+      "repair_note": "The initial Python candidate changed the persisted outbox error on an intentional-offline restart; the unchanged machine-interface assertion detected it. One repair round passed all checks."
     }
   ],
   "archive_verification_history": [
@@ -693,5 +805,90 @@
     "backup_bundle": "artifacts/history/CHG-001-before-squash.bundle",
     "backup_verification": "PASS",
     "note": "One consolidated CHG-001 commit; historical evidence hashes remain unchanged. No application or test changes during consolidation. Remote not pushed; prior archive results apply to their recorded original revisions."
+  },
+  "retained_server_changes": {
+    "CHG-002": {
+      "status": "COMPLETE",
+      "completed": "2026-11-01T13:08:15.988378-08:00",
+      "base_revision": "d6fdcd50c850a9e9e1445de784f329eed2c07813",
+      "specification": "specs/SERVER.md",
+      "targeted_client_regeneration": "NOT_NEEDED: no client behavior, wire protocol or storage change; actual all-client generation performed in clean proof.",
+      "acceptance": {
+        "report": "artifacts/changes/CHG-002/acceptance.json",
+        "collected": 65,
+        "passed": 65,
+        "failed": 0,
+        "skipped": 0,
+        "flaky": 0,
+        "status": "PASS"
+      },
+      "harness_guards": {
+        "report": "artifacts/changes/CHG-002/harness.json",
+        "collected": 9,
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0,
+        "flaky": 0,
+        "status": "PASS"
+      },
+      "clean_regeneration_run": "20261101T204250502871Z",
+      "agent_visual_inspection": "PASS; artifacts/changes/CHG-002/server-desktop.png and preview.json; not user evidence.",
+      "manual_review": "GENERAL_CONFIRMATION_RECEIVED",
+      "preserved_hashes": {
+        "generated/python-client/core.py": "1669b3b75a958c62cf982ebe8934bc2fa446e5a5001b134058136553598e0cb3",
+        "generated/python-client/gui.py": "b38c2616f45822224e640b05c66a94772955c8a86d50c3b1f27cf747c1346ce3",
+        "generated/python-client/main.py": "58ba83788f09c633482aee65f2f7b366193e923a563266ccb65e95c42371fa94",
+        "generated/python-client/protocol.py": "9d30217a60d6fa3135eb7a954f848a174f4b1c4639e9a9188ac9d0fe1e38a4e4",
+        "generated/python-client/storage.py": "81fa04e08f04377bd9169464e9a9f1aa41eb309471db7b6f65121e1147e0618e",
+        "generated/typescript-web/build.mjs": "9e3c433490b97028d16e5d40bd7b3cf932576500cbbbb60c4c4805c86358e9d2",
+        "generated/typescript-web/index.html": "264b6711d787bbcd57d393e470e1f62b19b3830bc771668fcc8e784bcc1cf787",
+        "generated/typescript-web/package-lock.json": "b0ef2025cbd695540122061dbb5a75ce54265ff23e9bf12629edb78acc4578c9",
+        "generated/typescript-web/package.json": "dee07c4769cb55851ce2cec3e3d125b462cd92dcbd2c7e35f71ba11574e95d5f",
+        "generated/typescript-web/src/main.ts": "5b7569d97fc264daf4d16eadb5c85da4f2421baff187d4b89805252d1a77480a",
+        "generated/typescript-web/styles.css": "81830c2833c7312db5fa79141208f04e41111697283968e9a904d5c59579bc04",
+        "generated/typescript-web/tsconfig.json": "8bd21c79247399f6b3e7be67e55a0ea377c356a7a927ffdf627875b5a3db5f75",
+        "generator/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "generator/codex/package-lock.json": "3b9f69e9f1bfed5dc0b76c6ca4eff0e067b01bdd2644865efc065bbfa4476802",
+        "generator/codex/package.json": "f30ee2949ef8aa7471f10d2c40212f42f3805b428c5c7275da89cd89144e7335",
+        "generator/core.py": "6325957e7155bcca374ff1e7f897b789b4d9255d638da8b40e0b85c8a40cda43",
+        "generator/prompts/client.md": "1b3b0e66c959bb39c6926f8884e5958af49b29dc9318c055eb2bbbf5818c8d36",
+        "generator/run.py": "990d2723dea67df4856ed6e0add20369bdab262c6ceba482c0b509fea0e576f8",
+        "generator/targets.json": "c91ac8ad9490330fe853a0236189229857a9084017e6bdefe535ef472f90668b",
+        "specs/PROTOCOL.md": "9a7fded8ece6c0e444886bede9542f79300690d685db17ebef45fb072de3cee5"
+      },
+      "failed_checks": [
+        {
+          "report": "artifacts/changes/CHG-002/red.json",
+          "result": "Expected pre-implementation import failure: server.gui did not exist."
+        },
+        {
+          "report": "artifacts/changes/CHG-002/server-gui-first.json",
+          "result": "Sandbox Xvfb socket denial; zero tests, not a pass. Native checks subsequently used authorized execution."
+        },
+        {
+          "report": "artifacts/changes/CHG-002/server-gui-native.json",
+          "result": "7/8 passed; launch test matched its fixture window. Fixture renamed to identify production window. Timer cancellation and disconnected-response cleanup corrected."
+        },
+        {
+          "report": "artifacts/changes/CHG-002/acceptance-first.json",
+          "result": "64/65; SG-06 teardown waited for an already-signaled child. Fixture now checks signalCode; focused 2/2 then complete 65/65 passed. No retries, skips, relaxed assertions or increased deadlines."
+        }
+      ],
+      "generation_validation_failure_recorded": true,
+      "generation_repair_history": [
+        "Initial Python candidate changed the queued outbox error field during intentional offline restart; unchanged AT-01/AT-09 snapshot assertion rejected it. Harness repair used the same frozen contracts and tests.",
+        "The next candidate passed 63/65 but failed two existing GUI-04 reset assertions: stale outbox content and login controls visible before reset readiness. All new server GUI tests passed; another bounded repair used unchanged assertions."
+      ],
+      "user_confirmation": {
+        "date": "2026-11-01",
+        "timezone": "America/Los_Angeles",
+        "statement": "I found it works well.",
+        "scope": "General confirmation of CHG-002; individual scenario results were not supplied. USER observation cells remain unchanged."
+      }
+    }
+  },
+  "current_release_archive": {
+    "status": "NOT_CREATED",
+    "note": "Existing verified archive manifests apply to earlier revisions. Package the final committed CHG-002 revision for release after review."
   }
 }

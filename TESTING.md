@@ -1,6 +1,6 @@
 # Setup, verification, and manual walkthrough
 
-Status: CHG-001 complete. All 55 acceptance cases (44 existing plus 11 desktop) and nine harness guards pass. Clean regeneration passes the same 55 tests inside the harness and again standalone. Current run evidence is in [docs/STATUS.md](docs/STATUS.md).
+Status: CHG-002 complete. All 65 acceptance cases (55 existing plus ten server GUI cases) and nine harness guards pass. Clean regeneration passes all 65 tests inside the harness and again standalone. Current run evidence is in [docs/STATUS.md](docs/STATUS.md).
 
 ## What the user should do now
 
@@ -58,8 +58,10 @@ These entry points are implemented. Command reports distinguish PASS, FAIL, and 
 | `python3 scripts/verify.py --suite all` | Build and baseline actual protocol/client/browser checks; excludes harness simulation, clean regeneration, and evolution. |
 | `python3 scripts/verify.py --suite protocol` | Retained black-box server cases without generated-client prerequisite. |
 | `python3 scripts/verify.py --suite python-interface` | Real CLI startup, validation, durable offline enqueue, snapshots, and bounded shutdown. |
+| `python3 scripts/verify.py --suite server-gui` | Retained server window lifecycle and HTTP monitoring checks on an isolated display. |
 | `python3 scripts/verify.py --suite harness` | AT-18 guardrail tests using controlled runner fixtures, no live agent calls. |
 | `python3 scripts/verify.py --suite all --report artifacts/manual-verification.json` | Same baseline checks with a requested machine-readable report location. Other suites accept --report too. |
+| `python3 server/gui.py` | Open the optional server control window, initially stopped; Start/Stop and monitoring use the same retained HTTP server. |
 | `python3 scripts/demo.py --port 8765` | Start server, print browser URL and a copy-ready desktop launch command with a fresh state directory; bind failure does not kill another process. |
 | `python3 scripts/regenerate_check.py` | AT-15 proof in a fresh retained-input workspace; leave original source/stores unchanged. |
 | `python3 scripts/package.py` | Require committed intended source/clean tree; create source archive and real Git history, excluding runtime/cache/credential data; document exact restoration. |
@@ -134,3 +136,16 @@ Packaging includes committed clients, retained inputs/scripts/tests/manifests/lo
 Optional OF-01/OF-02 forced crash/write-failure tests remain explicitly NOT_RUN until performed. Do not silently turn them into baseline requirements or report them as covered by an ordinary successful run.
 
 The retained fault proxy uses a fresh upstream connection for each request to the closing local server, records asset failures in startup diagnostics, and never retries a failed static asset to conceal a failure. Delayed-receive assertions first observe a real held GET response. Failed clean proofs remain in execution history even after a later corrected run passes.
+
+## Server GUI manual verification (CHG-002)
+
+Use the same native Tk/Xvfb/X11 packages listed above; no new Python or npm dependency is required. From the project root run `python3 scripts/build.py --target all`, then `python3 server/gui.py`. The latter opens **Local Messenger - Server**; subsequent server operation uses the window. Close any old demo server before using its port, or choose another free port. Port `0` allocates one and the window displays the actual URL.
+
+1. Verify the initial **Stopped** state. Keep port `8765` and the default browser assets directory, then click **Start**. Expect **Running**, a loopback URL and a new session ID. Start/configuration are disabled while running; Stop and Open browser are enabled.
+2. Click **Open browser**, use a fresh private browser context, and log in as `bob`. Launch the Python GUI with the displayed URL and a fresh state directory, for example `python3 generated/python-client/main.py --server http://127.0.0.1:8765 --state-dir "$(mktemp -d)"`, then log in as `alice`. Replace the port when necessary.
+3. Run the eight-step interoperability walkthrough above, keeping this server window running. Both clients should receive each message once. The unique accepted-message count should be four; requests can be larger because clients poll. Select a monitor row to inspect exact text, sender, recipient, message ID and recipient sequence. Test multiline/Unicode text as well. The monitor displays the latest 200 messages/responses; total counts cover the whole session.
+4. Click **Stop**. Expect **Stopped**, a cleared listening URL and monitoring lists, and disabled Open browser. A new client send should remain queued because this endpoint is unavailable. Stopping the server is a separate lifecycle check, not the way to simulate a single client's outage.
+5. Close both old clients. Click **Start** again; expect a different session ID and empty counters/messages. Launch Python with a new state directory and use a fresh private browser context (close all prior private windows), or explicitly reset the old client stores. Exchange new messages. Cross-session automatic client recovery is not supported.
+6. Close the server window while running; it should close and release its port within six seconds. Reopening the GUI starts in **Stopped** state. Invalid ports/missing browser assets must produce visible guidance. If a different process already owns the chosen port, Start should fail visibly while leaving that process alone; choose a free port and retry.
+
+Record actual observations separately from automated evidence. On 2026-11-01 (America/Los_Angeles), the user confirmed CHG-002: “I found it works well.” This records general confirmation; individual scenario results were not supplied, so M01–M06 remain unchanged. Required automated SG-01–SG-06 include eight server-widget/HTTP tests and two client integration cases, and run in the full acceptance suite and clean regeneration. Focused command: `python3 scripts/verify.py --suite server-gui`.

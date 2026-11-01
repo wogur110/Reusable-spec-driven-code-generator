@@ -176,3 +176,7 @@ Evolution execution is deferred. If a selected FUTURE request or separate explic
 ## CHG-001 desktop inputs
 
 The Python target now requires main.py and gui.py and reads the revised registered PYTHON/PRODUCT/ACCEPTANCE contracts. The TypeScript implementation and protocol remain unchanged. Native prerequisites are listed in README and TESTING; setup checks Tk/Xvfb/xkbcomp/xwininfo before validation. GUI-01–06 run through actual widgets in the baseline verification command and therefore in clean regeneration. Generic orchestration and the prompt are unchanged; record their before/after hashes as evolution evidence. Preserve frozen assertions across repairs. Source USER cells remain verbatim; DECISIONS records the authorized interface override.
+
+## Retained server management coverage (CHG-002)
+
+The optional server desktop is retained infrastructure specified in specs/SERVER.md. It is not a generated target or a client protocol extension; targets.json and the generic runner/prompt remain unchanged. The full verification command now includes server-gui lifecycle/monitoring checks and desktop/browser interoperability against a GUI-managed server. Clean regeneration recreates both clients in the retained-only workspace and reruns those same assertions. Published client sources need no targeted replacement for this server-only change.

@@ -1,6 +1,6 @@
 # Acceptance contract
 
-Status: all 55 acceptance tests and nine harness guards pass. Clean regeneration passes the same 55 acceptance cases inside the harness and again standalone. Failed earlier runs remain recorded separately in CHANGES and EVIDENCE. Tests were authored before the generation run they validate; generated clients may not edit them.
+Status: the current contract includes CHG-001 client desktop cases and CHG-002 retained server desktop cases. Actual results, clean-regeneration evidence, and earlier failures are recorded in docs/STATUS.md and docs/EVIDENCE.json. Tests are authored before the run they validate; generated clients may not edit them.
 
 ## Your acceptance expectations
 
@@ -90,6 +90,7 @@ Allowed platform differences: same-name login and attempted different-name login
 | REQ-FAILURE-01 | AT-11, AT-13, AT-16, AT-17; optional OF-02 |
 | REQ-SESSION-01 | AT-13 cursor pause; explicit reset walkthrough; server source/protocol tests |
 | REQ-UI-01 | AT-01, AT-02, AT-11, AT-14, AT-16; user M05 |
+| REQ-SERVER-UI-01 | SG-01–SG-06 and AT-15 with the retained server GUI |
 | REQ-TEST-01 | All case reports and test-review evidence |
 | REQ-RELEASE-01 | Provenance/history and archive restoration check described in TESTING.md |
 
@@ -99,7 +100,7 @@ For final user sign-off, complete the fixed walkthrough, queued restart check, a
 
 Optional OF-01 forcibly terminates a client around an incoming transaction to inspect crash atomicity. Optional OF-02 injects SQLite/IndexedDB write failures to verify failed enqueue dispatches nothing and failed receive advances no cursor. Their behavior remains required by the contract, but fault-injection execution is deferred and must be reported NOT_RUN unless actually exercised. Normal restart, malformed-page atomicity, and startup storage boundaries remain required baseline tests.
 
-No evolution case is active. An explicit selected change or experiment must first define its own specification delta and independent acceptance IDs, preserve applicable baseline cases, and verify with unchanged generic harness/prompt logic. Do not import an old feature experiment or create a FUTURE request from an example.
+The authorized CHG-001 and CHG-002 deltas are defined below. Any later selected change or experiment must first define its own specification delta and independent acceptance IDs, preserve applicable baseline cases, and verify with unchanged generic harness/prompt logic. Do not import an old feature experiment or create a FUTURE request from an example.
 
 ## CHG-001 desktop acceptance delta
 
@@ -115,3 +116,16 @@ These cases are required in addition to all existing baseline assertions. No wir
 | GUI-06 | Unsupported store startup shows a visible error, leaves version/data unchanged, and offers a closable window. CURSOR_INVALID visibly disables sends; real permanent send failure shows failed plus reason. |
 
 GUI tests run on a real Tk display, using an isolated Xvfb display in automated Linux runs. Missing Tk/display prerequisites are BLOCKED, never a skip or a successful machine-only substitute. GUI-01–06 belong to baseline verification and AT-15 clean regeneration. User M01–M06 remain separate final manual sign-off evidence.
+
+## CHG-002 server desktop acceptance delta
+
+REQ-SERVER-UI-01 maps to SG-01–SG-06. Tests use a real isolated Xvfb display and production widgets, real sockets/HTTP, and current generated clients. Preserve all 55 existing cases and nine harness guards. These new tests join --suite all and AT-15; missing display requirements are BLOCKED, never skipped.
+
+| ID | Required exercise and result |
+|---|---|
+| SG-01 | Initial stopped controls; invalid port/missing assets fail visibly; correct inputs recover. GUI start exposes actual allocated loopback URL, health and browser assets; configuration and repeated Start disabled. Open browser receives the displayed URL (mock external browser launch only). |
+| SG-02 | Real POST/GET, exact replay, conflict and invalid requests; UI counts unique messages, shows status/error responses and exact multiline Unicode detail. Monitoring does not consume a message or change deduplication/cursors. Latest-200 windows are bounded while full counts remain correct. |
+| SG-03 | Stop closes the listener, clears live URL/monitoring and permits restart. New session ID and empty message store/counters, reusable port; warning explains fresh client stores. |
+| SG-04 | Bind conflict does not stop the preexisting server; show actionable error and recover on a free port. Close during startup and while a request is incomplete finishes within six seconds and releases the listener. Ordinary startup with stdin closed opens the production window. |
+| SG-05 | Start through actual GUI controls, then use actual Python desktop and browser clients to exchange greeting/reply and exact Unicode text. The monitor shows their accepted messages and details. Independently block each client's API for the full eight-step scenario, keeping this GUI-owned server alive; no duplicate deliveries. |
+| SG-06 | While clients are attached, Stop makes the endpoint unavailable and new sends queue. Restart creates an empty session; explicitly fresh/reset both stores, then exchange new messages. Do not claim automatic recovery across a server restart. |

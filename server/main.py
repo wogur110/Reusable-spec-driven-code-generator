@@ -1,5 +1,6 @@
 """Retained, in-memory implementation of specs/PROTOCOL.md."""
 import argparse
+from collections import deque
 import json
 import mimetypes
 import re
@@ -56,6 +57,7 @@ class Store:
         self.lock = threading.Lock()
         self.streams = {}
         self.receipts = {}
+        self.recent = deque(maxlen=200)
 
     def send(self, data):
         validate(data)
@@ -73,8 +75,13 @@ class Store:
                 message = dict(data, sequence=len(stream) + 1)
                 stream.append(message)
                 self.receipts[key] = message
+                self.recent.append(message)
                 status = 201
             return status, {k: message[k] for k in ('message_id', 'sender', 'recipient', 'sequence')}
+
+    def snapshot(self):
+        with self.lock:
+            return len(self.receipts), [dict(message) for message in self.recent]
 
     def receive(self, recipient, after):
         with self.lock:
@@ -91,8 +98,54 @@ class Server(ThreadingHTTPServer):
 
     def __init__(self, address, static_dir):
         self.store = Store()
+        self.monitor_lock = threading.Lock()
+        self.responses = 0
+        self.errors = 0
+        self.recent_responses = deque(maxlen=200)
+        self.connection_lock = threading.Lock()
+        self.connections = set()
         self.static_dir = Path(static_dir).resolve()
         super().__init__(address, Handler)
+
+
+    def record_response(self, method, path, status):
+        with self.monitor_lock:
+            self.responses += 1
+            self.errors += int(status >= 400)
+            self.recent_responses.append((method, path, status))
+
+    def snapshot(self):
+        count, messages = self.store.snapshot()
+        with self.monitor_lock:
+            return dict(message_count=count, messages=messages, responses=self.responses,
+                        errors=self.errors, requests=list(self.recent_responses))
+
+    def process_request(self, request, address):
+        with self.connection_lock:
+            self.connections.add(request)
+        try:
+            super().process_request(request, address)
+        except Exception:
+            with self.connection_lock:
+                self.connections.discard(request)
+            raise
+
+    def process_request_thread(self, request, address):
+        try:
+            super().process_request_thread(request, address)
+        finally:
+            with self.connection_lock:
+                self.connections.discard(request)
+
+    def close_connections(self):
+        with self.connection_lock:
+            connections = list(self.connections)
+        for connection in connections:
+            try:
+                connection.shutdown(socket.SHUT_RDWR)
+            except OSError:
+                pass
+            connection.close()
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -112,6 +165,7 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         if self.command != 'HEAD':
             self.wfile.write(body)
+        self.server.record_response(self.command, urlsplit(self.path).path, status)
 
     def length(self, required=False):
         values = self.headers.get_all('Content-Length', [])
@@ -202,6 +256,13 @@ class Handler(BaseHTTPRequestHandler):
         self.reply(200, body, mime)
 
     def handle_request(self):
+        try:
+            self._handle_request()
+        except (BrokenPipeError, ConnectionResetError):
+            # A GUI Stop may close a socket while an error response is written.
+            pass
+
+    def _handle_request(self):
         # Close each response: no unread body can become a subsequent request.
         self.close_connection = True
         self.allowed = None

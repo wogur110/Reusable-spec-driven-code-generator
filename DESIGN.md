@@ -74,3 +74,7 @@ Retained does not mean human-written. Do not invent authors, dates, commits, ver
 ## Desktop presentation (CHG-001)
 
 Tkinter/ttk supplies the Python desktop window. The GUI and retained --machine interface use the same generated Python messaging core; the browser implementation remains independent. Tk owns the main thread, while one bounded synchronization worker exchanges committed snapshots through scheduled UI updates. SQLite version 1 remains compatible with pre-GUI stores. Actual-widget tests complement existing machine protocol tests. Native Tcl/Tk and automated Xvfb prerequisites are installed/reported separately from Python packages. Evolution verification must preserve generic orchestration/prompt hashes and regenerate from the revised specifications; CHG-001 execution passed, with exact fingerprints and commands in [CHANGES](docs/CHANGES.md).
+
+## CHG-002 retained server control window
+
+The optional server/gui.py Tkinter window owns one retained Server per Start/Stop session. Binding, serving, and shutdown run outside the Tk event loop; widget updates occur only on that loop. Locked bounded snapshots expose recent responses and accepted messages without affecting protocol state. Each new instance starts empty, including restarts inside the same GUI process. This management UI is retained parent-agent code, not generated client code. See [the server contract](specs/SERVER.md).

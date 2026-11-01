@@ -2,11 +2,12 @@
 
 A reusable agentic harness that turns written specifications into independent Python and TypeScript clients. A local messaging application provides a concrete example of offline queues, durable client state, and interoperability.
 
-**Status: CHG-001 complete.** All 55 acceptance tests and nine harness guards pass. Clean regeneration recreated both clients and passed all 55 tests inside the harness and again standalone. The user confirmed that the code works well; detailed manual observations remain unrecorded. [Status and evidence](docs/STATUS.md) records actual results.
+**Status: CHG-001 and CHG-002 complete.** All 65 acceptance tests and nine harness guards pass. Clean regeneration passed the same 65 tests inside the harness and again standalone. The user confirmed that both changes work well; detailed manual observations remain unrecorded. [Status and evidence](docs/STATUS.md) records actual results.
 
 ## Change summary
 
 - **CHG-001:** Replaced the Python terminal interface with a desktop GUI, preserved existing stored data and the headless interface, and added GUI tests and setup instructions. Automated verification and clean regeneration passed.
+- **CHG-002:** Added a desktop window to start, stop, and monitor the local server, with session status, message activity, and GUI integration tests. Automated verification and clean regeneration passed.
 
 See [docs/CHANGES.md](docs/CHANGES.md) for the full change history and verification evidence.
 
@@ -14,7 +15,7 @@ See [docs/CHANGES.md](docs/CHANGES.md) for the full change history and verificat
 
 To try the committed application, follow the local demonstration below and [TESTING.md](TESTING.md). Read [the resolved choices](docs/DECISIONS.md) and the edit map if you want to change behavior. Leave preference cells blank when the defaults fit; you do not need to author wire protocols or database schemas.
 
-The selected interfaces are a Python desktop GUI, a plain TypeScript browser client, a small local Python server, and Codex-driven generation. Both clients persist identity and messages. The server retains data only while its process runs; each new server session requires explicit fresh/reset demo client stores. CHG-001 replaces the Python human terminal interface; the headless machine interface remains for protocol tests.
+The selected interfaces are a Python desktop GUI, a plain TypeScript browser client, a small local Python server, and Codex-driven generation. Both clients persist identity and messages. The server retains data only during one running server session; each new server session requires explicit fresh/reset demo client stores. CHG-001 replaces the Python human terminal interface; the headless machine interface remains for protocol tests.
 
 To bootstrap a separate new project, begin with the canonical [Instruction_for_Agent.md](Instruction_for_Agent.md). This README is the resulting operating guide; it is not a second construction template or preference form. Reading Markdown does not execute a workflow.
 
@@ -74,11 +75,12 @@ The implementation paths below exist. Only the two generated client directories 
 | README.md, AGENTS.md, DESIGN.md, GENERATE.md, TESTING.md | Retained navigation, agent rules, rationale, generation and test contracts |
 | FUTURE.md / docs/CHANGES.md | User's active requests / completed request evidence; archive completed requests with actual evidence |
 | specs/PRODUCT.md, PROTOCOL.md, ACCEPTANCE.md | Shared intent, wire behavior, and independent acceptance contract |
+| specs/SERVER.md | Retained server desktop controls, monitoring, and session lifecycle |
 | specs/PYTHON.md / TYPESCRIPT.md | Platform-specific interfaces, storage, and lifecycle |
 | docs/DECISIONS.md / STATUS.md | Effective choices, provenance, readiness and actual evidence |
 | docs/ASSIGNMENT.md / ASSIGNMENT_REVIEW.md | Neutral requirements-source summary and criterion-to-evidence mapping |
 | generator/ | Retained generic orchestration, configuration, prompts, and tool adapter |
-| server/ | Retained small local server |
+| server/ | Retained local server and optional desktop controls |
 | tests/ | Retained independent tests and fault fixtures |
 | scripts/ | Retained environment/setup/build/test/demo/proof/package commands |
 | generated/python-client/ | **Generated deletion boundary** for Python source and target declarations |
@@ -133,6 +135,26 @@ python3 scripts/demo.py --port 8765
 Keep that terminal open. The demo prints a browser URL and a complete Python command for a second terminal with a fresh store. In VS Code open another terminal with +, use the same project directory, and paste the printed command. In the desktop window enter `alice` and click **Log in**. Open the printed local URL in a fresh private browser window and log in as `bob`. See [the exact launch steps](TESTING.md#manual-launch-two-terminals-and-one-browser).
 
 In Alice's desktop window, set Recipient to `bob`, type `Hi Bob, I have something important to tell you`, and click **Send**. Bob sees it in the browser inbox and replies to `alice` with `What is it?`. Both windows show inbox and outgoing messages, connection status, and queued / accepted by server / failed states. Select a desktop row to read its complete message in the detail pane. Follow [the eight-step offline walkthrough](TESTING.md#manual-interoperability-walkthrough). Development transport controls each client independently; automated tests also fail real API transport while keeping the server alive.
+
+## Operate the server from a desktop window
+
+After installing the [desktop prerequisites](#desktop-prerequisites-ubuntu--wsl), run:
+
+```sh
+python3 scripts/setup.py
+python3 scripts/build.py --target all
+python3 server/gui.py
+```
+
+In **Local Messenger - Server**, keep port `8765` and the default browser assets directory, then click **Start**. The window shows **Running**, the listening URL, a session ID, response/error counts, and accepted-message activity. Click **Open browser** to open the URL; use a fresh private browser context and log in as `bob`. Start the Python client in another terminal with a fresh store:
+
+```sh
+python3 generated/python-client/main.py --server http://127.0.0.1:8765 --state-dir "$(mktemp -d)"
+```
+
+Log in as `alice` and exchange messages. If you selected a different server port, use the URL shown in the server window. Select an accepted-message row to read its complete text. Counts represent server acceptance and HTTP responses, not delivery/read receipts or online users.
+
+Use **Stop** or close the window to stop its server. Every **Start** begins an empty server session; use fresh/reset client stores and a fresh private browser context after restarting. Keep the server running during client-offline tests. The existing terminal demo remains available. Follow [the server GUI walkthrough](TESTING.md#server-gui-manual-verification-chg-002) for detailed checks.
 
 ## How to request changes
 

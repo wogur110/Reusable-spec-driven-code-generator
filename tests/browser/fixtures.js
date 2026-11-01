@@ -21,7 +21,7 @@ function processLine(child, predicate, timeout = 10000) {
 }
 
 async function stop(child) {
-  if (child.exitCode !== null) return;
+  if (child.exitCode !== null || child.signalCode !== null) return;
   child.kill('SIGTERM');
   await new Promise(resolve => {
     const timer = setTimeout(() => { child.kill('SIGKILL'); }, 5000);
@@ -174,8 +174,8 @@ class Web {
   async close() { await this.context.close(); }
 }
 
-async function fixture(browser) {
-  const backend=await server(); const dir=await fs.mkdtemp(path.join(os.tmpdir(),'spec-acceptance-'));
+async function fixture(browser, suppliedBackend) {
+  const backend=suppliedBackend || await server(); const dir=await fs.mkdtemp(path.join(os.tmpdir(),'spec-acceptance-'));
   const proxies=[]; const clients=[];
   return { backend,dir,proxies,clients,
     async client(kind,username) {
