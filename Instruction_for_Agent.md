@@ -10,6 +10,14 @@ Use standalone project framing in public documentation, interface labels, commen
 
 The project root is the directory containing this file. Keep project edits, Git operations, and published outputs within that root; disposable workspaces may be created under its `artifacts/` directory or a documented temporary directory. Leave sibling projects and their history unchanged. An explicitly supplied external requirements file is a read-only reference, not authorization to modify its location or copy another project's implementation into this one.
 
+## Working in this completed checkout
+
+This repository has completed Stage 2 and CHG-001–004. Current behavior is a Tkinter Python desktop, a compact TypeScript browser client, retained server Start/Stop/monitoring, shared recipients/durable acknowledgments, per-user activity, and explicit Offline/Online notifications with heartbeat fallback. DIRECTORY.md and PRESENCE.md are active registered extensions. The construction steps and original default catalog below explain how a new project starts; they must not reset this checkout's finished behavior.
+
+For this checkout use the current USER preference forms, resolved decisions and registered specifications. Their adjacent examples now summarize completed behavior, with previous defaults preserved in docs/DECISIONS.md. Every user regeneration request includes checking changed preference cells and reconciling affected decisions/specs/tests and necessary retained implementation/configuration before freezing inputs. With no changed choices, preserve the current contract. Follow [the default README instruction](README.md#default-regeneration-instruction). Saving Markdown alone executes nothing; a documentation-only request does not start generation. Candidate-generation/repair scope remains restricted to the selected output.
+
+FUTURE.md is a pending queue requiring a separate explicit apply request. docs/CHANGES.md preserves historical evidence, not additional generation requirements. Read neither as a feature list to activate during regeneration. Preserve actual user input values and manual observations; distinguish current documentation from historical run hashes and results.
+
 ## 1. The two-stage workflow
 
 | Step | Actor | Action |
@@ -65,7 +73,7 @@ The following is the project's requirements summary, not a verbatim external sou
 - The main deliverable is a reusable **code generator** that converts written specifications into working clients through **Codex or Claude Code**. A working messaging application alone is insufficient.
 - If the generated client source is deleted, the documented generator must recreate working clients whose behavior matches the specifications. Regeneration is the primary evaluation criterion.
 - The project requires two clients in different languages with independent messaging implementations. The selected project languages are **Python and TypeScript**. Shared protocol documents, schemas, fixtures, and test expectations are allowed; do not share a messaging implementation between the clients.
-- Default interfaces are a Python command-line client and a TypeScript browser application. The user can revise their preferences through the designated source fields.
+- Original bootstrap defaults are a Python command-line client and TypeScript browser application. This completed checkout instead uses the authorized desktop interfaces described above and in current PRODUCT.md; do not reapply the bootstrap defaults during regeneration.
 - Application runtime is local: localhost or an emulator is acceptable. No cloud messaging service, external runtime service, or turnkey messaging/chat SDK. General-purpose transport, JSON, storage, and UI libraries are allowed. Coding-tool authentication is a generation-time dependency, not an application runtime service.
 - A small local server is sufficient: one process with in-memory state. Do not overbuild it. State loss on server restart must be explicit in the contract and demonstration instructions.
 - Required messaging behavior: identify by username on first launch; send addressed text; queue locally during an outage and flush after reconnecting; display messages received from the server.
@@ -145,7 +153,7 @@ On an existing project, read the current documents first. Preserve user-authored
 
 ## 4. User input forms and ownership rules
 
-Create the following USER sections in the corresponding generated documents. The user edits the generated forms, not this field catalog or a duplicate README settings table.
+For a new bootstrap, create the following USER sections from the original catalogs below. In this completed checkout, preserve current field IDs, questions and user input values; current adjacent examples and effective decisions incorporate CHG-001–004. Record prior example wording/provenance when synchronizing derived guidance. The user edits the generated forms, not this catalog or a duplicate README settings table.
 
 | Document | Section key | Field IDs | User contribution |
 |---|---|---|---|
@@ -164,7 +172,7 @@ Preference tables have columns `ID`, `Question`, `Your input`, and `Example / au
 - Blank/whitespace-only preference cells, `TBD`, and `—` select their adjacent defaults. Treat `false`, `0`, and `none` as explicit values and validate compatibility.
 - Record effective values in `docs/DECISIONS.md` with provenance `USER_EXPLICIT`, `TEMPLATE_DEFAULT` (the example/default catalog), or `AGENT_DERIVED`. Do not fill the user's cells with defaults on their behalf.
 - Missing facts are not preferences. Preserve `NOT_RUN`, `NOT_RECORDED`, `UNVERIFIED`, or `BLOCKED` as appropriate; never turn an observation example into evidence.
-- Preserve USER sections on revisions. An explicit selected change request may authorize the minimum necessary change to an affected source decision; archive its original wording and preserve unrelated inputs.
+- Preserve USER field IDs, questions, exact input values and manual observations on revisions. The preference-table `Example / automatic default` columns are agent-maintained guidance: keep affected examples synchronized with authorized development and record previous/new text and provenance in docs/DECISIONS.md. This does not authorize filling user input cells or inventing observations. An explicit selected request may authorize the minimum necessary source-decision change; archive its original wording and preserve unrelated inputs.
 - Ask only about an actual conflict or necessary user-only fact that cannot be resolved from the authorized defaults and context. Never assume credentials, account entitlement, installed versions, or test success.
 
 The following compact catalogs define which fields to create. They are not complete Markdown file examples.
@@ -287,6 +295,8 @@ Include copy-ready instructions in README and FUTURE for both operations:
 Saving FUTURE.md does not start an agent or authorize its entire contents. A direct apply instruction authorizes necessary supporting edits; do not repeatedly ask permission for routine implementation choices. Unselected requests remain untouched.
 
 For an applied code change, update authoritative specs first and retained tests for the deliberately changed contract. Keep these controlled edits separate from generator repair, which cannot modify retained tests/specs. Regenerate affected clients through the harness, run relevant checks and clean regeneration, and update the operating docs and provenance. Do not clear a request merely because its specification was edited.
+
+For all future authorized development, including direct feature/bug-fix requests and revised USER choices, completion requires consistency across code, specification sheets, retained tests, operating docs and affected preference-table default/example columns. The parent updates affected specs/tests/defaults before freezing generation inputs, records previous/new default wording and provenance, and preserves user input/observation cells. Pending or failed work must remain labeled unverified/incomplete rather than becoming a finished default. After checks pass, ensure defaults describe the resulting baseline and report changed fields or why none needed revision. Include this rule in generated AGENTS.md and README instructions; see [the current agent rule](AGENTS.md#future-development-completion-rule). Candidate agents remain limited to their selected output; this rule never permits changing frozen inputs during repair.
 
 Archive the request's original wording, any changed USER decision and its previous value, affected requirements/files, actual validation commands/results, and available revision evidence. Archive before removing the active entry; avoid duplicate records on retries. Keep failed, blocked, partial, or required-user-check items with an accurate state and reason. Preserve the queue file, unrelated requests, examples, and completed history. A documentation-only change needs appropriate document checks rather than application regeneration.
 

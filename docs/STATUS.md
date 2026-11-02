@@ -2,6 +2,12 @@
 
 Updated 2026-11-01 (America/Los_Angeles). The agent authored specifications and retained infrastructure/tests; actual isolated Codex harness calls authored both clients. Blank USER preferences are not user-authored answers, and automated/agent checks do not fill manual observations.
 
+## Current documentation baseline
+
+The current specifications and preference examples describe completed CHG-001–004, including the Python/server GUIs, compact web layout, directory/durable receipts and explicit presence. Regeneration checks changed USER choices and reconciles them before freezing inputs; pending FUTURE requests remain excluded. All 26 user input cells and six manual-observation cells are unchanged. Previous example/default text and provenance are retained in DECISIONS.
+
+This documentation-only reconciliation consolidates existing behavior, route/scheduler rules and acceptance mappings. It changes no implementation, retained test assertion, generic prompt or target configuration. The runtime PASS results below remain evidence for their recorded snapshots; no application tests or model generation were rerun for these documentation edits. Documentation checks passed: 21 Markdown documents reviewed, 138 local links/anchors valid, USER input/observation preservation, archived CHG-entry preservation, and documented configuration matching targets.json. The generic prompt remains unchanged; the other 20 Markdown documents were synchronized.
+
 ## CHG-004 complete
 
 Both clients explicitly notify the server when their Development transport changes, and the web interface follows the Python desktop layout. Server Offline state is independent of peer message traffic and cannot be undone by a late legacy heartbeat. Real connection loss still uses heartbeat expiry. Published generation 20261101T230328364307Z passed 92/92; one initial call per target. Nine harness guards pass. Clean proof 20261101T232007378344Z passed 92/92 inside the harness and 92/92 standalone and preserved the original tree; three calls per target (initial plus two repairs).
@@ -42,7 +48,7 @@ Earlier clean proof 20261101T143710332729Z remains FAIL: TypeScript's initial co
 | Automated baseline | PASS | 92 tests: 15 protocol, four machine interface, 13 server GUI and 60 browser/client cases; zero failures/skips/flaky results |
 | Harness guards | PASS | Nine AT-18 tests, including inventory/path violations, incomplete events, invalid reports, timeout, input allowlisting, and publication rollback |
 | Clean regeneration | PASS | Run 20261101T232007378344Z recreated both clients, passed 92 tests in the harness and again standalone, and preserved the original tree |
-| Evolution | PASS — CHG-001–004 | Client desktop, server GUI, directory and durable receipts verified; generic runner/prompt unchanged; storage remains version 1 |
+| Evolution | PASS — CHG-001–004 | Client/server desktop, directory/durable receipts, explicit presence and compact browser layout verified; generic runner/prompt unchanged; stores remain version 1 |
 | Optional storage/crash injections | NOT_RUN — deferred | OF-01/OF-02 remain disclosed optional executions; normal restart, malformed-page rollback, and unsupported-store checks pass |
 | User manual review | GENERAL CONFIRMATION RECEIVED — CHG-001 and CHG-002 | The user confirmed CHG-002: “I found it works well.” Detailed M01–M06 observations were not supplied; source cells remain blank. |
 | Review archive | PRIOR REVISION VERIFIED; CURRENT NOT_CREATED | Earlier CHG-001 archive passed source/history restoration. Package the final committed CHG-004 revision separately; prior manifests do not cover it. |
@@ -84,11 +90,11 @@ The regression additions and protocol clarification occurred between generation 
 
 TypeScript 5.9.3 and @playwright/test 1.56.1 are installed from real npm locks. Chromium 141.0.7390.37 launches and executes the browser suite. Setup locally extracts the missing Ubuntu NSS/NSPR packages into /tmp/reusable-spec-native; browser commands add that directory to their library path. Browser binaries are cached at /tmp/reusable-spec-playwright unless PLAYWRIGHT_BROWSERS_PATH overrides it. For CHG-001 the user installed native python3-tk/xvfb/x11-xkb-utils; x11-utils is also present. Tk 8.6.12 and isolated display creation were verified. No account switch was needed. README and TESTING list package prerequisites and the interactive-display requirement.
 
-Generation is a development-time service dependency. Running the committed clients/server requires no model login. Native Windows/macOS and other browser engines are unverified. The server remains memory-only; each new server process requires fresh/reset client stores. One active client instance per identity is supported. Offline browser asset loading and closed-app delivery remain excluded.
+Generation is a development-time service dependency. Running committed clients/server requires no model login. Native Windows/macOS and other browser engines remain unverified. The memory-only server requires fresh/reset client stores after each new session, including GUI Stop/Start. One active client per identity is supported. Offline browser asset loading and closed-app delivery remain excluded.
 
 ## Source preservation and review
 
-The external original remains AVAILABLE, COMPARED, and NOT_INCLUDED, with provenance in [ASSIGNMENT](ASSIGNMENT.md). The construction guide and external-source hashes are unchanged. All source USER blocks are preserved. CHG-001 is archived with its exact original wording and evidence; its completed active entry was then removed, preserving queue markers and examples. Retained source and generated ownership are distinguished in [DESIGN](../DESIGN.md).
+The external original remains AVAILABLE, COMPARED and NOT_INCLUDED, with historical source/guide provenance in [ASSIGNMENT](ASSIGNMENT.md). Current guide revisions do not rewrite those comparison hashes. User-authored input values and manual observations remain preserved; adjacent defaults now reflect completed requests, with previous wording in DECISIONS. CHG-001–004 entries and their actual evidence remain archived in [CHANGES](CHANGES.md). [DESIGN](../DESIGN.md) distinguishes authorship and regeneration ownership.
 
 The user can follow [the two-terminal walkthrough](../TESTING.md#manual-launch-two-terminals-and-one-browser), then record actual M01–M06 observations. Source preference edits should be reconciled before another generation run. The source archive may be prepared for review while those observations remain pending; final sign-off must disclose that state.
 

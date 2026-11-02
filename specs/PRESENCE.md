@@ -1,6 +1,6 @@
 # CHG-004 explicit client presence
 
-This registered extension overrides DIRECTORY's heartbeat-only presence and blanket prohibition on all requests in Development offline mode only as described here. All old message/receipt objects, stores, selectors, session limits and failure semantics remain. The user explicitly requested server status changes by client communication when choosing Offline/Online, without other users sending messages. Web layout changes are specified in TYPESCRIPT.md.
+This registered CHG-004 extension defines explicit presence alongside [DIRECTORY.md](DIRECTORY.md). It supersedes the original heartbeat-only/offline-no-requests rules; the shared and platform contracts now summarize this current behavior directly. Message/receipt objects, version-1 stores, existing selectors, session limits and failure semantics remain compatible. Server status changes when the client selects Offline/Online without peer message traffic. Web layout is specified in [TYPESCRIPT.md](TYPESCRIPT.md).
 
 ## Server contract
 

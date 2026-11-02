@@ -1,11 +1,11 @@
 # Change requests
 
-Use this queue after reviewing the project to request deliberate changes. Saving this file does not start an agent. Review requests do not authorize implementation; apply requests must identify selected IDs. Construction stages still follow [Instruction_for_Agent.md](Instruction_for_Agent.md).
+Use this queue for future deliberate changes. CHG-001–004 are completed and archived in [docs/CHANGES.md](docs/CHANGES.md); current specifications already include them. Regeneration follows [the README default workflow](README.md#default-regeneration-instruction), including changed USER choices, and does not apply this queue. Saving this file starts no work; review authorizes no implementation and apply requests must select IDs.
 
 ## Active requests
 
 <!-- CHANGE_REQUESTS:BEGIN -->
-No active requests yet.
+No active requests.
 <!-- CHANGE_REQUESTS:END -->
 
 ## How to write a request
@@ -14,7 +14,7 @@ Add only a change you actually want inside the markers. A desired change is requ
 
 | Field you write | Guidance | Adjacent instructional example |
 |---|---|---|
-| ID | Choose the next unique ID across this queue and completed history; start with CHG-001. | CHG-001 is the format of a first real request, not a reserved request here. |
+| ID | Choose the next unique ID across this queue and completed history; CHG-001–004 are already used. | CHG-NNN is the format; assign an unused number only when adding a real request. |
 | Desired change | State the observable behavior you want. | Allow searching locally stored messages. |
 | Expected result | Describe how you would recognize success. | A query returns matching saved messages without contacting the server. |
 | Affected scope | Identify clients/components if you have a preference. | Both clients; local interface only. |
@@ -38,11 +38,15 @@ Replace the placeholder only with IDs you actually added:
 
 ```text
 Apply only <selected request IDs> from FUTURE.md. Reconcile the affected source
-decisions, specifications, and independent tests first. Regenerate affected
-clients through the harness and verify the changed contract and clean regeneration.
-Preserve unrelated USER inputs and requests. Archive the original request,
-previous source values, affected requirements, and actual evidence in
+decisions, specification sheets, independent tests, and preference-table
+default/example columns before freezing inputs. Regenerate affected clients
+through the harness and verify the changed contract and clean regeneration.
+Update code and operating docs; check that specs/docs/defaults match the finished
+result. Preserve my input/observation cells and unrelated requests. Record
+previous/new defaults and their rationale. Archive original wording, changed
+source values/defaults, affected requirements and actual evidence in
 docs/CHANGES.md before removing only completed selected entries.
+Keep failed or incomplete work clearly labeled rather than calling it finished.
 ```
 
 Applying selected IDs authorizes necessary supporting changes within their scope. It does not authorize unselected requests or require repeated approval for routine implementation choices. Agent-owned derived specs may change; minimum necessary USER-source changes must retain original wording/value in the completion record. Generator repairs use frozen specs/tests and cannot redefine the desired behavior.
@@ -50,5 +54,7 @@ Applying selected IDs authorizes necessary supporting changes within their scope
 ## Completion and incomplete work
 
 For code changes, update specifications and deliberately changed independent assertions first, freeze them, then generate/verify. Record command outcomes and the clean-regeneration result. For documentation-only changes, run appropriate consistency/link/input checks instead of regenerating applications. Keep manual observations separate from agent evidence.
+
+Completion also requires affected default/example columns to match the resulting code, specifications and operating instructions. Apply the [agent completion rule](AGENTS.md#future-development-completion-rule): record previous/new defaults, preserve actual USER inputs, and report unchanged defaults when no update is needed. Unselected requests remain outside current specifications/defaults.
 
 Write a completed record to [docs/CHANGES.md](docs/CHANGES.md) before removing the selected active request. Preserve its original text, prior/changed USER decisions, requirement IDs, files, real commands/results, known limits, and available commit/revision evidence. Use unique IDs and avoid duplicate completion entries on reruns. Keep failed, BLOCKED, PARTIAL, or AWAITING_USER_CHECK entries in this queue with their reason and remaining work. Editing a specification alone does not complete a code request. Preserve the queue file, markers, examples, unselected requests, and all completed history.

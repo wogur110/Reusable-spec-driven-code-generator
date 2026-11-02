@@ -1,12 +1,12 @@
 # Setup, verification, and manual walkthrough
 
-Status: CHG-002 complete. All 65 acceptance cases (55 existing plus ten server GUI cases) and nine harness guards pass. Clean regeneration passes all 65 tests inside the harness and again standalone. Current run evidence is in [docs/STATUS.md](docs/STATUS.md).
+Status: CHG-001–004 complete. The last recorded snapshot passed 92 acceptance cases and nine harness guards; clean regeneration passed the same 92 cases inside the harness and standalone. See [docs/STATUS.md](docs/STATUS.md) for actual evidence and pending manual/current-archive work. Documentation synchronization is not a new runtime verification run.
 
 ## What the user should do now
 
-Read [README.md](README.md#what-you-can-edit) and [docs/DECISIONS.md](docs/DECISIONS.md). Leave the 26 preference inputs blank if the resolved choices fit; CHG-001 explicitly supersedes the original Python CLI default. Edit a relevant preference cell only if you want different behavior, then ask for Stage 1 reconciliation. You do not need to write protocols, database schemas, or acceptance tests yourself.
+Read [the README edit map](README.md#what-you-can-edit) and [current decisions](docs/DECISIONS.md). Leave preference inputs blank if the completed CHG-001–004 defaults fit. To change behavior, edit a relevant input and use [the default regeneration instruction](README.md#default-regeneration-instruction); the agent reconciles it before generation. You do not need to author protocols, database schemas or tests.
 
-Run the manual launch and walkthrough below, then fill M01–M06 with your actual observations. Automated reports and agent previews do not fill those fields. If you change preferences, request reconciliation before regenerating clients.
+Run the manual launch and walkthrough below, then fill M01–M06 with actual observations. Automated reports and agent previews never fill these fields. Before directly running generator/run.py or clean proof with edited preferences, have the parent agent complete reconciliation; these shell commands do not reconcile documents themselves.
 
 ## Your manual observations
 
@@ -55,9 +55,9 @@ These entry points are implemented. Command reports distinguish PASS, FAIL, and 
 | `python3 scripts/setup.py --skip-browser-install` | Reuse an already installed matching browser; missing native/browser prerequisites still fail when exercised. |
 | `python3 generator/run.py --target all` | Actual isolated generation and validation/publication from current specs. |
 | `python3 scripts/build.py --target all` | Python compile/help validation and TypeScript typecheck/build; python/typescript target selection also supported. |
-| `python3 scripts/verify.py --suite all` | Build and baseline actual protocol/client/browser checks; excludes harness simulation, clean regeneration, and evolution. |
+| `python3 scripts/verify.py --suite all` | Build and all current protocol/machine/desktop/browser cases, including completed CHG-001–004; excludes separate harness guards, model generation and unrequested experiments. |
 | `python3 scripts/verify.py --suite protocol` | Retained black-box server cases without generated-client prerequisite. |
-| `python3 scripts/verify.py --suite python-interface` | Real CLI startup, validation, durable offline enqueue, snapshots, and bounded shutdown. |
+| `python3 scripts/verify.py --suite python-interface` | Headless Python machine-interface startup, validation, durable offline enqueue, snapshots and bounded shutdown. |
 | `python3 scripts/verify.py --suite server-gui` | Retained server window lifecycle and HTTP monitoring checks on an isolated display. |
 | `python3 scripts/verify.py --suite harness` | AT-18 guardrail tests using controlled runner fixtures, no live agent calls. |
 | `python3 scripts/verify.py --suite all --report artifacts/manual-verification.json` | Same baseline checks with a requested machine-readable report location. Other suites accept --report too. |
@@ -82,9 +82,9 @@ python3 scripts/verify.py --suite harness
 python3 scripts/regenerate_check.py
 ```
 
-The baseline runner uses Python unittest under tests/protocol and Playwright under tests/browser. Required case mapping is in [ACCEPTANCE.md](specs/ACCEPTANCE.md#required-automated-cases); no hard-coded final executable test count is claimed before collection. Tests allocate their own ports, external per-client proxies, Python stores, and browser contexts. Reports include spec/test fingerprints and failures; Playwright traces/screenshots are retained for failures. Do not edit tests in a generator repair. Whole-test retries do not turn a flaky result into a clean pass.
+The current acceptance runner uses Python unittest for protocol, machine-interface and server-GUI cases, and Playwright for browser/client integration (including actual Tk controls). Required IDs are in [ACCEPTANCE.md](specs/ACCEPTANCE.md). The last recorded total is 92; reports must reflect actual collection after a deliberate contract change. Tests own isolated ports, proxies, stores and browser contexts. Reports include fingerprints and failures; traces/screenshots are retained. Do not edit tests during repair or turn a flaky result into a pass through whole-test retries.
 
-Model tool installation/preflight is needed for generation/proof, not for replaying ordinary acceptance against committed clients. The outer proof excludes old generated source, Git objects, old sessions, stores, and source-bearing transcripts. Baseline verification never invokes regeneration recursively. CHG-001 adds GUI-01–06 and is verified through the ordinary harness; generic orchestration and prompt fingerprints are compared before/after.
+Model tool installation/preflight is needed for generation/proof, not ordinary acceptance against committed clients. Clean proof excludes old generated source, Git objects, sessions, stores and source-bearing transcripts. Current verification includes GUI-01–06, SG-01–06, DIR-01–08, PRES-01–05 and WEB-01 alongside the messaging cases; it never invokes generation recursively. Generic orchestration and prompt fingerprints remain unchanged across the completed feature changes.
 
 ## Manual launch: two terminals and one browser
 
@@ -111,7 +111,7 @@ Keep the same server alive throughout. Record actual observations in M03/M05/M06
 | 3 | Desktop Development transport offline; send bob `Alice queued while offline` | The new row stays queued with its original text/ID; the earlier accepted row remains. |
 | 4 | Browser Development transport offline; send alice `Bob queued while offline` | Bob's new row stays queued; neither queued message is newly accepted. |
 | 5 | Desktop Development transport online | Alice's queued row becomes accepted while Bob remains offline. |
-| 6 | Desktop Development transport offline after that acceptance | Server remains running; Alice stops new network requests. |
+| 6 | Desktop Development transport offline after that acceptance | Server remains running; Alice permits one final bounded Offline notification, then stops API traffic while local messages stay queued. |
 | 7 | Browser Development transport online | Bob receives Alice's queued text once and his own queued row becomes accepted. Either observation may happen first. |
 | 8 | Desktop Development transport online | Alice receives Bob's queued text once. Each inbox contains the two expected texts in order. |
 

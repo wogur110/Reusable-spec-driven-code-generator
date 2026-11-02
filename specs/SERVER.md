@@ -1,12 +1,12 @@
 # Retained server desktop contract
 
-CHG-002 adds an optional management interface around the retained server. This file specifies retained server behavior, not an extension to the client wire protocol or a generated-client target. Implementation and verification status is recorded in docs/STATUS.md.
+Current retained server contract through CHG-004: optional Start/Stop/monitoring window introduced by CHG-002, shared directory and per-user activity from CHG-003, and explicit presence from CHG-004. This file defines retained infrastructure, not a generated-client target. Client wire additions are registered in DIRECTORY.md and PRESENCE.md. Actual verification is recorded in [STATUS](../docs/STATUS.md).
 
 ## Launch and scope
 
 `python3 server/gui.py` opens a window titled **Local Messenger - Server**, initially stopped. Optional `--port` (default 8765, 0 allocates a port) and `--static-dir` (default repository-relative generated/typescript-web/dist) prefill controls. `--help` requires no display. Tk/Tcl 8.6 and an interactive display are required; reuse CHG-001 native dependencies. No pip dependency. Running server operations after launch needs no terminal interaction. The existing `server/main.py` CLI and its ready JSON remain compatible and display-free.
 
-Bind only 127.0.0.1. Keep the existing protocol, in-memory streams, idempotency, static serving, and limits. No remote management endpoint, server database, or extra client messages. Both launchers use the same Server/Handler implementation. Clients require no behavioral changes or targeted regeneration; clean regeneration must still pass the expanded retained suite.
+Bind only 127.0.0.1. Both launchers use the same Server/Handler and current PROTOCOL/DIRECTORY/PRESENCE contracts, in-memory state, idempotency, static serving and limits. No remote management API or server database. The CHG-002 launcher alone needed no client change; the current clients implement the later directory/receipt/presence extensions. The expanded retained suite participates in clean client regeneration.
 
 ## Controls and lifecycle
 
@@ -31,7 +31,7 @@ The registered [DIRECTORY.md](DIRECTORY.md) contract adds a shared directory and
 
 ### Server user Online/Offline display
 
-The Users directory's presence column is titled **Status** and displays **Online** for online=true and **Offline** for online=false. These labels use the existing 15-second announcement timeout, not guaranteed network reachability. Show a visible presence notice explaining that Online means a heartbeat within the last 15 seconds and Offline means none; detection may lag a disconnection. Known users who never announced are Offline. Automatic refresh updates expiry/reconnection without operator intervention and preserves user selection/activity. Add a `presence-notice` Label to app.widgets. This server-only presentation refinement leaves client labels, wire behavior, and receipt classification unchanged.
+The Users directory's presence column is titled **Status**, displaying **Online** for online=true and **Offline** for online=false. Under PRESENCE.md, a successful explicit Offline notification sets the latch immediately; only an explicit Online notification clears it. Otherwise a heartbeat younger than 15 seconds determines Online. The visible `presence-notice` Label explains communicated mode changes and timeout fallback for uncommunicated disconnections. Never-announced users are Offline. Automatic refresh within one second preserves selection/activity. Messages, receipt reports and operator refresh never restore presence or acknowledge delivery.
 
 
 ## CHG-004 explicit presence override

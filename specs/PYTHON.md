@@ -1,10 +1,10 @@
 # Python client contract
 
-Status: implemented and verified CHG-001 desktop contract; normal launch opens the GUI and --machine remains available. Shared behavior is authoritative in [PRODUCT.md](PRODUCT.md) and [PROTOCOL.md](PROTOCOL.md).
+Status: current Python contract through CHG-004: Tkinter desktop, shared directory/durable receipts, and explicit presence. Normal launch opens the GUI; --machine remains display-free. Shared behavior is authoritative in [PRODUCT.md](PRODUCT.md), [PROTOCOL.md](PROTOCOL.md), [DIRECTORY.md](DIRECTORY.md), and [PRESENCE.md](PRESENCE.md). Historical verification is recorded in [STATUS](../docs/STATUS.md).
 
 ## Source and entry point
 
-Generated boundary: `generated/python-client/`. Required entries: `main.py` and `gui.py`. Separate presentation, storage, validation/transport, and synchronization concerns into local modules; implementation file names other than main.py are free. Python 3.10+ standard library including tkinter/ttk with Tcl/Tk 8.6; no pip dependency, messaging SDK, browser implementation imports, or shared messaging source. Normal launch opens a desktop window. Tests drive real desktop widgets and the existing machine interface, both using the same production storage/synchronization core. Tk native modules/libraries are operating-system prerequisites, documented by setup; no pip package is required.
+Generated boundary: `generated/python-client/`. Required entries: `main.py` and `gui.py`. Separate presentation, storage, validation/transport, and synchronization into local modules; other implementation filenames are free. Python 3.10+ standard library including tkinter/ttk with Tcl/Tk 8.6; no pip dependency, messaging SDK, browser implementation imports, or shared messaging source. Normal launch opens a desktop window. Real desktop widgets and the headless machine interface use the same production storage/synchronization core. Native Tk libraries are operating-system prerequisites listed in README/TESTING.
 
 ```sh
 python3 generated/python-client/main.py --server http://127.0.0.1:8765 --state-dir var/alice
@@ -34,7 +34,7 @@ If an outcome write fails, leave the previously committed row queued and report 
 
 ## Concurrency and transport
 
-One background worker implements the protocol's serialized cycles; the Tk main thread remains responsive to editing and window events. Only the main thread touches widgets; marshal committed snapshots through after/queues. Use the storage lock for short transactions/snapshots only, never across network calls or user input. Serialize writes to stdout. Use a five-second total HTTP deadline including body reads, no redirects, and no environment proxy routing. Validate status/content type/body independently as specified in PROTOCOL.md. A development transport toggle uses the real transport abstraction; it does not pretend acceptance or insert messages directly.
+One background worker implements the serialized messaging/directory/receipt/presence scheduler; the Tk main thread remains responsive. Only the main thread touches widgets; marshal committed snapshots through after/queues. Hold the storage lock only for short transactions/snapshots, never network calls or input. Serialize stdout writes. Message requests have a five-second total HTTP deadline including body reads; directory/receipt/presence requests have two seconds. Follow PROTOCOL/DIRECTORY/PRESENCE for ordering and exact validation. Use no redirects or environment proxy routing. The development toggle controls real transport and schedules the bounded presence transition; it never pretends acceptance or inserts messages directly.
 
 On window close or SIGINT (and on quit/stdin EOF in machine mode only): stop scheduling, finish or cancel the current bounded request, do not start a new receive afterward, complete owned storage work, close the database, and exit within six seconds. Exit 0 for ordinary shutdown and help, 2 for unusable startup/reset arguments or store. Runtime command errors keep the client running. Human display updates must not destroy a partially typed draft.
 
@@ -62,7 +62,8 @@ Expose `app.widgets`, a mapping to the actual production Tk widgets, for retaine
 | recipient-input | Entry/ttk.Entry |
 | message-input | tkinter.Text; get("1.0", "end-1c") is the exact draft |
 | send-button | Button/ttk.Button using the normal enqueue handler |
-| connection-status | Label/ttk.Label text exactly unknown/online/offline/error; put any descriptive prefix in a separate label |
+| connection-status | Label/ttk.Label text exactly unknown/online/offline/error; put descriptive prefixes in a separate label |
+| presence-status | Label/ttk.Label text exactly unknown/pending/confirmed/error for the current mode notification; follow PRESENCE.md and keep it separate from connection/delivery state |
 | error-message | Label/ttk.Label text empty or a visible actionable error |
 | transport-mode | ttk.Combobox values online/offline; <<ComboboxSelected>> runs the production handler |
 | reset-button | Button/ttk.Button showing confirmation |

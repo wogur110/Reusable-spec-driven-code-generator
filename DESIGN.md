@@ -1,6 +1,6 @@
 # Design and ownership
 
-Status: CHG-001 desktop evolution verified; 55 acceptance cases, nine harness guards, and clean regeneration pass. [Decisions](docs/DECISIONS.md) record provenance; [status](docs/STATUS.md) separates readiness and evidence.
+Status: completed design through CHG-004: independent desktop/browser clients, retained server GUI, shared directory/durable receipts and explicit presence. The last recorded snapshot passed 92 acceptance cases, nine guards and clean regeneration. [Decisions](docs/DECISIONS.md) records current defaults/provenance; [status](docs/STATUS.md) distinguishes historical runs, documentation reconciliation and pending manual/packaging work.
 
 ## Your design priorities
 
@@ -18,7 +18,7 @@ Leave preferences blank to use the adjacent defaults. These fields express prior
 
 ## Architecture and principles
 
-Specs determine behavior; independently authored retained tests establish observable expectations before client generation. The generic harness reads registered Markdown and configuration, invokes the chosen coding tool, validates isolated candidates, and publishes source only after checks. The harness owns paths, execution, integrity, and evidence; it contains no messaging business logic or finished client templates.
+Current registered specs determine behavior; independent retained tests establish expectations before generation. A regeneration request first reconciles changed USER choices against the decision snapshot. Completed features remain unless those choices intentionally change them; FUTURE.md stays outside generation scope. The generic harness freezes registered Markdown/configuration, invokes the coding tool, validates isolated candidates and publishes only after checks. It owns paths, execution, integrity and evidence, with no messaging logic or finished client templates.
 
 ```mermaid
 flowchart LR
@@ -35,13 +35,13 @@ At runtime, each client has presentation, validation, durable storage, transport
 
 Durable enqueue precedes network dispatch. Stable IDs let the server distinguish retries from new submissions. The server stores accepted messages for its entire session; retrieval is nondestructive, so an interrupted receiver can retry before committing a cursor. A single client receive transaction preserves inbox/cursor consistency. Each recipient has a contiguous sequence; local outgoing order is independent of server sequence. Outgoing accepted means server acceptance only.
 
-One send and one incoming page per cycle balance outgoing FIFO with receive progress during a send failure. A five-second total request deadline and one-second cycle delay bound interaction without a complex backoff framework. A single scheduler eliminates overlapping cycles; network work never holds a local storage lock. Browser reset invalidates late responses to protect a new identity.
+One scheduler prioritizes presence intent, then sends one queued message and retrieves one page, followed by durable receipt, heartbeat and directory work. Message deadlines are five seconds; auxiliary/presence deadlines are two seconds, with one second between cycles. Offline selection stops ordinary work but allows one final bounded notification. Network work never holds a local storage lock or blocks the UI. Identity/reset and mode-revision guards prevent stale replies from restoring old state.
 
 ## Tradeoffs and boundaries
 
 | Decision | Benefit | Limit |
 |---|---|---|
-| In-memory server | Small, auditable protocol implementation | New server process requires explicit fresh client stores; no durable server recovery |
+| In-memory server | Small, auditable protocol implementation | Every new session, including GUI Stop/Start, requires fresh/reset client stores; no durable server recovery |
 | Polling HTTP/JSON | Simple independent clients and fault injection | Foreground latency and background browser scheduling limitations |
 | SQLite / IndexedDB | Native durable local queues | Storage denial/eviction and disk failure cannot be eliminated |
 | One active identity instance | Avoids account/multi-device coordination | Shared-tab or multi-device concurrency is unsupported |
@@ -49,7 +49,7 @@ One send and one incoming page per cycle balance outgoing FIFO with receive prog
 | Independent retained tests | Common behavior checked without shared client code | Optional forced-crash/write-failure paths remain unverified until exercised |
 | Staged publication | Failed generations preserve usable source | Requires disposable workspaces and integrity manifests |
 
-No authentication, production security, network exactly-once guarantee, server database, push notifications, offline browser asset cache, or unrequested feature is included. A specification change may later extend these limits through [FUTURE.md](FUTURE.md), whose completed CHG-001 desktop change is archived in [CHANGES](docs/CHANGES.md).
+No authentication, production security, network exactly-once guarantee, server database, push notifications or offline browser asset cache is included. Current completed scope includes directory, durable receipts, explicit presence and desktop interfaces; later changes require edited USER choices plus reconciliation or a separately selected [FUTURE.md](FUTURE.md) request. Completed requests are archived in [CHANGES](docs/CHANGES.md).
 
 ## Dependency rationale
 
@@ -63,10 +63,10 @@ Real package-manager locks are committed; tested versions are recorded in STATUS
 |---|---|---|
 | Instruction_for_Agent.md | Retained construction guide | User-supplied guide revised by the agent with user authorization; commit 216ef72 |
 | Root docs, specs/, docs/ | Retained contracts and workflow | Agent-authored in Stage 1 and reconciled with actual Stage 2 implementation/evidence; no user field values were invented |
-| USER preference cells | User-owned inputs | All 26 blank; adjacent defaults resolved separately |
+| USER preference cells | User-owned inputs | All 26 blank; adjacent defaults summarize completed behavior and retain prior wording/provenance in DECISIONS |
 | M01–M06 | User-owned factual observations | Blank; no manual results recorded |
 | generator/, server/, tests/, scripts/ | Retained during client generation | Parent coding agent authored retained infrastructure/tests; actual commits record milestones |
-| generated/python-client/, generated/typescript-web/ | Deletion/regeneration boundaries | Separate actual Codex 0.166.0 / requested gpt-6-astra harness calls; Python regenerated for the page-limit regression and CHG-001 desktop GUI |
+| generated/python-client/, generated/typescript-web/ | Deletion/regeneration boundaries | Separate actual Codex harness calls; Python regenerated for the page-limit regression/CHG-001 and both clients for CHG-003/004; recorded tool/model in STATUS |
 | Dependency locks / compiled assets | Locks committed / builds disposable | npm created committed locks; TypeScript/Node produced disposable browser assets |
 
 Retained does not mean human-written. Do not invent authors, dates, commits, verification runs, or an old project lineage. Stage 2 records actual commands, input/test hashes, repairs, and generated source provenance. A release archive includes authentic history and excludes credentials, stores, caches, and old source-bearing transcripts; verify restoration before marking archive completion.
@@ -81,7 +81,9 @@ The optional server/gui.py Tkinter window owns one retained Server per Start/Sto
 
 ## CHG-003 directory and receipt design
 
-One retained Store lock protects messages, session-known users, explicit announcement times and cumulative recipient acknowledgments. Shared directory observations are returned over new version-1 routes; the server GUI reads the same state locally. Clients serialize receipt/announcement/directory calls after normal message synchronization and acknowledge only committed cursors. No schema migration or per-message receipt table is needed. GUI caches are transient, guarded by identity/reset generation, and cannot prevent manual sending. Server per-user views show observational receipt status; unseen offline outboxes remain unknown. See specs/DIRECTORY.md for exact contracts.
+One retained Store lock protects accepted messages, session-known users, heartbeat times, explicit-offline latches and cumulative recipient acknowledgments. Clients serialize presence transitions and normal send/receive/receipt/heartbeat/directory work; only committed receive cursors may be acknowledged. The server GUI observes the same locked state. No schema migration or per-message client receipt table is needed. Transient caches use identity/reset guards and do not prevent manual sending. Server activity reports durable receipt, while unseen offline outboxes remain unknown. Exact contracts are in [DIRECTORY.md](specs/DIRECTORY.md) and [PRESENCE.md](specs/PRESENCE.md).
 
 
-CHG-004 separates local transport intent from confirmed server presence. A serialized priority control request communicates mode changes; explicit offline state cannot be undone by message activity or a late heartbeat. Failed offline notification leaves queues intact and uses expiry as fallback. The browser adopts the Python task layout with bounded panels and exact detail panes.
+## CHG-004 presence and browser presentation
+
+CHG-004 separates local transport intent from confirmed server presence. A serialized priority control request communicates mode changes; explicit offline cannot be undone by messages or late heartbeats. Failed Offline notification preserves queues and uses 15-second expiry as fallback. The browser follows the desktop task layout with bounded panels, keyboard-selectable tables and exact text details; narrow layouts stack history. Both clients retain version-1 stores and independent messaging implementations.

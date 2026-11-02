@@ -1,10 +1,10 @@
 # Acceptance contract
 
-Status: the current contract includes CHG-001 client desktop cases and CHG-002 retained server desktop cases. Actual results, clean-regeneration evidence, and earlier failures are recorded in docs/STATUS.md and docs/EVIDENCE.json. Tests are authored before the run they validate; generated clients may not edit them.
+Status: current contract includes CHG-001–004: client/server desktop controls, shared directory/durable receipts, explicit presence and compact web layout. The last verified implementation passed 92 acceptance cases and nine harness guards; actual results, clean proof and earlier failures are in [STATUS](../docs/STATUS.md) and [EVIDENCE.json](../docs/EVIDENCE.json). This documentation reconciliation does not claim a new runtime run. Tests are authored before the run they validate; generated clients may not edit them.
 
 ## Your acceptance expectations
 
-Blank preferences use adjacent defaults. Examples here are expected behavior, not observations. Your actual manual results belong in [TESTING.md](../TESTING.md#your-manual-observations).
+Blank preferences use adjacent defaults, which include the completed baseline. Examples express expectations, not observations. A regeneration request includes reconciling changed choices before freezing specifications/tests; see [the default workflow](../README.md#default-regeneration-instruction). Actual manual results belong in [TESTING.md](../TESTING.md#your-manual-observations).
 
 <!-- USER:BEGIN ACCEPTANCE_CHOICES -->
 | ID | Question | Your input | Example / automatic default |
@@ -13,7 +13,7 @@ Blank preferences use adjacent defaults. Examples here are expected behavior, no
 | A02 | What repeated-send failure should be checked? | | Given the server accepts a message but its reply is lost, when the client retries, the recipient still sees one inbox entry. |
 | A03 | What should happen to invalid input? | | Empty messages and invalid recipients show a clear error; valid Unicode, spaces, and newlines are preserved exactly. |
 | A04 | What manual usability check matters? | | I can distinguish queued from accepted messages and find the sender and exact text of each incoming message without reading logs. |
-| A05 | What extra acceptance case do you want? | | None beyond the fixed scenario, A01–A04, and the technical boundary tests derived by the agent. |
+| A05 | What extra acceptance case do you want? | | Preserve the fixed scenario, A01–A04, derived boundary tests, and completed GUI/server/directory/receipt/presence/web-layout cases; no pending FUTURE feature is selected. |
 <!-- USER:END ACCEPTANCE_CHOICES -->
 
 ## Fixtures and observation rules
@@ -59,12 +59,12 @@ Rows may expand into several executable tests. Reports must map collected tests 
 | AT-12 | Actual browser network offline after loading; also exercise both development transport controls | Already-loaded page can enqueue; request genuinely fails and entry stays queued; restore transport and observe one delivery. Mode controls do not bypass production storage/transport logic. |
 | AT-13 | Per client: POST timeout, 408, 429, 500, redirect, malformed/mismatched 201 receipt, permanent 400/409; GET wrong recipient/gapped sequence/bad next_after; valid CURSOR_INVALID | Uncertain sends keep IDs queued; permanent sends fail and later entries proceed; malformed pages preserve complete inbox/cursor; later valid page recovers; cursor error pauses both directions and demands reset. |
 | AT-14 | Wire framing/schema errors, duplicate JSON request members, unknown fields/routes, media/body limits, bad/repeated query keys, invalid cursors; static resources and health | Exact status/code/field mapping; no acceptance from invalid sends; browser assets and requests stay local; no store/session claim from health alone. |
-| AT-15 | Fresh retained-input workspace, actual harness all-target generation, build, and same frozen AT-01–AT-14 plus AT-16–AT-17 | No previous clients/Git/transcripts supplied; all baseline checks pass, retained inputs unchanged; original working tree preserved. This outer proof is excluded from baseline verification to prevent recursion. |
+| AT-15 | Fresh retained-input workspace, actual harness all-target generation, build, and the complete current acceptance suite: AT-01–AT-14, AT-16–AT-17, GUI-01–06, SG-01–06, DIR-01–08, PRES-01–05 and WEB-01 | No previous clients/Git/transcripts supplied; all frozen checks pass inside the harness and standalone, retained inputs unchanged; original working tree preserved. This outer proof is excluded from ordinary verification to prevent recursion. |
 | AT-16 | Client starts with unsupported store version or incompatible stored origin (Python); input during a delayed network request; normal quit with a request in flight | Startup error visible without destructive reset; local interaction remains responsive; quit completes within six seconds; no new work after shutdown. |
 | AT-17 | Deliver invalid multi-row page containing one valid-looking row and one bad row; then recover with a valid page | Neither first row nor cursor commits from the bad page; recovery inserts the complete valid page atomically. Repeated/stale pages do not create duplicate rows. Test both platforms. |
 | AT-18 | Harness config/path/integrity and publication failures using controlled runner fixtures | Reject output escapes/symlinks, changed retained files, missing outputs, incomplete agent events, zero-test results, and timeouts. Preserve existing published clients and rollback a partial publication. Unit checks do not replace AT-15's real generation proof. |
 
-Baseline verification collects AT-01–AT-14, AT-16, and AT-17. Harness verification covers AT-18. Full Stage 2 implementation completion also requires AT-15 and verified documentation/builds.
+Current full verification collects AT-01–AT-14, AT-16–AT-17 and all completed-change cases below: GUI-01–06, SG-01–06, DIR-01–08, PRES-01–05 and WEB-01. Harness verification covers AT-18 separately. Implementation verification also requires AT-15 and documentation/build checks. These acceptance IDs expand to 92 executable cases in the last verified snapshot; changed preferences may deliberately change that count before a future frozen run.
 
 Allowed platform differences: same-name login and attempted different-name login are machine-interface assertions for Python; the browser removes login controls after login and requires the confirmed reset flow to select another name. Browser startup/version and draft behavior use visible controls; Python origin binding and machine quit retain their command contract; desktop close, responsive editing, draft preservation, and confirmed reset are checked through actual Tk widgets. Normal restart/persistence, input validation, synchronization, retry, and deduplication remain required for both clients. Wire-only framing and concurrency checks target the shared server directly. AT-18 uses retained fixtures rather than a production model request; AT-15 supplies that separate real-generation evidence.
 
@@ -74,7 +74,7 @@ Allowed platform differences: same-name login and attempted different-name login
 |---|---|
 | REQ-GEN-01 | AT-15, AT-18, actual adapter command/model logs |
 | REQ-GEN-02 | AT-15 with frozen input/test fingerprints |
-| REQ-GEN-03 | Config/extension design in GENERATE.md; evolution execution deferred until authorized |
+| REQ-GEN-03 | Registered DIRECTORY/PRESENCE inputs, completed CHG-001–004 evidence in STATUS/CHANGES, unchanged generic harness/prompt |
 | REQ-LOCAL-01 | AT-14; source/dependency review |
 | REQ-ID-01 | AT-01, AT-09, AT-16 |
 | REQ-SEND-01 | AT-02–AT-05, AT-11 |
@@ -89,8 +89,13 @@ Allowed platform differences: same-name login and attempted different-name login
 | REQ-PERSIST-01 | AT-01, AT-09, AT-16 |
 | REQ-FAILURE-01 | AT-11, AT-13, AT-16, AT-17; optional OF-02 |
 | REQ-SESSION-01 | AT-13 cursor pause; explicit reset walkthrough; server source/protocol tests |
-| REQ-UI-01 | AT-01, AT-02, AT-11, AT-14, AT-16; user M05 |
+| REQ-UI-01 | AT-01, AT-02, AT-11, AT-14, AT-16; GUI-01–06; WEB-01; user M05 |
 | REQ-SERVER-UI-01 | SG-01–SG-06 and AT-15 with the retained server GUI |
+| REQ-DIR-01 | DIR-01, DIR-03–04, DIR-06–08 |
+| REQ-RECEIPT-01 | DIR-02, DIR-05–08 |
+| REQ-ACTIVITY-01 | DIR-03, DIR-05, DIR-08 |
+| REQ-PRESENCE-01 | PRES-01–05 and AT-15 |
+| REQ-WEB-UI-02 | WEB-01 and AT-15 |
 | REQ-TEST-01 | All case reports and test-review evidence |
 | REQ-RELEASE-01 | Provenance/history and archive restoration check described in TESTING.md |
 
@@ -100,11 +105,11 @@ For final user sign-off, complete the fixed walkthrough, queued restart check, a
 
 Optional OF-01 forcibly terminates a client around an incoming transaction to inspect crash atomicity. Optional OF-02 injects SQLite/IndexedDB write failures to verify failed enqueue dispatches nothing and failed receive advances no cursor. Their behavior remains required by the contract, but fault-injection execution is deferred and must be reported NOT_RUN unless actually exercised. Normal restart, malformed-page atomicity, and startup storage boundaries remain required baseline tests.
 
-The authorized CHG-001 and CHG-002 deltas are defined below. Any later selected change or experiment must first define its own specification delta and independent acceptance IDs, preserve applicable baseline cases, and verify with unchanged generic harness/prompt logic. Do not import an old feature experiment or create a FUTURE request from an example.
+The authorized CHG-001–004 requirements below are cumulative parts of the current baseline. Their headings identify origin; they are already implemented requirements, not pending requests. Later selected changes must define their own specification delta and independent acceptance IDs, preserve applicable prior cases, and verify through unchanged generic harness/prompt logic. Do not import unselected FUTURE requests or instructional examples.
 
 ## CHG-001 desktop acceptance delta
 
-These cases are required in addition to all existing baseline assertions. No wire behavior changes, no new shared extension, and no schema migration are selected. Freeze revised specs/tests before every generation run.
+These desktop cases remain required alongside the current protocol extensions. CHG-001 itself changed no wire behavior, shared extension or storage schema; CHG-003/004 subsequently added directory/receipt/presence requirements below. Freeze reconciled specs/tests before every generation run.
 
 | ID | Required exercise and result |
 |---|---|
@@ -119,7 +124,7 @@ GUI tests run on a real Tk display, using an isolated Xvfb display in automated 
 
 ## CHG-002 server desktop acceptance delta
 
-REQ-SERVER-UI-01 maps to SG-01–SG-06. Tests use a real isolated Xvfb display and production widgets, real sockets/HTTP, and current generated clients. Preserve all 55 existing cases and nine harness guards. These new tests join --suite all and AT-15; missing display requirements are BLOCKED, never skipped.
+REQ-SERVER-UI-01 maps to SG-01–SG-06. Tests use real Xvfb displays and production widgets, sockets/HTTP, and current generated clients. Preserve all applicable prior cases and the nine harness guards. These cases belong to --suite all and AT-15; missing display requirements are BLOCKED, never skipped.
 
 | ID | Required exercise and result |
 |---|---|
@@ -132,7 +137,7 @@ REQ-SERVER-UI-01 maps to SG-01–SG-06. Tests use a real isolated Xvfb display a
 
 ## CHG-003 directory and receipt acceptance delta
 
-Retain all 65 existing cases and nine harness guards. Preserve baseline message-fault assertions by recording message-route history separately from new directory/receipt traffic, and scope existing injected send/page faults to the messages route. New cases independently inspect all new-route attempts. This is deliberate protocol-extension test maintenance before generation, not a repair-time weakening. DIR-01–DIR-08 map to REQ-DIR-01/REQ-RECEIPT-01/REQ-ACTIVITY-01 and join full verification and AT-15.
+Preserve all applicable prior cases and nine harness guards. Record message-route history separately from directory/receipt traffic, scoping legacy send/page faults to the messages route while new cases inspect auxiliary attempts. This is deliberate extension coverage established before generation. DIR-01–08 map to REQ-DIR-01/REQ-RECEIPT-01/REQ-ACTIVITY-01 and belong to full verification and AT-15.
 
 | ID | Required exercise and result |
 |---|---|
@@ -148,4 +153,13 @@ Retain all 65 existing cases and nine harness guards. Preserve baseline message-
 
 ## CHG-004 cases
 
-PRES-01: strict presence schema/routes, idempotent online/offline state, exact 15-second fallback, explicit-offline latch immune to late heartbeats/messages/receipts/refresh. PRES-02: real server Users status changes on presence HTTP without message traffic and preserves counts. PRES-03: each GUI and Python machine control communicates offline then reconnect online, no messages needed, offline queue intact; messages to offline users cannot mark them online. PRES-04: failed/lost notifications keep local offline queues and report failures, no repeated offline traffic, reconnect recovers. PRES-05: active old heartbeat/rapid mode switches serialize correctly and final mode wins without stale confirmation. WEB-01: desktop-sized panel geometry and table structure, selection/detail exact text, keyboard operation, narrow-screen containment. Preserve all previous 81 cases (including the Online/Offline label follow-up); add independent cases for these requirements before generation.
+These cases belong to --suite all and AT-15 alongside all previous assertions. CHG-004 expanded the preceding 81 executable cases to 92; counts and repairs are historical evidence in STATUS/CHANGES.
+
+| ID | Required exercise and result |
+|---|---|
+| PRES-01 | Strict presence schemas/routes, idempotent online/offline state, exact 15-second fallback, and explicit-offline latch immune to late heartbeats/messages/receipts/refresh. |
+| PRES-02 | Real server Users status changes on presence HTTP without message traffic and preserves message/activity counts. |
+| PRES-03 | Each GUI and Python machine control communicates Offline then Online without peer messages; offline queues remain intact and messages to an offline user cannot mark it online. |
+| PRES-04 | Failed/lost notifications preserve local offline queues and report failure; no repeated offline traffic; reconnect recovers. |
+| PRES-05 | Old in-flight heartbeat and rapid mode switches remain serialized; final intent wins without stale confirmation. |
+| WEB-01 | Desktop panel geometry and semantic tables, exact text/details, keyboard selection and narrow-screen containment. |

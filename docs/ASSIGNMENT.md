@@ -10,7 +10,7 @@
 | Comparison | COMPARED on 2026-11-01, America/Los_Angeles |
 | Original inclusion | NOT_INCLUDED; kept unmodified outside this repository |
 | Construction guide | Instruction_for_Agent.md, baseline commit 216ef72 |
-| Guide SHA-256 | `190a384ffce70396fa93fb02c6722b73f6a74bae5185e1ba9b0f540da5eda5fc` |
+| Baseline guide SHA-256 | `190a384ffce70396fa93fb02c6722b73f6a74bae5185e1ba9b0f540da5eda5fc`; historical comparison at 216ef72, not a hash of later guide revisions |
 | Conflicts found | None between the compared core requirements and the selected baseline |
 
 Private source paths and commissioning details are intentionally absent. NOT_INCLUDED means the original is not packaged here; it does not mean the source was unavailable or the comparison was not performed. Future source changes must trigger a new comparison and provenance entry before updating obligations.
@@ -36,4 +36,4 @@ The source permits flexible harness/repository structure and language selection,
 
 The eighth scenario step, restart-persistence checks, receipt-loss deduplication, strict validation, local schema contracts, three repair rounds, and 30-second observations make the selected behavior testable. The source's minimal behavior is preserved; these concrete project contracts are recorded as defaults/derived decisions in [DECISIONS.md](DECISIONS.md).
 
-The user-selected CHG-001 desktop change demonstrates adaptation through revised specifications/configuration with unchanged generic orchestration and prompt. Its actual acceptance and clean-regeneration evidence is recorded in CHANGES; the active request queue is now empty. Required human sign-off is a project workflow step, distinct from automated acceptance and Stage 2 implementation completion. None of this source comparison establishes runtime compliance; see [ASSIGNMENT_REVIEW.md](ASSIGNMENT_REVIEW.md).
+Completed CHG-001–004 extend presentation/operation with client and server GUIs, shared recipients, durable acknowledgment/activity views, explicit presence, and compact web layout. DIRECTORY.md and PRESENCE.md are active client extensions. These changes retain the independent languages, local runtime, fixed exchange, durable client queues and in-memory server session required by the source. Actual generation and clean-proof evidence is in CHANGES/STATUS; FUTURE has no active request. Current defaults describe these finished changes, while the original defaults/comparison remain historical. Human sign-off and a current release archive remain separate from automated completion; see [ASSIGNMENT_REVIEW.md](ASSIGNMENT_REVIEW.md).

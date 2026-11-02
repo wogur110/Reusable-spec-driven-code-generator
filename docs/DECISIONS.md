@@ -1,31 +1,31 @@
 # Resolved decisions
 
-Reconciled on 2026-11-01 (America/Los_Angeles), retaining the Stage 1 preference snapshot and recording Stage 2 results. All 26 source preference cells are blank. Except for the explicitly authorized CHG-001 interface override below, their effective values come from the adjacent defaults, with provenance `TEMPLATE_DEFAULT`; blank cells are never represented as personally supplied answers; CHG-001 separately supplies explicit interface intent. The six manual observation cells remain blank and are not defaulted to successful results.
+Current decisions include all completed changes through CHG-004 and the default USER-choice reconciliation workflow. All 26 `Your input` cells and six manual-observation cells remain blank. The adjacent preference defaults now describe finished behavior; they are agent-maintained summaries, not user-authored answers. Earlier defaults and the requests that superseded them are retained below. Historical runtime evidence remains tied to its recorded input hashes; this documentation synchronization does not claim another generation or test run.
 
-The user's explicit Stage 2 request authorized implementation, supporting reconciliation, actual generation, verification, and authentic history; standalone public framing remains in force. The supplied guide fixes Python and TypeScript as the two independent languages. [Project requirements](ASSIGNMENT.md) distinguishes source obligations from project choices.
+The user's explicit Stage 2 request authorized implementation, and later CHG-001–004 requests authorized the completed extensions. The current request authorizes synchronizing documentation with that behavior. Standalone public framing remains in force. Python and TypeScript remain independent languages; [project requirements](ASSIGNMENT.md) distinguishes source obligations from project choices.
 
 ## Effective preferences
 
-Each row's source snapshot is a blank `Your input` cell. The linked source table remains the editable authority; this record is agent-maintained. Provenance for every row in this table is `TEMPLATE_DEFAULT`.
+Each row's source snapshot is a blank `Your input` cell. Linked forms remain editable; the effective values and provenance below are agent-maintained. `TEMPLATE_DEFAULT` applies unless a row identifies a later `USER_EXPLICIT` request or `AGENT_DERIVED` reconciliation. Updating adjacent examples does not change their historical provenance.
 
 | ID | Effective value | Source / effect |
 |---|---|---|
 | P01 | Project name: reusable-spec-driven-code-generator. | [PRODUCT_CHOICES](../specs/PRODUCT.md#your-product-choices); documentation title/identity |
 | P02 | Demonstrate recreating independent Python and TypeScript clients from precise specifications. | PRODUCT_CHOICES; REQ-GEN-01–03 |
 | P03 | Developer/reviewer running a local demonstration on one computer. | PRODUCT_CHOICES; launch and review instructions |
-| P04 | Python Tkinter desktop GUI and TypeScript desktop-browser client (USER_EXPLICIT: CHG-001; original blank cell preserved). | PRODUCT_CHOICES; platform contracts and actual-client tests |
-| P05 | Username, recipient, text, Send, inbox, outgoing list, and connection/status feedback. | PRODUCT_CHOICES; TYPESCRIPT selectors, REQ-UI-01 |
+| P04 | Python Tkinter desktop GUI, retained headless machine interface, and TypeScript browser with comparable compact desktop layout. | USER_EXPLICIT: CHG-001/004; PRODUCT_CHOICES, platform contracts |
+| P05 | Session/transport/reset and presence controls, filterable recipients/Refresh, compose/Send, and side-by-side Inbox/Outgoing tables with exact detail panes; stack history on narrow screens. | USER_EXPLICIT: CHG-003/004; layout/selectors AGENT_DERIVED in TYPESCRIPT |
 | P06 | First-launch username, remembered across normal restarts; explicit reset to change it; no password. | PRODUCT_CHOICES; REQ-ID-01 |
 | P07 | Persist identity, original queued IDs/payloads, received messages, and synchronization progress. | PRODUCT_CHOICES; REQ-PERSIST-01 |
-| P08 | Running desktop client/loaded page queues during API outage; offline browser asset load/reload excluded. | PRODUCT_CHOICES; REQ-QUEUE-01 and API-only reload faults |
+| P08 | Desktop/loaded page queues offline; one final bounded notification on Offline selection, then no API traffic; reconnect resumes work. Offline asset load/reload remains excluded. | AGENT_DERIVED from CHG-001/004; PRODUCT_CHOICES, PRESENCE |
 | P09 | Show queued / accepted by server / failed with an actionable reason; acceptance is not delivery/read confirmation. | PRODUCT_CHOICES; REQ-STATE-01 |
-| P10 | No additional feature. | PRODUCT_CHOICES; empty extension inventory and FUTURE queue |
+| P10 | Retained server GUI, shared recipient discovery, click-to-address, durable receipt/activity views, and explicit presence with heartbeat fallback; offline client queues unknown. | USER_EXPLICIT: CHG-002–004; SERVER defines retained behavior; DIRECTORY/PRESENCE are registered for both clients |
 | P11 | No attachments, groups, reactions, passwords, cloud deployment, push notifications, closed-app delivery, or read receipts. | PRODUCT_CHOICES; observable limits |
 | A01 | Restart a queued client with the same store; reconnect; deliver original text once. Browser assets stay reachable. | [ACCEPTANCE_CHOICES](../specs/ACCEPTANCE.md#your-acceptance-expectations); AT-09 |
 | A02 | Lose the reply after acceptance; retry without a second inbox entry. | ACCEPTANCE_CHOICES; AT-07–08 |
 | A03 | Reject empty text/invalid recipients clearly; preserve valid Unicode, spaces, and newlines. | ACCEPTANCE_CHOICES; AT-02, AT-11 |
 | A04 | Distinguish queued from accepted and read incoming sender/exact text without logs. | ACCEPTANCE_CHOICES; TESTING manual usability inspection |
-| A05 | No extra user case beyond the fixed scenario, A01–A04, and derived boundary tests. | ACCEPTANCE_CHOICES; AT-01–18 |
+| A05 | Fixed scenario, A01–A04, derived boundaries and all completed GUI/server/directory/receipt/presence/web-layout cases; no pending feature selected. | AGENT_DERIVED from CHG-001–004; AT, GUI, SG, DIR, PRES and WEB acceptance IDs |
 | D01 | Prioritize offline correctness, clean regeneration, readable specs, simplicity, then polish. | [DESIGN_CHOICES](../DESIGN.md#your-design-priorities); design tradeoffs |
 | D02 | One local Python server process with in-memory state; no database/authentication service. | DESIGN_CHOICES; REQ-LOCAL-01, REQ-SESSION-01 |
 | D03 | Prefer standard libraries and small general-purpose tools; no turnkey messaging SDK or runtime CDN. | DESIGN_CHOICES; dependency policy |
@@ -45,9 +45,9 @@ Every TD row has provenance `AGENT_DERIVED`. These choices resolve implementatio
 |---|---|---|
 | TD-01 | Exact lowercase ASCII usernames, 1–32 characters, no normalization; one instance per identity. Simple addressing avoids cross-language normalization ambiguity. No passwords or recipient registration. | [PRODUCT](../specs/PRODUCT.md), [PROTOCOL](../specs/PROTOCOL.md); AT-01, AT-05, AT-11 |
 | TD-02 | Unicode scalar text of 1–4,096 UTF-8 bytes, including whitespace-only text; no trimming. A byte limit makes both languages agree. | PROTOCOL; AT-02, AT-11 |
-| TD-03 | Versioned HTTP JSON send/retrieve endpoints, exact schemas, strict request validation, loopback default port 8765, same-origin assets/API. This keeps runtime local and removes CORS setup. | PROTOCOL; AT-14 |
+| TD-03 | Version-1 HTTP JSON messaging, directory, durable-receipt and presence routes with exact schemas and strict validation; loopback port 8765, same-origin assets/API. | PROTOCOL, DIRECTORY, PRESENCE; AT-14, DIR-01–02, PRES-01 |
 | TD-04 | UUIDv4 client IDs, server dedupe key (sender, message_id), immutable payload, FIFO outbox, per-recipient sequence and persistent inbox dedupe. Lost replies can be retried safely within a server session. | PROTOCOL; AT-06–10 |
-| TD-05 | Serialize one queued POST then one GET page even after a send failure; one-second cycle delay, five-second request deadline, 100-row pages, 32,768-byte request-body limit. Bound work while keeping input responsive. | PROTOCOL; AT-06, AT-10, AT-13–16 |
+| TD-05 | One serialized scheduler prioritizes presence intent, then queued POST/GET and receipt/heartbeat/directory work. One-second cycle delay, five-second message and two-second auxiliary deadlines; at most 18 seconds of network work with an online presence attempt. 100-row pages; 32,768-byte request-body limit. | PROTOCOL, DIRECTORY, PRESENCE; AT-06, AT-10, AT-13–16, DIR-06–07, PRES-03–05 |
 | TD-06 | SQLite version 1 and IndexedDB version 1 with atomic enqueue/outcome/receive transactions. Commit inbox and cursor together; reserve the maximum safe local allocator value as exhaustion. No baseline migration. | [PYTHON](../specs/PYTHON.md), [TYPESCRIPT](../specs/TYPESCRIPT.md); AT-09, AT-16–17 |
 | TD-07 | Explicit identity reset; cursor-invalid pauses synchronization and new enqueue. Server restart always requires fresh/reset stores, even if a numeric cursor appears valid. No automatic session reconciliation. | PROTOCOL and platform reset contracts; AT-01, AT-13 |
 | TD-08 | Standard-library threaded Python server with one lock protecting acceptance/dedupe/sequence snapshots; bounded HTTP framing and safe static-root access. Keep infrastructure small. | [DESIGN](../DESIGN.md), PROTOCOL; AT-08, AT-14 |
@@ -55,17 +55,33 @@ Every TD row has provenance `AGENT_DERIVED`. These choices resolve implementatio
 | TD-10 | Python 3.10+ standard library; Node 22+ tooling; TypeScript 5.9.3, retained @playwright/test 1.56.1 and its Chromium. Exact package versions and actual npm locks avoid floating declarations; the selected versions pass builds and the acceptance suite. | DESIGN dependency sources, TYPESCRIPT, [TESTING](../TESTING.md); Stage 2 setup/build evidence |
 | TD-11 | Project-local Codex 0.166.0 with requested gpt-6-astra passed writable authenticated preflight and actual generation; effective model is UNREPORTED. Recheck access in each harness run. | [GENERATE](../GENERATE.md); authenticated preflight and generation PASS |
 | TD-12 | Fresh allowlisted candidate workspaces, separate target context, retained inventory/hash checks after agent calls and trusted checks, and rollback publication. Previous clients never become generation context. | GENERATE; AT-15, AT-18 |
-| TD-13 | Generic prompt/config-driven orchestration; extensions initially empty. Maximum four calls per target, 600 seconds per generation call, 5,400 seconds per harness run, and a 7,200-second outer clean-check budget. Do not add application feature branches to orchestration. | GENERATE complete timeout table; AT-18; evolution NOT_RUN |
-| TD-14 | Independent retained assertions drive actual clients through external per-client API faults. Baseline suite, harness guards, and outer clean regeneration are separate to avoid recursion; manual facts remain user-owned. | ACCEPTANCE and TESTING; AT-01–18, M01–M06 |
-| TD-15 | Record authorship separately from retained/generated ownership, preserve authentic commits, and verify archive inventory/history restoration. Track implementation, manual review, deferred evolution, and final readiness independently. | DESIGN, TESTING, [STATUS](STATUS.md), [review record](ASSIGNMENT_REVIEW.md) |
+| TD-13 | Generic prompt/config-driven orchestration; DIRECTORY.md then PRESENCE.md registered for both targets. Maximum four calls per target, 600 seconds per call, 5,400 seconds per harness run and 7,200 seconds per clean proof. No feature-specific orchestration branches. | GENERATE timeout table; AT-18 and recorded CHG-001–004 evolution |
+| TD-14 | Independent retained assertions drive actual clients under external per-client API faults. Current acceptance includes completed GUI/server/directory/presence/layout cases. Harness guards and clean proof remain separate to avoid recursion; manual facts remain user-owned. | ACCEPTANCE and TESTING; AT, GUI, SG, DIR, PRES, WEB, M01–M06 |
+| TD-15 | Record authorship separately from ownership; preserve real commits and archive history restoration. Track implementation, manual review, future unexecuted work and current packaging independently. | DESIGN, TESTING, STATUS and review record |
 
 ## Observation and reconciliation snapshot
 
 Source snapshot: P01–P11, A01–A05, D01–D05, and W01–W05 all blank as of this revision. M01, M02, M05, and M06 are `NOT_RECORDED`; M03 and M04 are `NOT_RUN`. These states describe missing evidence, not preferences. Current requirements contain no unresolved user-choice conflict. The current environment/model is verified; other operating systems and accounts remain unverified.
 
-After a user edit, compare the changed source cell against this snapshot, preserve its exact wording, and reconcile affected decisions, requirements, platform schemas, tests, and instructions before implementation. Blank/whitespace, TBD, and — mean the adjacent default; false, 0, and none are explicit values whose compatibility must be checked. Do not overwrite source cells with resolved values.
+Every regeneration request includes comparing current preference cells against this snapshot. Preserve exact user wording. Reconcile changed choices into decisions, contracts, independent tests and necessary retained implementation/configuration before freezing inputs. With no changed choices, use the current contract unchanged. Blank/whitespace, TBD and — select adjacent current defaults; false, 0 and none are explicit choices. Never fill source cells with resolved values. Candidate-generation and repair agents cannot perform this parent reconciliation or modify frozen inputs.
 
-Unchanged blanks do not revoke a later explicitly authorized extension or selected change request. Record that authorization, its affected source values and previous values, and the resulting current contract. Archive completed requests in [CHANGES](CHANGES.md); leave unrelated inputs and requests intact. A changed UI or coding-tool preference may require broad reconciliation, but does not itself authorize Stage 2. The five editable source locations are listed in [README](../README.md#what-you-can-edit).
+Unchanged blanks do not revoke completed changes. Saving preferences alone starts no work; a regeneration request includes reconciliation by default and does not restart Stage 1. FUTURE.md requires separate explicit selection/application. Preserve historical requests and runtime evidence; record previous/new values when choices change. Manual fields remain factual observations. See the [README default instruction](../README.md#default-regeneration-instruction).
+
+## Current-default documentation reconciliation
+
+For future authorized development, maintain this decision record alongside affected specifications and preference-table defaults. Record each changed default's field ID, previous/new text, rationale and authorizing request before generation input freeze. Preserve exact user input values and historical snapshots. Verify default/spec/code/doc consistency before completion, and explain when no default change is needed; see [the agent rule](../AGENTS.md#future-development-completion-rule).
+
+At the user's request, the adjacent examples for P04, P05, P08, P10 and A05 now describe the already completed baseline. The original questions, IDs, all input values and manual observation fields are preserved. This is a documentation correction, not a newly implemented feature or a new CHG request. Previous example/default text is retained here so a future reconciliation can distinguish user edits from changes to derived guidance.
+
+| ID | Previous adjacent example/default | Basis for current default |
+|---|---|---|
+| P04 | Python command-line client and TypeScript desktop-browser client. | CHG-001/004; current value above |
+| P05 | Username entry, recipient field, message input, Send button, inbox, outgoing-message list, and clear connection/status feedback. | CHG-003/004; current value above |
+| P08 | A running CLI or already-loaded page can queue messages while the API is unreachable; offline first load/reload of browser assets is excluded. | CHG-001/004; current value above |
+| P10 | None beyond the project's required messaging behavior. | CHG-002–004; current value above |
+| A05 | None beyond the fixed scenario, A01–A04, and the technical boundary tests derived by the agent. | Acceptance derived from CHG-001–004; current value above |
+
+The construction guide's original bootstrap catalog remains labeled as historical starting defaults. For this completed checkout, current preference forms and registered contracts govern regeneration. The following sections retain decisions and outcomes at the time each implementation change was made; later completed changes supersede their earlier scope statements.
 
 ## Stage 2 environment reconciliation
 

@@ -1,12 +1,14 @@
 # Completed changes
 
-Completed requests and their actual evidence are recorded below.
+Completed requests through CHG-004 and their actual evidence are recorded below. Entries preserve scope, defaults, source hashes and outcomes at the time of each change; later documentation reconciliation does not rewrite those historical results. Current requirements and defaults live in registered specs and [DECISIONS.md](DECISIONS.md), and regeneration follows [README.md](../README.md#default-regeneration-instruction).
 
 This is the completion history for actual requests from [FUTURE.md](../FUTURE.md), not a fabricated history of the initial build. Stage 1 creation and ordinary project milestones belong in [STATUS.md](STATUS.md) and real Git history. No CHG IDs are reserved or inferred from examples.
 
 ## Required evidence for a completed entry
 
 Before removing an active selected request, append one record containing its unique ID, original wording, scope/expected result/preservation constraints, original and revised affected USER values, affected requirement/acceptance IDs and files, implementation outcome, actual validation commands and counts/results, and genuine revision/commit evidence when available. Include applicable clean-regeneration evidence for code changes, or appropriate document checks for documentation-only changes. Preserve limitations and required manual results separately from automated reports.
+
+For future entries, also record affected preference field IDs and previous/new default/example text with rationale/provenance, or explain why no defaults needed changing. Confirm that code, specification sheets, retained tests, operating docs and affected defaults agree on the finished behavior. Preserve actual USER input/observation cells and historical entries; do not archive failed or incomplete work as a finished baseline.
 
 Record date/time with timezone for actual work; never backdate history or fabricate authorship/commit IDs. An uncommitted change can record a real base revision and fingerprints without pretending it was committed. Archive the original request before removing it from the queue. On retries, find an existing ID and reconcile its record rather than duplicating it. Failed, partial, blocked, or required-user-check-pending requests remain active until their declared completion criteria are satisfied. A separately authorized experiment outside the queue does not invent a completed CHG entry.
 

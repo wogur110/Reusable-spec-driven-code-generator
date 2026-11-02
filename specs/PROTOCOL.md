@@ -1,6 +1,6 @@
 # Messaging protocol version 1
 
-Status: current wire and synchronization contract, implemented by the server and generated clients. This specializes [PRODUCT.md](PRODUCT.md).
+Status: current wire and synchronization contract through CHG-004, implemented by the server and generated clients. This specializes [PRODUCT.md](PRODUCT.md); the registered [DIRECTORY.md](DIRECTORY.md) and [PRESENCE.md](PRESENCE.md) extensions are required parts of the active version-1 contract.
 
 ## Transport and address
 
@@ -25,11 +25,13 @@ The server accepts at most 32,768 request-body bytes. POST requires one nonnegat
 | Page | Exactly `messages` (array of 0–100 Message objects) and `next_after` (Cursor). |
 | Error | Exactly `error`, whose object has exactly `code` (one code below), `message` (nonempty English string), `field` (null or a field name below). Error prose is not stable; tests assert code/field/status. |
 
-Error fields are `message_id`, `sender`, `recipient`, `text`, `after`, or null. Error messages contain no credentials or internal traceback.
+Error fields are `message_id`, `sender`, `recipient`, `text`, `after`, `username`, `through`, `online`, or null. The last three belong to the registered directory/receipt/presence routes. Error messages contain no credentials or internal traceback.
 
 The 32,768-byte limit applies to request bodies, not receive pages. A valid page containing 100 texts of 4,096 control characters expands to approximately 2.47 MB when JSON-escaped by this server. Clients must accept every maximum-size page the server can emit; if imposing a response-buffer cap, allow at least 4 MiB. Validate the decoded message count and text-byte limits independently.
 
 ## Routes
+
+The active inventory is GET /health, POST/GET /api/v1/messages, POST/GET /api/v1/users, POST /api/v1/receipts, and POST /api/v1/presence. Exact users/receipts schemas are in [DIRECTORY.md](DIRECTORY.md); the presence schema, offline latch and notification rules are in [PRESENCE.md](PRESENCE.md). They preserve existing message objects and protocol_version=1.
 
 ### GET /health
 
@@ -82,14 +84,16 @@ Serve browser assets from a configured local build directory; `/` maps to `index
 | 400 | INVALID_JSON | null; invalid UTF-8/JSON, duplicate members, nonfinite token |
 | 400 | INVALID_FIELDS | null; wrong outer type, missing/unknown members |
 | 400 | INVALID_MESSAGE_ID | message_id |
-| 400 | INVALID_USERNAME | sender or recipient |
+| 400 | INVALID_USERNAME | sender, recipient, or username according to the route |
+| 400 | INVALID_RECEIPT | through; invalid cumulative acknowledgment |
+| 400 | INVALID_PRESENCE | online; value is not a JSON boolean |
 | 400 | SELF_SEND | recipient |
 | 400 | INVALID_TEXT | text |
 | 400 | INVALID_QUERY | after for an invalid after value; otherwise null |
 | 404 | NOT_FOUND | null |
 | 405 | METHOD_NOT_ALLOWED | null |
 | 409 | IDEMPOTENCY_CONFLICT | message_id |
-| 409 | CURSOR_INVALID | after; cursor is beyond this server stream |
+| 409 | CURSOR_INVALID | after for retrieval, through for acknowledgment; value is beyond this server stream |
 | 413 | PAYLOAD_TOO_LARGE | null |
 | 415 | UNSUPPORTED_MEDIA_TYPE | null |
 | 503 | SEQUENCE_EXHAUSTED | null |
@@ -115,19 +119,19 @@ No queued item is dropped for retry count. Failed rows are retained and excluded
 
 ## Synchronization and incoming validation
 
-At startup with a stored identity, successful first login, explicit reconnect, browser online/focus/visibility activation: schedule an immediate cycle. Merge overlapping triggers into one worker. Otherwise wait one second after a completed cycle; no concurrent cycles or overlapping requests. A cycle sends at most the earliest queued entry then fetches one incoming page, even if the send failed. One cycle may therefore take up to ten seconds plus local work. Five seconds is the complete request deadline, including response body; cancel/close requests on expiry. Backoff is the fixed one-second delay, with no jitter or unbounded exponential delay in v1.
+At startup with a stored identity, successful first login, explicit reconnect, browser online/focus/visibility activation: schedule an immediate cycle. Merge overlapping triggers into one worker. Prioritize pending presence intent as defined in PRESENCE.md. Ordinary work sends at most the earliest queued entry then fetches one incoming page, even if the send failed, followed by receipt report, heartbeat and directory fetch as defined in DIRECTORY.md. Message requests have a five-second total deadline, including response body; auxiliary and presence requests have two seconds. Ordinary work totals at most 16 seconds of network time; a cycle including an online presence attempt totals at most 18 seconds, plus local work. Wait one second after each completed cycle; no concurrent cycles or overlapping requests. A mode transition takes priority after any in-flight request, ahead of remaining cycle work and sleep. Cancel/close requests on expiry; no unbounded exponential backoff in v1.
 
 Validate Page content type, exact schemas, safe integers, valid usernames/IDs/text, recipient equal to the current identity, distinct sender, no repeated message keys, contiguous sequences beginning at requested after+1, and matching next_after. Validate before storage, then in one transaction compare/insert deduplicated inbox rows and update the cursor. Existing identical `(sender,message_id)` rows may be retained; any conflicting payload/sequence or duplicate sequence mapped to another key rejects and rolls back the entire page. A repeated stale page cannot advance the cursor. Read the persisted cursor again next cycle.
 
 Malformed pages, GET transport/errors other than a valid 409 CURSOR_INVALID, or aborted writes leave inbox/cursor unchanged and allow later retries. A valid CURSOR_INVALID pauses both sending and receiving and prominently requests explicit reset. Toggling online mode does not clear this pause. Do not infer a fresh session from empty results or automatically clear storage.
 
-Development offline mode blocks new requests before dispatch, while enqueue and snapshots continue. An in-flight request may already have reached the server; its uncertainty uses normal retry/deduplication behavior. External faults must exercise that same path. Only explicit reset invalidates all old asynchronous responses; a reset completion must not be followed by a stale write.
+Development offline mode blocks ordinary requests before dispatch, while enqueue and snapshots continue. Its sole exception is one final bounded POST /api/v1/presence online=false when switching from online, as defined in PRESENCE.md; after that attempt no API requests run while offline. Offline startup does not send a notification. An in-flight request may already have reached the server; its uncertainty uses normal retry/deduplication behavior. External faults must exercise that same path. Reset invalidates all old-identity asynchronous responses; reset completion must not be followed by a stale write. Presence responses additionally carry mode-revision guards.
 
-Server process restart discards all streams, receipts, and counters. Even when an old cursor happens to be numerically valid on a new server, this version cannot reconcile sessions. A fresh server session requires explicit fresh/reset client stores. There is no cross-session delivery guarantee.
+Each new server session, including GUI Stop/Start in the same process, discards streams, acceptance receipts, directory membership, durable-receipt observations, presence latches and counters. Even when an old cursor happens to be numerically valid on a new server, this version cannot reconcile sessions. A fresh server session requires explicit fresh/reset client stores. There is no cross-session delivery guarantee.
 
 ## Active CHG-003 extension
 
-[DIRECTORY.md](DIRECTORY.md) adds users/receipts routes, Error fields username/through, INVALID_RECEIPT, and serialized auxiliary work after the original send/receive cycle. Its exact scheduling, validation and acknowledgment rules supersede the baseline two-request-only cycle above. Legacy message payloads, health version, send acceptance states and client storage schemas remain unchanged. Server restart here includes Stop/Start inside the management process.
+[DIRECTORY.md](DIRECTORY.md) defines users/receipts routes and the auxiliary scheduling summarized above. Legacy message payloads, health version, send acceptance states and client storage schemas remain unchanged.
 
 
 ## CHG-004 explicit presence override

@@ -1,6 +1,6 @@
 # TypeScript browser client contract
 
-Status: current implemented browser contract; builds and baseline browser checks pass. Shared behavior is defined by [PRODUCT.md](PRODUCT.md) and [PROTOCOL.md](PROTOCOL.md).
+Status: current browser contract through CHG-004: compact desktop layout, directory/durable receipts, and explicit presence. Shared behavior is defined by [PRODUCT.md](PRODUCT.md), [PROTOCOL.md](PROTOCOL.md), [DIRECTORY.md](DIRECTORY.md), and [PRESENCE.md](PRESENCE.md). Historical verification is recorded in [STATUS](../docs/STATUS.md).
 
 ## Source, build, and origin
 
@@ -34,6 +34,7 @@ The page has labeled controls and English status/error text. Support ordinary ke
 | inbox | Container ordered by recipient sequence. |
 | outbox | Container ordered by local_order. |
 | connection-status | Visible text and data-state=unknown/online/offline/error. |
+| presence-status | Text unknown/pending/confirmed/error for the selected mode notification, following PRESENCE.md. |
 | error-message | Visible local validation/storage/reset-required message; empty when none. |
 | transport-mode | Select with values online/offline; labeled Development transport. Defaults online on each load. |
 | reset-button | Opens a confirmation panel; does not itself clear data. |
@@ -59,9 +60,9 @@ Validate scalar input and enforce protocol limits before opening a write transac
 
 ## Network, lifecycle, and reset
 
-Use fetch with AbortController, cache:no-store, redirect:error, and a five-second deadline covering receipt/body processing. Validate the exact protocol objects and cross-field consistency. A network TypeError/timeout is uncertain, never permanent rejection. Classify HTTP status even if its error body cannot be parsed. Use the single protocol scheduler: one POST head and one GET page per cycle, followed by a one-second delay. Wake at login/startup/reconnect and page activation; merge triggers and prohibit overlapping cycles. Background throttling is best effort; no closed-tab delivery.
+Use fetch with AbortController, cache:no-store and redirect:error. Message requests have a five-second total deadline covering body processing; auxiliary and presence requests have two seconds. Validate exact protocol objects and cross-field consistency. A network TypeError/timeout is uncertain, never permanent rejection; classify HTTP status even when its error body is invalid. Use one serialized scheduler: pending presence intent, POST queued head, GET page, then receipt/heartbeat/directory work. Follow PROTOCOL/DIRECTORY/PRESENCE for priority, eligibility and the one-second inter-cycle delay. Wake at login/startup/reconnect and page activation; merge triggers and prohibit overlapping requests/cycles. Background throttling is best effort; no closed-tab delivery.
 
-Online/offline development control blocks requests through the same transport path while allowing offline enqueue. Browser online/offline events are hints, not proof of server reachability. Actual external outage tests must fail real API traffic. Reload persistence tests leave static assets accessible and keep the same origin/profile/server session.
+Development offline mode stops ordinary requests while allowing local enqueue. Selecting offline permits one final two-second presence notification after in-flight work, then no API traffic; selecting online schedules explicit presence before ordinary work. Follow PRESENCE.md for failures and rapid transitions. Browser online/offline events are hints, not proof of reachability. External outage tests must fail real API traffic. Reload persistence tests leave assets accessible and keep the same origin/profile/server session.
 
 Before confirmed reset, stop the scheduler, abort/invalidate in-flight requests using a generation token, and wait for existing transactions. Clear only this application's three stores and restore metadata defaults in a transaction. Ignore every response tied to the old identity/generation. Show login only when reset commits; a failed reset preserves the last committed store and shows an error. Do not clear unrelated origin storage or browser profiles. A canceled confirmation changes nothing. Reset restores online mode, unknown connection, and unpaused synchronization with no identity.
 
