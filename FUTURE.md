@@ -5,7 +5,28 @@ Use this queue for future deliberate changes. CHG-001–004 are completed and ar
 ## Active requests
 
 <!-- CHANGE_REQUESTS:BEGIN -->
-No active requests.
+
+CHG-005: Add an automated network-failure test panel
+- State: PROPOSED
+- Change: Provide a separate local test panel that can interrupt either client's actual API traffic, execute reproducible failure scenarios, and report messaging outcomes.
+- Scope: Retained test infrastructure, a small local control panel, headless scenario execution, transport-fault fixtures, evidence, and testing documentation.
+- Dependencies: Working baseline clients, server, and integration tests. The panel can operate with the Python CLI or GUI;
+- Priority: High. Useful before additional messaging features.
+
+CHG-006: Support small file attachments in both clients
+- State: PROPOSED
+- Change: Let users attach a small file to an addressed message in the Python and TypeScript GUIs, queue it locally while offline, and retrieve/save the original bytes after delivery.
+- Scope: Product and protocol extensions, both client interfaces and stores, server attachment storage, per-user message views, retained tests, generation inputs, and operating documentation.
+- Dependencies: CHG-001 and CHG-003 completed and verified, including the server GUI.  Persistent server storage is not part of this request.
+- Priority: Normal. Apply after existing text messaging and receipt behavior are stable.
+
+CHG-007: Extend the generator with a Kotlin Android client target
+- State: PROPOSED
+- Change: Add a native Kotlin Android client as a third generated target, using the existing shared messaging specification and local server.
+- Reason: Demonstrate that the generator can extend to another language and platform through written contracts and target configuration, while retaining reproducible generation and interoperability.
+- Scope: A Kotlin platform specification, target/capability declarations, retained harness and Android test support, generated Android project, local emulator setup, operating documentation, and verification evidence.
+- Dependencies: A working generation harness, shared protocol, local server, and verified Python/TypeScript baseline. The numbered GUI, presence, and attachment proposals are not automatic prerequisites; features already mandatory in the current accepted shared contract must be handled as specified below.
+- Priority: Normal. Apply after baseline interoperability and regeneration are proven.
 <!-- CHANGE_REQUESTS:END -->
 
 ## How to write a request
