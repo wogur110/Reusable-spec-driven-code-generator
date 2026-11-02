@@ -480,33 +480,156 @@
           "src/main.ts": "a5b9c283d95675426c53bc973189eda2b8862ed0c0d8b68beffe869d2b53ea6c"
         }
       }
+    },
+    {
+      "status": "PASS",
+      "started": "2026-11-02T00:29:27.229028+00:00",
+      "finished": "2026-11-02T00:52:51.258974+00:00",
+      "base_revision": "050aa0f6e61ccd0d5949f83ce768ca0156e36ecd",
+      "scope": [
+        "python",
+        "typescript"
+      ],
+      "requested_model": "gpt-6-astra",
+      "effective_model": "UNREPORTED",
+      "tool_version": "codex-cli 0.166.0",
+      "preflight": "PASS",
+      "publication": "PASS",
+      "input_hashes": {
+        ".gitignore": "2a684861dab09e69362b7260d322912bfa246aa2c0a9d5e43701fa547b520bfc",
+        "DESIGN.md": "ef4ed5f69e8026b24a31caa6418cc8ab7f983f3d0beca4c58c7ec2bcafb4605c",
+        "README.md": "d52d024307cbec6d3ea964d75aab7e9f596b51ad87e98717ec784c9e18f00430",
+        "AGENTS.md": "4d912914fab81b65aa24374c595001f31724ab54e26a90975a1b2604eaeca3d6",
+        "TESTING.md": "fa05ef7a078087a5cd5cc13c965dc3dcab6343af0b9f11e85ce86aa7f79c16a1",
+        "FUTURE.md": "050b9038a29af1bbdace05498bba349f7418c21ac4ed72d0a8a851640a031c7a",
+        "GENERATE.md": "d894948ad6b4ced051322a11ba37fb478f18b6fef0af8eef6834cf46ac129173",
+        "Instruction_for_Agent.md": "baa2bd07913e44980811c8ee7ab98d367bb569dafc9552a1f212132d62d00065",
+        "specs/ACCEPTANCE.md": "e8b3f483929816054ff101756b8083fcb045aa767ed561f263d57672e9aaeb10",
+        "specs/PRODUCT.md": "bd8ba53292a5d123ec3460c3cf5d51ecde054254d9031df419b89ddda7075e57",
+        "specs/DIRECTORY.md": "7d827b573e40e5968c1a0fd7dfe35f1f1005a9ce71c3e48ba9f177d677d67b71",
+        "specs/PRESENCE.md": "4acbca4f1f95a0114b2dd7890b05af09f28e3c49720cec54fab2b848dd44692a",
+        "specs/TYPESCRIPT.md": "526554dd2d284abc98efa7405f9e53f1a79b8fe749c4d3f665c794fdbe71b246",
+        "specs/PYTHON.md": "bac6992e5e4accbf61ac2c60c76275703056c02d1b9ce40c2290c8875c56f7d5",
+        "specs/SERVER.md": "4214a44152679bf410311623dff33f7b7a9a2086983c26e65cf08700ca72e766",
+        "specs/PROTOCOL.md": "19efef8467b8aea4ae72fa2c37a7209903dc8cbfe5f7f88da4d1c25fcb27d8df",
+        "tests/package-lock.json": "bf25085969ac29c0a94033aac75b729e22584f3306ba493525e770cd0384c19d",
+        "tests/package.json": "3667bfd58dca0a5ebf772d85a23ac89c5c0b27e3a782c3b6a40684f321119006",
+        "tests/gui_driver.py": "79ebf802c4eea8236a766e5688324d5e849144c6653d50e3cf853541166a5803",
+        "tests/playwright.config.js": "b9c9cf4dd550188d6dbf7da25719c92eec018023826e5ba0db79c7005ade9152",
+        "tests/server_gui_driver.py": "e666ab713a9a9ccce428f40ed75311138b6d739eb8b206048a6950354375333b",
+        "tests/run_unittest.py": "95c06b54821dbe8978fb834d10275205ffc11ef312f0cecc3160a10bcb4a959e",
+        "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/python_interface/test_cli.py": "70d6857a443c22316908c161b859017baf60e11159e8b568c3afccb67636c05a",
+        "tests/python_interface/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/protocol/test_directory.py": "4c829a9fa0dbad215f558f8387b3c5c3589b4df62f9acd6485cb9e577de13f69",
+        "tests/protocol/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/protocol/test_protocol.py": "0f219013ae5aea6808387e10b0a0280045947514e5d23e3e93ec2eb3b6483433",
+        "tests/harness/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/harness/test_guards.py": "6b96fd79e773157ae134b7d6c0cc07de39efdd40ac814a07c66286a821b1b13b",
+        "tests/server_gui/test_server_gui.py": "9198fe6b59a757811e790042439aa2a75aa9b89269170bbbeae34914c5cd07f0",
+        "tests/server_gui/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/browser/presence-layout.spec.js": "cf2a26ccf2e976d11bc5f377285a4ec9ae9d6af8967f1bb12788e496966939a1",
+        "tests/browser/acceptance.spec.js": "41f86bd7ac182a0671f5da568fcc53b05007602d117785dd5e70b72603b44823",
+        "tests/browser/desktop.spec.js": "9fd0896606cc9c0be006bb63136c9b48947c3290e77852c4a7ab3502532ec2a4",
+        "tests/browser/server-desktop.spec.js": "779846635667591c305dd97e922b68991c5c76c82136bf8fdec2ba2d69e1a284",
+        "tests/browser/fixtures.js": "998bbbbe929a8fa0b0dd120bab764f8fe412245babb5b40259ace6a9452356cd",
+        "tests/browser/directory.spec.js": "f8e340a501d38296b89524293a9b53e1206a182027d094a4ba66db60d41bb808",
+        "server/gui.py": "2ea97a31c793daca1cceaa5dcac7be5135597e26580fb60fd26f851a7db7636c",
+        "server/main.py": "81a4d307e291ce7179662a896953b4f3e05df528088309d5c0544997cc281b9d",
+        "scripts/demo.py": "aa0a2cecbf818cc70c5ae81d0fde5dbaee730c622bfa2873236de10d02024c58",
+        "scripts/build.py": "2e6b5137841fe41aaf8e1b98c791ff7bde214f0cc2502d201dd1747b42093101",
+        "scripts/package.py": "83eff1e03fea9b7b2e50f03b8b0169743ad6abc13b4f79d99df9a5c133d5971c",
+        "scripts/common.py": "ce3aba6a31509ebedaa88983b49524168951c9ae3399b9ef6504e27ea534db56",
+        "scripts/check_environment.py": "19a0110d8765992574c52338bc3a5fc1ea2ae3ae9e330ee6f53fe4bfc6826855",
+        "scripts/setup.py": "70e8260a0036c45e0d62d460198414ff27cb4c6977c9922c8e3f164174f4639e",
+        "scripts/verify.py": "8af77acff652e5e0fa033fbf36e6610a6f8ca223931f7513d09768d38153adb9",
+        "scripts/regenerate_check.py": "9ab0aa31dd179670896d7831908afe731e9ba15fba890ccbb7c58e9fd5ef14ff",
+        "scripts/gui_support.py": "e53c3d857332d12b4563c5ef2ef116d6c31bb046cf07966dbefc1e90bd4957c3",
+        "docs/DECISIONS.md": "8cf28d2e9b92c69691576e1911fd94871a86da6893f51226e89b6faeaf58bd4d",
+        "docs/CHANGES.md": "e0491a35a44243ebcc9e9efd344b3cc40a4aa894c93c73dac8b9b1ee5d51109c",
+        "docs/STATUS.md": "ac433aad22e1ed2b137aa67de082f3f648991e877e207f87259bfeda8af86342",
+        "docs/ASSIGNMENT_REVIEW.md": "210dca9fdce37e640886f8adb8ef0015eb9c5f9893954540249f5163eb40a1a9",
+        "docs/ASSIGNMENT.md": "cbcd1afe98769e078ca33d5f5682a4c6add7435e3da2b8c2b242ae25d87e2c6d",
+        "docs/EVIDENCE.json": "a4100a9c0de3218837b93072c833df9eb097ad56019c06ddc7737d72f0114df6",
+        "generator/core.py": "6325957e7155bcca374ff1e7f897b789b4d9255d638da8b40e0b85c8a40cda43",
+        "generator/targets.json": "936d45ad5e336ea9baccdac63d49169aa207546b1487593c2bde6ebfa8725c8b",
+        "generator/run.py": "990d2723dea67df4856ed6e0add20369bdab262c6ceba482c0b509fea0e576f8",
+        "generator/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "generator/prompts/client.md": "1b3b0e66c959bb39c6926f8884e5958af49b29dc9318c055eb2bbbf5818c8d36",
+        "generator/codex/package-lock.json": "3b9f69e9f1bfed5dc0b76c6ca4eff0e067b01bdd2644865efc065bbfa4476802",
+        "generator/codex/package.json": "f30ee2949ef8aa7471f10d2c40212f42f3805b428c5c7275da89cd89144e7335"
+      },
+      "run_id": "20261102T002927228257Z",
+      "request": "P01 project-name reconciliation and all-client regeneration after source deletion",
+      "rounds": {
+        "python": 3,
+        "typescript": 3
+      },
+      "test_counts": {
+        "collected": 92,
+        "passed": 92,
+        "failed": 0,
+        "skipped": 0,
+        "flaky": 0
+      },
+      "published_hashes": {
+        "python": {
+          "gui.py": "1b141d632244aa71e55b46fed9f923cf9d71ee5000ec3d555dbb34352795f925",
+          "main.py": "d454c170eac9a7317b6c96864a15313bf787970b423244da24cdb31d1cf4afbd",
+          "core.py": "6a8dbb0d1c705fbfc01d1229c5b68a6e5fbbda174e92201b81a9cb7d181d84ef",
+          "storage.py": "a53645dbc304e47fce3968f27653f956229bdec03baa59c9cfb3df95c5102a3f",
+          "protocol.py": "5defc4290fb0e7f7aeb949cee1196f797df04d8314ea231ddb20d42ff5741abd"
+        },
+        "typescript": {
+          "package-lock.json": "1d6f17fcb9f2f383f2020e15190dcb9af0e0cde9f8a668c9fde0adfe792db4b6",
+          "build.mjs": "0d9c5d1be5a45561adaa65328cc6e0d3aea69b87bd6c65f116dc36eb8e6c910a",
+          "package.json": "6843476772ba567e3a0bb859cd0b99b1a19a49fb017ce09211bcc3b45449d1f6",
+          "tsconfig.json": "9867808f9c3413a73d223c2b17e11f131f9742d1a794c570c15c583c45278725",
+          "styles.css": "1387a1416786c86df676d17826b25bc1c5c30cd34cfbb64b92156617cbb69261",
+          "index.html": "cf4cc54bb74b42bd3a5087d36282b7fa4d379df8409fbc233a54cf425a8506ae",
+          "src/main.ts": "c63da355fb99d94484185c73a8a7cabf1c265507c7f5144fa48ef8920b96b64a"
+        }
+      },
+      "failed_attempts": [
+        {
+          "stage": "initial TypeScript build",
+          "reason": "Generated helper named status conflicted with a browser global; repaired through the frozen-contract harness."
+        },
+        {
+          "stage": "first full acceptance",
+          "passed": 91,
+          "collected": 92,
+          "case": "AT-13 web retryable send outcomes",
+          "reason": "A timed-out send did not display Offline. All new presence/layout cases passed. The second repair fixed the candidate without changing assertions."
+        }
+      ]
     }
   ],
   "clean_regeneration": {
     "status": "PASS",
-    "change_request": "CHG-004",
-    "run_id": "20261101T232007378344Z",
-    "started": "2026-11-01T23:20:07.379370+00:00",
-    "finished": "2026-11-01T23:48:23.270998+00:00",
-    "input_revision": "ecfa93db0300b232d5d5d989973c13c37a7f4ea8",
-    "input_revision_note": "Authorized CHG-004 working-tree snapshot; hashes identify actual validated inputs.",
+    "request": "P01 reconciled baseline clean regeneration",
+    "run_id": "20261102T010021541172Z",
+    "started": "2026-11-02T01:00:21.541946+00:00",
+    "finished": "2026-11-02T01:20:44.170280+00:00",
+    "input_revision": "050aa0f6e61ccd0d5949f83ce768ca0156e36ecd",
+    "input_revision_note": "Base revision plus P01 reconciliation and pre-run status documentation; frozen hashes identify the tested inputs. Final evidence documentation follows verification.",
     "input_hashes": {
       ".gitignore": "2a684861dab09e69362b7260d322912bfa246aa2c0a9d5e43701fa547b520bfc",
-      "DESIGN.md": "14a220be9460279f5a397fadded815710e0d3ac2021d994b0b52a1ea1746cafe",
-      "README.md": "2889375bc6e3920889f0f2324b70147306d74a29edcc8730c63411318b26c46a",
-      "AGENTS.md": "aa8a68917a978090f7c87196e6c44e6d59a9caf8825755167df7fb8c7fc566ca",
-      "TESTING.md": "25dadb7b82e3473f1f1951268c0eede027f20fe1747493a554f7b038ca3dd6d4",
-      "FUTURE.md": "a64929e71b0c62416aab09e167231375f8ae985c1c7b34f46617eed6647f2e20",
-      "GENERATE.md": "9852a8eca7bd610065f9ae9097f11f314726c1be1ad6f8a7d08d5be218a72445",
-      "Instruction_for_Agent.md": "190a384ffce70396fa93fb02c6722b73f6a74bae5185e1ba9b0f540da5eda5fc",
-      "specs/ACCEPTANCE.md": "0aed735b7119b497973325e1d89e468ca9fea786e346445985156295494b5233",
-      "specs/PRODUCT.md": "5a8d79d4a9ed1a7ecfee0e4a2cdc4b57746bc987d7a3f8b64acb79ed8552189d",
-      "specs/DIRECTORY.md": "5429cfb49179b3b4815e62648341fdf7f2943a855011022f6c1fae99365bc639",
-      "specs/PRESENCE.md": "74d5511f767d754ffc61a59a2e4362cb32f536c519a088efaf32841ccab6a0ce",
-      "specs/TYPESCRIPT.md": "266d458bde6f5191900ce0b0361f73a78d88b9b6b756ec9c1ea4f74dbc9ca688",
-      "specs/PYTHON.md": "8414cafbd300f97ed60401476779d13146cc32a951a0912425d1f2f03fdb9abd",
-      "specs/SERVER.md": "0767890294a81a2ed0ffa1fbce732db1df97fa4b19ebd3b51eda4ce4d16827ae",
-      "specs/PROTOCOL.md": "9d74edbb5f57e2dc0bca96f92e0f9db2dbe6a1d0a3142127881fb3aa3b7d1b90",
+      "DESIGN.md": "ef4ed5f69e8026b24a31caa6418cc8ab7f983f3d0beca4c58c7ec2bcafb4605c",
+      "README.md": "d52d024307cbec6d3ea964d75aab7e9f596b51ad87e98717ec784c9e18f00430",
+      "AGENTS.md": "4d912914fab81b65aa24374c595001f31724ab54e26a90975a1b2604eaeca3d6",
+      "TESTING.md": "fa05ef7a078087a5cd5cc13c965dc3dcab6343af0b9f11e85ce86aa7f79c16a1",
+      "FUTURE.md": "050b9038a29af1bbdace05498bba349f7418c21ac4ed72d0a8a851640a031c7a",
+      "GENERATE.md": "d894948ad6b4ced051322a11ba37fb478f18b6fef0af8eef6834cf46ac129173",
+      "Instruction_for_Agent.md": "baa2bd07913e44980811c8ee7ab98d367bb569dafc9552a1f212132d62d00065",
+      "specs/ACCEPTANCE.md": "e8b3f483929816054ff101756b8083fcb045aa767ed561f263d57672e9aaeb10",
+      "specs/PRODUCT.md": "bd8ba53292a5d123ec3460c3cf5d51ecde054254d9031df419b89ddda7075e57",
+      "specs/DIRECTORY.md": "7d827b573e40e5968c1a0fd7dfe35f1f1005a9ce71c3e48ba9f177d677d67b71",
+      "specs/PRESENCE.md": "4acbca4f1f95a0114b2dd7890b05af09f28e3c49720cec54fab2b848dd44692a",
+      "specs/TYPESCRIPT.md": "526554dd2d284abc98efa7405f9e53f1a79b8fe749c4d3f665c794fdbe71b246",
+      "specs/PYTHON.md": "bac6992e5e4accbf61ac2c60c76275703056c02d1b9ce40c2290c8875c56f7d5",
+      "specs/SERVER.md": "4214a44152679bf410311623dff33f7b7a9a2086983c26e65cf08700ca72e766",
+      "specs/PROTOCOL.md": "19efef8467b8aea4ae72fa2c37a7209903dc8cbfe5f7f88da4d1c25fcb27d8df",
       "tests/package-lock.json": "bf25085969ac29c0a94033aac75b729e22584f3306ba493525e770cd0384c19d",
       "tests/package.json": "3667bfd58dca0a5ebf772d85a23ac89c5c0b27e3a782c3b6a40684f321119006",
       "tests/gui_driver.py": "79ebf802c4eea8236a766e5688324d5e849144c6653d50e3cf853541166a5803",
@@ -540,12 +663,12 @@
       "scripts/verify.py": "8af77acff652e5e0fa033fbf36e6610a6f8ca223931f7513d09768d38153adb9",
       "scripts/regenerate_check.py": "9ab0aa31dd179670896d7831908afe731e9ba15fba890ccbb7c58e9fd5ef14ff",
       "scripts/gui_support.py": "e53c3d857332d12b4563c5ef2ef116d6c31bb046cf07966dbefc1e90bd4957c3",
-      "docs/DECISIONS.md": "37223d0938e1befd2ac0ae1bd2558e41e4a3773725a7f8e0d68e799b09b5e4a1",
-      "docs/CHANGES.md": "4bad6fe9eafb400f5cbae3156252548b0fca4d137cd30ea43cc5ed40c8cb2a0d",
-      "docs/STATUS.md": "dc2f3dec4ff0e9a57a27956d3ec5fe31264cb68c1c5c0b43541e3a378f7da99c",
-      "docs/ASSIGNMENT_REVIEW.md": "b864f961a44a38c78efe7b1adcdcc8b06cb0b93067e41fd0d7893c96ea305566",
-      "docs/ASSIGNMENT.md": "1f1e68ce691ec9d314f362af6c192bf072a9773cf92025695a2a50905e331e4f",
-      "docs/EVIDENCE.json": "abf8c64d6f8ec623de798e3ad25a572abcb972763450a3538be57f6e3a3a3eaf",
+      "docs/DECISIONS.md": "8cf28d2e9b92c69691576e1911fd94871a86da6893f51226e89b6faeaf58bd4d",
+      "docs/CHANGES.md": "e0491a35a44243ebcc9e9efd344b3cc40a4aa894c93c73dac8b9b1ee5d51109c",
+      "docs/STATUS.md": "ac433aad22e1ed2b137aa67de082f3f648991e877e207f87259bfeda8af86342",
+      "docs/ASSIGNMENT_REVIEW.md": "210dca9fdce37e640886f8adb8ef0015eb9c5f9893954540249f5163eb40a1a9",
+      "docs/ASSIGNMENT.md": "cbcd1afe98769e078ca33d5f5682a4c6add7435e3da2b8c2b242ae25d87e2c6d",
+      "docs/EVIDENCE.json": "a4100a9c0de3218837b93072c833df9eb097ad56019c06ddc7737d72f0114df6",
       "generator/core.py": "6325957e7155bcca374ff1e7f897b789b4d9255d638da8b40e0b85c8a40cda43",
       "generator/targets.json": "936d45ad5e336ea9baccdac63d49169aa207546b1487593c2bde6ebfa8725c8b",
       "generator/run.py": "990d2723dea67df4856ed6e0add20369bdab262c6ceba482c0b509fea0e576f8",
@@ -558,10 +681,10 @@
     "effective_model": "UNREPORTED",
     "tool_version": "codex-cli 0.166.0",
     "preflight": "PASS",
-    "inner_generation_run_id": "20261101T232019679970Z",
+    "inner_generation_run_id": "20261102T010033133984Z",
     "rounds": {
-      "python": 3,
-      "typescript": 3
+      "python": 1,
+      "typescript": 1
     },
     "harness_test_counts": {
       "collected": 92,
@@ -580,24 +703,25 @@
     "original_tree_preserved": true,
     "fresh_published_hashes": {
       "python": {
-        "sync.py": "d7faa39d864c812ff4b8c631e07ae631325fc47e7c064d01c5d873091f8ff516",
-        "gui.py": "1f1e33597cbf7481cb0e0216a50cf1f58bb2dab7fa489bc8d001128366a1b1f4",
-        "main.py": "5d9986b1d644630e04454c3d307694e77516fa9d04b09132531a57a459bdc794",
-        "model.py": "8ad3368482fee394075060b6f3ddd1960f111900189efe29ed4771f7154ea2c9"
+        "gui.py": "892c8ee1e9297a412972f1fba5d0175ae3edff0fc337591977336177684d9b94",
+        "main.py": "c8980c878c541d0f58455bf2a3b79cc7fc4b29d22ac275c06322ff6a79f0c985",
+        "core.py": "c7247c8b8a6cf1045cf12f8d88a9ad999e1876cead3f4b888ae90558bf956b9d",
+        "storage.py": "e919f188f202fd25119c8e255bc479ae682571af2aece94c24522bd6452c83c0",
+        "protocol.py": "f4ef884efd2b269d2fe73e6020eb1ce4a04d9bae4567a1824bca794f37b7067c"
       },
       "typescript": {
-        "package-lock.json": "9c814503d062f7c72b74e1e376f9e0d0aaac3fe30a46780477fe634466ab8fa2",
-        "build.mjs": "0671ace702dc10c07ab39f11d14835ddfd4bf70bb233c6dc161c505c70669bc1",
-        "package.json": "c799b6901d345a6151695553d050a5f6d44e4a9df7cd5fdb1cf1f6bc17d7cfd9",
-        "tsconfig.json": "12bc93fb81446fb7d8b817b0afc22e9675d0fefe0c46f6505bca147053d89472",
-        "styles.css": "4a3f5fdf80355ad567d95ab9e85b32b1cbbb44a1603822bce2885545e8da024b",
-        "index.html": "bd945b05f5c093f4fd3276b8394fd4f592e0d2af8f8658e7609f92de7310ca4e",
-        "src/main.ts": "479ef1ac1ca9200c065b8812b1d7d989bf7828bf73fb8c61abb7f17a30f27ce9"
+        "package-lock.json": "b5d26b385b4372d5f104e6f76da2ca8da63928fd1f4805b75490decc9f70c8d6",
+        "build.mjs": "c341f3965af5f79afafeb51c7f0581115ff81d91af037b97793df8149cdfee82",
+        "package.json": "73b906a1c413847c8ea0057bf517e5f6dcaa981bb156d7c0c7b723630566cb3a",
+        "tsconfig.json": "5ab0072549d1bbf8249ce0c86b5ab95beec1f269f73c4e1c1997ccc155ebc046",
+        "styles.css": "dbaadae4928b46655163ed65b84488e534cb7571777743bf337f4630cf49a8b2",
+        "index.html": "0061810640bc921bc57e98ae9fe0497531b53c4276d71601a89ed8206bf6ce41",
+        "src/main.ts": "60301ca2ebe3522f4faa790e32e2b6553838b3cfa728d03cf48e38f7412f523f"
       }
     },
-    "publication_scope": "Disposable clean workspace; original published source preserved."
+    "publication_scope": "Fresh proof clients stayed in the disposable workspace; original published clients were preserved."
   },
-  "manual_review": "General confirmation received for CHG-001 and CHG-002; detailed M01\u2013M06 observations remain unrecorded.",
+  "manual_review": "User-reported M03/M04 PASS and M05 Good after regeneration; M01/M02 supplied. Actual browser/version, tested revision and M06 evidence remain unspecified.",
   "evolution": {
     "status": "PASS",
     "request": "CHG-001",
@@ -653,11 +777,14 @@
   },
   "harness_guards": {
     "status": "PASS",
-    "run_id": "20261101T142656748004Z",
+    "report": "artifacts/reconciliation/20261102T002611038268Z/harness.json",
+    "started": "2026-11-02T00:28:26.844275+00:00",
+    "finished": "2026-11-02T00:28:27.121464+00:00",
     "collected": 9,
     "passed": 9,
     "failed": 0,
-    "skipped": 0
+    "skipped": 0,
+    "flaky": 0
   },
   "archive_verification": {
     "status": "PASS",
@@ -1220,6 +1347,121 @@
         }
       },
       "publication_scope": "Disposable clean workspace only; original published clients preserved."
+    },
+    {
+      "status": "PASS",
+      "change_request": "CHG-004",
+      "run_id": "20261101T232007378344Z",
+      "started": "2026-11-01T23:20:07.379370+00:00",
+      "finished": "2026-11-01T23:48:23.270998+00:00",
+      "input_revision": "ecfa93db0300b232d5d5d989973c13c37a7f4ea8",
+      "input_revision_note": "Authorized CHG-004 working-tree snapshot; hashes identify actual validated inputs.",
+      "input_hashes": {
+        ".gitignore": "2a684861dab09e69362b7260d322912bfa246aa2c0a9d5e43701fa547b520bfc",
+        "DESIGN.md": "14a220be9460279f5a397fadded815710e0d3ac2021d994b0b52a1ea1746cafe",
+        "README.md": "2889375bc6e3920889f0f2324b70147306d74a29edcc8730c63411318b26c46a",
+        "AGENTS.md": "aa8a68917a978090f7c87196e6c44e6d59a9caf8825755167df7fb8c7fc566ca",
+        "TESTING.md": "25dadb7b82e3473f1f1951268c0eede027f20fe1747493a554f7b038ca3dd6d4",
+        "FUTURE.md": "a64929e71b0c62416aab09e167231375f8ae985c1c7b34f46617eed6647f2e20",
+        "GENERATE.md": "9852a8eca7bd610065f9ae9097f11f314726c1be1ad6f8a7d08d5be218a72445",
+        "Instruction_for_Agent.md": "190a384ffce70396fa93fb02c6722b73f6a74bae5185e1ba9b0f540da5eda5fc",
+        "specs/ACCEPTANCE.md": "0aed735b7119b497973325e1d89e468ca9fea786e346445985156295494b5233",
+        "specs/PRODUCT.md": "5a8d79d4a9ed1a7ecfee0e4a2cdc4b57746bc987d7a3f8b64acb79ed8552189d",
+        "specs/DIRECTORY.md": "5429cfb49179b3b4815e62648341fdf7f2943a855011022f6c1fae99365bc639",
+        "specs/PRESENCE.md": "74d5511f767d754ffc61a59a2e4362cb32f536c519a088efaf32841ccab6a0ce",
+        "specs/TYPESCRIPT.md": "266d458bde6f5191900ce0b0361f73a78d88b9b6b756ec9c1ea4f74dbc9ca688",
+        "specs/PYTHON.md": "8414cafbd300f97ed60401476779d13146cc32a951a0912425d1f2f03fdb9abd",
+        "specs/SERVER.md": "0767890294a81a2ed0ffa1fbce732db1df97fa4b19ebd3b51eda4ce4d16827ae",
+        "specs/PROTOCOL.md": "9d74edbb5f57e2dc0bca96f92e0f9db2dbe6a1d0a3142127881fb3aa3b7d1b90",
+        "tests/package-lock.json": "bf25085969ac29c0a94033aac75b729e22584f3306ba493525e770cd0384c19d",
+        "tests/package.json": "3667bfd58dca0a5ebf772d85a23ac89c5c0b27e3a782c3b6a40684f321119006",
+        "tests/gui_driver.py": "79ebf802c4eea8236a766e5688324d5e849144c6653d50e3cf853541166a5803",
+        "tests/playwright.config.js": "b9c9cf4dd550188d6dbf7da25719c92eec018023826e5ba0db79c7005ade9152",
+        "tests/server_gui_driver.py": "e666ab713a9a9ccce428f40ed75311138b6d739eb8b206048a6950354375333b",
+        "tests/run_unittest.py": "95c06b54821dbe8978fb834d10275205ffc11ef312f0cecc3160a10bcb4a959e",
+        "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/python_interface/test_cli.py": "70d6857a443c22316908c161b859017baf60e11159e8b568c3afccb67636c05a",
+        "tests/python_interface/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/protocol/test_directory.py": "4c829a9fa0dbad215f558f8387b3c5c3589b4df62f9acd6485cb9e577de13f69",
+        "tests/protocol/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/protocol/test_protocol.py": "0f219013ae5aea6808387e10b0a0280045947514e5d23e3e93ec2eb3b6483433",
+        "tests/harness/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/harness/test_guards.py": "6b96fd79e773157ae134b7d6c0cc07de39efdd40ac814a07c66286a821b1b13b",
+        "tests/server_gui/test_server_gui.py": "9198fe6b59a757811e790042439aa2a75aa9b89269170bbbeae34914c5cd07f0",
+        "tests/server_gui/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/browser/presence-layout.spec.js": "cf2a26ccf2e976d11bc5f377285a4ec9ae9d6af8967f1bb12788e496966939a1",
+        "tests/browser/acceptance.spec.js": "41f86bd7ac182a0671f5da568fcc53b05007602d117785dd5e70b72603b44823",
+        "tests/browser/desktop.spec.js": "9fd0896606cc9c0be006bb63136c9b48947c3290e77852c4a7ab3502532ec2a4",
+        "tests/browser/server-desktop.spec.js": "779846635667591c305dd97e922b68991c5c76c82136bf8fdec2ba2d69e1a284",
+        "tests/browser/fixtures.js": "998bbbbe929a8fa0b0dd120bab764f8fe412245babb5b40259ace6a9452356cd",
+        "tests/browser/directory.spec.js": "f8e340a501d38296b89524293a9b53e1206a182027d094a4ba66db60d41bb808",
+        "server/gui.py": "2ea97a31c793daca1cceaa5dcac7be5135597e26580fb60fd26f851a7db7636c",
+        "server/main.py": "81a4d307e291ce7179662a896953b4f3e05df528088309d5c0544997cc281b9d",
+        "scripts/demo.py": "aa0a2cecbf818cc70c5ae81d0fde5dbaee730c622bfa2873236de10d02024c58",
+        "scripts/build.py": "2e6b5137841fe41aaf8e1b98c791ff7bde214f0cc2502d201dd1747b42093101",
+        "scripts/package.py": "83eff1e03fea9b7b2e50f03b8b0169743ad6abc13b4f79d99df9a5c133d5971c",
+        "scripts/common.py": "ce3aba6a31509ebedaa88983b49524168951c9ae3399b9ef6504e27ea534db56",
+        "scripts/check_environment.py": "19a0110d8765992574c52338bc3a5fc1ea2ae3ae9e330ee6f53fe4bfc6826855",
+        "scripts/setup.py": "70e8260a0036c45e0d62d460198414ff27cb4c6977c9922c8e3f164174f4639e",
+        "scripts/verify.py": "8af77acff652e5e0fa033fbf36e6610a6f8ca223931f7513d09768d38153adb9",
+        "scripts/regenerate_check.py": "9ab0aa31dd179670896d7831908afe731e9ba15fba890ccbb7c58e9fd5ef14ff",
+        "scripts/gui_support.py": "e53c3d857332d12b4563c5ef2ef116d6c31bb046cf07966dbefc1e90bd4957c3",
+        "docs/DECISIONS.md": "37223d0938e1befd2ac0ae1bd2558e41e4a3773725a7f8e0d68e799b09b5e4a1",
+        "docs/CHANGES.md": "4bad6fe9eafb400f5cbae3156252548b0fca4d137cd30ea43cc5ed40c8cb2a0d",
+        "docs/STATUS.md": "dc2f3dec4ff0e9a57a27956d3ec5fe31264cb68c1c5c0b43541e3a378f7da99c",
+        "docs/ASSIGNMENT_REVIEW.md": "b864f961a44a38c78efe7b1adcdcc8b06cb0b93067e41fd0d7893c96ea305566",
+        "docs/ASSIGNMENT.md": "1f1e68ce691ec9d314f362af6c192bf072a9773cf92025695a2a50905e331e4f",
+        "docs/EVIDENCE.json": "abf8c64d6f8ec623de798e3ad25a572abcb972763450a3538be57f6e3a3a3eaf",
+        "generator/core.py": "6325957e7155bcca374ff1e7f897b789b4d9255d638da8b40e0b85c8a40cda43",
+        "generator/targets.json": "936d45ad5e336ea9baccdac63d49169aa207546b1487593c2bde6ebfa8725c8b",
+        "generator/run.py": "990d2723dea67df4856ed6e0add20369bdab262c6ceba482c0b509fea0e576f8",
+        "generator/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "generator/prompts/client.md": "1b3b0e66c959bb39c6926f8884e5958af49b29dc9318c055eb2bbbf5818c8d36",
+        "generator/codex/package-lock.json": "3b9f69e9f1bfed5dc0b76c6ca4eff0e067b01bdd2644865efc065bbfa4476802",
+        "generator/codex/package.json": "f30ee2949ef8aa7471f10d2c40212f42f3805b428c5c7275da89cd89144e7335"
+      },
+      "requested_model": "gpt-6-astra",
+      "effective_model": "UNREPORTED",
+      "tool_version": "codex-cli 0.166.0",
+      "preflight": "PASS",
+      "inner_generation_run_id": "20261101T232019679970Z",
+      "rounds": {
+        "python": 3,
+        "typescript": 3
+      },
+      "harness_test_counts": {
+        "collected": 92,
+        "passed": 92,
+        "failed": 0,
+        "skipped": 0,
+        "flaky": 0
+      },
+      "standalone_test_counts": {
+        "collected": 92,
+        "passed": 92,
+        "failed": 0,
+        "skipped": 0,
+        "flaky": 0
+      },
+      "original_tree_preserved": true,
+      "fresh_published_hashes": {
+        "python": {
+          "sync.py": "d7faa39d864c812ff4b8c631e07ae631325fc47e7c064d01c5d873091f8ff516",
+          "gui.py": "1f1e33597cbf7481cb0e0216a50cf1f58bb2dab7fa489bc8d001128366a1b1f4",
+          "main.py": "5d9986b1d644630e04454c3d307694e77516fa9d04b09132531a57a459bdc794",
+          "model.py": "8ad3368482fee394075060b6f3ddd1960f111900189efe29ed4771f7154ea2c9"
+        },
+        "typescript": {
+          "package-lock.json": "9c814503d062f7c72b74e1e376f9e0d0aaac3fe30a46780477fe634466ab8fa2",
+          "build.mjs": "0671ace702dc10c07ab39f11d14835ddfd4bf70bb233c6dc161c505c70669bc1",
+          "package.json": "c799b6901d345a6151695553d050a5f6d44e4a9df7cd5fdb1cf1f6bc17d7cfd9",
+          "tsconfig.json": "12bc93fb81446fb7d8b817b0afc22e9675d0fefe0c46f6505bca147053d89472",
+          "styles.css": "4a3f5fdf80355ad567d95ab9e85b32b1cbbb44a1603822bce2885545e8da024b",
+          "index.html": "bd945b05f5c093f4fd3276b8394fd4f592e0d2af8f8658e7609f92de7310ca4e",
+          "src/main.ts": "479ef1ac1ca9200c065b8812b1d7d989bf7828bf73fb8c61abb7f17a30f27ce9"
+        }
+      },
+      "publication_scope": "Disposable clean workspace; original published source preserved."
     }
   ],
   "archive_verification_history": [
@@ -1336,7 +1578,7 @@
   },
   "current_release_archive": {
     "status": "NOT_CREATED",
-    "note": "Prior manifests cover earlier revisions. Current CHG-004 release archive remains uncreated."
+    "note": "The regenerated P01 revision requires its own release archive; committing the sources does not create or verify that archive."
   },
   "change_requests": {
     "CHG-003": {
@@ -1463,6 +1705,105 @@
         "Web lost-presence-reply fixture allowed Chromium transparent retry; not established as client defect."
       ],
       "probe": "artifacts/changes/CHG-004/probe-lost-reply.json"
+    }
+  ],
+  "harness_guard_history": [
+    {
+      "status": "PASS",
+      "run_id": "20261101T142656748004Z",
+      "collected": 9,
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "regeneration_requests": [
+    {
+      "status": "COMPLETE",
+      "request": "Regenerate both clients from reconciled current USER choices, preserve CHG-004 and exclude pending FUTURE requests.",
+      "started": "2026-11-02T00:26:11.121482+00:00",
+      "finished": "2026-11-02T01:21:50.834105+00:00",
+      "base_revision": "050aa0f6e61ccd0d5949f83ce768ca0156e36ecd",
+      "input_delta": {
+        "P01": {
+          "previous_input": "",
+          "previous_effective_value": "reusable-spec-driven-code-generator",
+          "new_input": "Jaehyeok-spec-driven-code-generator",
+          "previous_default": "reusable-spec-driven-code-generator",
+          "new_default": "Jaehyeok-spec-driven-code-generator",
+          "provenance": "USER_EXPLICIT"
+        }
+      },
+      "other_preference_inputs_blank": 25,
+      "manual_observation_fields_unchanged": 6,
+      "initial_generated_directories_absent": true,
+      "generation_run_id": "20261102T002927228257Z",
+      "clean_regeneration_run_id": "20261102T010021541172Z",
+      "published_acceptance": {
+        "report": "artifacts/reconciliation/20261102T002611038268Z/published-acceptance.json",
+        "started": "2026-11-02T00:54:44.892910+00:00",
+        "finished": "2026-11-02T00:59:33.016641+00:00",
+        "collected": 92,
+        "passed": 92,
+        "failed": 0,
+        "skipped": 0,
+        "flaky": 0
+      },
+      "harness_test_counts": {
+        "collected": 9,
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0,
+        "flaky": 0
+      },
+      "retained_tests_server_generic_runner_prompt_config_unchanged": true,
+      "pending_requests_applied": false,
+      "candidate_generation_context_excludes_future_and_change_history": true,
+      "runtime_behavior_delta": "None. P01 changes documentation identity; existing titles, storage/package identifiers, output paths and CHG-004 behavior are preserved.",
+      "failed_attempts": [
+        {
+          "stage": "initial TypeScript build",
+          "reason": "Generated helper named status conflicted with a browser global; repaired through the frozen-contract harness."
+        },
+        {
+          "stage": "first full acceptance",
+          "passed": 91,
+          "collected": 92,
+          "case": "AT-13 web retryable send outcomes",
+          "reason": "A timed-out send did not display Offline. All new presence/layout cases passed. The second repair fixed the candidate without changing assertions."
+        }
+      ],
+      "environment_resolution": "Initial sandboxed setup failed because local AF_UNIX socket creation was denied. Existing setup and GUI/browser/model checks passed with approved parent execution; coding agents retained workspace-write isolation.",
+      "limits": [
+        "Manual observation fields remain user-owned and unfilled.",
+        "Current revision has no new release archive or commit.",
+        "Historical reports/hashes are preserved; final documentation follows the verified snapshot."
+      ]
+    }
+  ],
+  "manual_review_history": [
+    "General confirmation received for CHG-001 and CHG-002; detailed M01\u2013M06 observations remain unrecorded."
+  ],
+  "manual_observation_snapshots": [
+    {
+      "source": "TESTING.md USER:MANUAL_OBSERVATIONS",
+      "author": "USER_EXPLICIT",
+      "context": "User-edited fields observed after regeneration, before the requested commit. These are user reports, separate from automated evidence.",
+      "raw_cells": {
+        "M01": " Windows 11, browser and version copied from its About page",
+        "M02": " 11/1/2026, 9:20pm",
+        "M03": " PASS",
+        "M04": " PASS",
+        "M05": "Good",
+        "M06": " "
+      },
+      "reported_test_time": "11/1/2026, 9:20pm",
+      "tested_revision": "NOT_RECORDED",
+      "browser_and_version": "NOT_RECORDED",
+      "evidence_location_or_steps": "NOT_RECORDED",
+      "offline_scenario": "USER_REPORTED_PASS",
+      "restart_persistence": "USER_REPORTED_PASS",
+      "usability": "Good"
     }
   ]
 }

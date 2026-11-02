@@ -1,5 +1,3 @@
-import {copyFile, mkdir} from 'node:fs/promises';
-await mkdir(new URL('./dist/', import.meta.url), {recursive: true});
-for (const name of ['index.html', 'styles.css']) {
-  await copyFile(new URL(name, import.meta.url), new URL(`dist/${name}`, import.meta.url));
-}
+import { mkdir, copyFile } from 'node:fs/promises';
+await mkdir('dist', { recursive: true });
+for (const file of ['index.html', 'styles.css']) await copyFile(file, `dist/${file}`);

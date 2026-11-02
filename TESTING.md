@@ -1,6 +1,6 @@
 # Setup, verification, and manual walkthrough
 
-Status: CHG-001–004 complete. The last recorded snapshot passed 92 acceptance cases and nine harness guards; clean regeneration passed the same 92 cases inside the harness and standalone. See [docs/STATUS.md](docs/STATUS.md) for actual evidence and pending manual/current-archive work. Documentation synchronization is not a new runtime verification run.
+Status: P01 reconciliation and both-client regeneration complete for Jaehyeok-spec-driven-code-generator. Current published acceptance passed 92/92 and guards 9/9. Clean proof `20261102T010021541172Z` passed 92/92 inside the harness and standalone. The full CHG-004 behavior and retained assertions are preserved. [STATUS](docs/STATUS.md#p01-reconciliation-and-client-regeneration) records actual results and pending manual/archive work.
 
 ## What the user should do now
 
@@ -10,18 +10,18 @@ Run the manual launch and walkthrough below, then fill M01–M06 with actual obs
 
 ## Your manual observations
 
-On 2026-11-01 (America/Los_Angeles), the user confirmed: “I confirmed that it works well.” This records general user confirmation; no individual scenario results or environment details were supplied, so M01–M06 remain unchanged.
+Earlier general confirmation was recorded on 2026-11-01 (America/Los_Angeles). After regeneration, the user entered M01–M05 below: offline and restart checks PASS, usability Good, and test time `11/1/2026, 9:20pm`. Preserve these entries verbatim. M01 does not identify an actual browser/version, M02 does not identify the tested revision, and M06 remains blank; these details are not inferred from automated reports.
 
 These are facts from your execution, not preferences. Blank observations never select an example as a result. After testing, record actual environment/time/revision, PASS/FAIL with what happened, usability, and evidence. For final user sign-off, the fixed scenario, queued restart, and usability inspection are required; optional fault-injection cases are separate. Agent/automated evidence belongs in STATUS and reports, not these cells.
 
 <!-- USER:BEGIN MANUAL_OBSERVATIONS -->
 | ID | Observation | Your observation | Example / behavior if blank |
 |---|---|---|---|
-| M01 | Actual test environment | | Example: Windows 11, browser and version copied from its About page. Blank: `NOT_RECORDED`. |
-| M02 | Actual test time and implementation revision | | Example: local date/time and Git commit hash from this run. Blank: `NOT_RECORDED`. |
-| M03 | Required offline scenario result | | Example after verification: PASS; both queued texts appeared once after the specified reconnections. Blank: `NOT_RUN`. |
-| M04 | Restart-persistence result | | Example after verification: FAIL; queued text disappeared after the browser reloaded. Blank: `NOT_RUN`. |
-| M05 | Usability observations | | Example after verification: I could not distinguish queued from accepted because the labels looked identical. Blank: `NOT_RECORDED`. |
+| M01 | Actual test environment | Windows 11, browser and version copied from its About page| Example: Windows 11, browser and version copied from its About page. Blank: `NOT_RECORDED`. |
+| M02 | Actual test time and implementation revision | 11/1/2026, 9:20pm| Example: local date/time and Git commit hash from this run. Blank: `NOT_RECORDED`. |
+| M03 | Required offline scenario result | PASS| Example after verification: PASS; both queued texts appeared once after the specified reconnections. Blank: `NOT_RUN`. |
+| M04 | Restart-persistence result | PASS| Example after verification: FAIL; queued text disappeared after the browser reloaded. Blank: `NOT_RUN`. |
+| M05 | Usability observations |Good| Example after verification: I could not distinguish queued from accepted because the labels looked identical. Blank: `NOT_RECORDED`. |
 | M06 | Evidence location or reproducible steps | | Example: a test report path plus the exact action sequence that reproduced the failure. Blank: `NOT_RECORDED`. |
 <!-- USER:END MANUAL_OBSERVATIONS -->
 

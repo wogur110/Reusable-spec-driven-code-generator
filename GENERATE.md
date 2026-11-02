@@ -1,6 +1,6 @@
 # Generation harness contract
 
-Status: CHG-001–004 generation/evolution complete. The last CHG-004 snapshot passed 92 acceptance tests in the harness and again standalone, plus nine harness guards. [STATUS](docs/STATUS.md) records actual runs and failures; documentation-only reconciliation does not create new runtime evidence. Application behavior lives in registered specs; this document defines reusable orchestration.
+Status: P01 all-client regeneration is complete. Published run `20261102T002927228257Z` and checkout acceptance passed 92/92; guards passed 9/9. Independent clean proof `20261102T010021541172Z` passed 92 cases inside the harness and standalone, preserving the original tree. Published generation needed two repair rounds; clean generation succeeded on its initial calls. [STATUS](docs/STATUS.md#p01-reconciliation-and-client-regeneration) and EVIDENCE.json retain actual failures, input hashes and tool/model details. Generic harness/prompt and target configuration remain unchanged.
 
 ## Inputs and target configuration
 

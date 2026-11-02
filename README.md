@@ -1,8 +1,8 @@
-# Reusable Spec-Driven Code Generator
+# Jaehyeok-spec-driven-code-generator
 
 A reusable agentic harness that turns written specifications into independent Python and TypeScript clients. A local messaging application provides a concrete example of offline queues, durable client state, and interoperability.
 
-**Status: CHG-001–004 complete.** The last recorded implementation check passed 92 acceptance tests and nine harness guards. Clean regeneration passed 92 tests inside the harness and again standalone. User review of CHG-004 remains pending. [Status and evidence](docs/STATUS.md) records those runs and the later documentation reconciliation.
+**Status: both clients regenerated and verified.** P01 names the project Jaehyeok-spec-driven-code-generator; completed CHG-001–004 behavior is preserved. Published generation and checkout verification each passed 92 tests; nine harness guards passed. Independent clean proof `20261102T010021541172Z` passed 92 tests inside the harness and again standalone, preserving the working tree. [Status and evidence](docs/STATUS.md#p01-reconciliation-and-client-regeneration) records the two published-generation repairs, first-round clean proof, and pending manual/archive work.
 
 ## Change summary
 
@@ -33,7 +33,7 @@ Edit the `Your input` or `Your observation` cells inside the paired USER markers
 | [AGENTS.md](AGENTS.md#your-working-preferences) | WORKFLOW_CHOICES / W01–W05 | Tool and working preferences | W01: Codex; another supported choice is Claude Code |
 | [TESTING.md](TESTING.md#your-manual-observations) | MANUAL_OBSERVATIONS / M01–M06 | Actual observations after personally testing Stage 2 | M03: the observed offline scenario result; blank means NOT_RUN |
 
-All 26 preference inputs and six observation cells remain blank. Adjacent preference examples now describe the completed CHG-001–004 baseline; effective values, original defaults and request provenance are recorded in [docs/DECISIONS.md](docs/DECISIONS.md). Unchanged blanks preserve completed features. The agent maintains technical contracts and workflow/evidence sections. A regeneration request checks and reconciles changed preferences by default before implementation; you do not need to edit wire schemas or generated code. Use [the default regeneration instruction](#default-regeneration-instruction).
+P01 explicitly names the project `Jaehyeok-spec-driven-code-generator`; the other 25 preference inputs remain blank. The user recorded M01–M05, including PASS for offline/restart checks and Good for usability; M06 remains blank. Adjacent defaults describe the reconciled baseline, with previous values and provenance in [docs/DECISIONS.md](docs/DECISIONS.md). Unchanged blanks preserve completed features. The agent maintains technical contracts and workflow/evidence sections. A regeneration request checks and reconciles changed preferences by default; use [the default regeneration instruction](#default-regeneration-instruction).
 
 ## Stages and copy-ready instructions
 
@@ -114,7 +114,7 @@ Select an individual target with --target python or --target typescript. Candida
 
 ## Regenerate the clients
 
-**Yes: deleting either generated client directory does not remove the information needed to recreate a working client.** The CHG-004 clean proof (`20261101T232007378344Z`) started without client source, Git objects, or old generation transcripts. Both clients were regenerated; all 92 acceptance tests passed inside the harness and again standalone. The clean run needed two bounded repair rounds. This is evidence of reproducible tested behavior, not a promise that every future model call will succeed on its first attempt. See [the recorded results](docs/STATUS.md#chg-004-complete).
+**Yes: both deleted client directories were recreated from the reconciled specifications.** Published run `20261102T002927228257Z` passed 92 acceptance tests after two bounded repair rounds. Independent clean proof `20261102T010021541172Z` began without previous client source, Git objects or old transcripts; both fresh clients passed all 92 cases inside the harness and again standalone, on their initial generation calls. This demonstrates tested behavioral reconstruction; future model calls may still require bounded repairs. See [the recorded results](docs/STATUS.md#p01-reconciliation-and-client-regeneration).
 
 The intended result is equivalent specified behavior and comparable UI structure. Generated filenames, internal code, exact spacing, fonts and other unspecified styling can differ. Current tests check messaging, persistence, presence, controls and browser layout geometry; they do not compare every screen pixel. Regeneration recreates application code, not lost client messages or in-memory server data. Restore a saved Git revision or source archive when you need the exact original source bytes.
 

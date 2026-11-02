@@ -9,7 +9,7 @@ Edit only `Your input` to change a preference. Adjacent defaults describe the fi
 <!-- USER:BEGIN PRODUCT_CHOICES -->
 | ID | Question | Your input | Example / automatic default |
 |---|---|---|---|
-| P01 | What is the project called? | | `reusable-spec-driven-code-generator` |
+| P01 | What is the project called? | Jaehyeok-spec-driven-code-generator| `Jaehyeok-spec-driven-code-generator` |
 | P02 | What should the project demonstrate? | | A reusable generator can recreate independent Python and TypeScript messaging clients from a precise specification. |
 | P03 | Who will use or review it? | | A developer or reviewer running a small local demonstration on one computer. |
 | P04 | What interfaces should the two clients have? | | Python Tkinter desktop GUI and TypeScript browser client with a comparable compact desktop layout; retain the Python headless machine interface. |
@@ -21,6 +21,10 @@ Edit only `Your input` to change a preference. Adjacent defaults describe the fi
 | P10 | What additional feature is essential? | | Server Start/Stop/monitoring GUI; shared recipient directory and click-to-address; durable receive acknowledgments and per-user Sent/Received/Queued views; explicit Online/Offline presence with heartbeat fallback. Offline client queues remain unknown to the server. |
 | P11 | What is intentionally out of scope? | | Attachments, groups, reactions, passwords, cloud deployment, push notifications, closed-app delivery, and read receipts. |
 <!-- USER:END PRODUCT_CHOICES -->
+
+## Project identity
+
+The project is named **Jaehyeok-spec-driven-code-generator**, from the user's explicit P01 choice. The name applies to project documentation and descriptive project identity. Preserve existing technical compatibility identifiers: repository/output paths, package names, SQLite/IndexedDB names and schemas, GUI titles such as Local Messenger - Python/Server, and documented selectors. P01 does not request a repository move, database migration, messaging change or new feature. Current CHG-001–004 behavior remains required.
 
 ## Scope and operating assumptions
 

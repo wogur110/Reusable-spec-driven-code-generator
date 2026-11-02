@@ -1,6 +1,6 @@
 # Design and ownership
 
-Status: completed design through CHG-004: independent desktop/browser clients, retained server GUI, shared directory/durable receipts and explicit presence. The last recorded snapshot passed 92 acceptance cases, nine guards and clean regeneration. [Decisions](docs/DECISIONS.md) records current defaults/provenance; [status](docs/STATUS.md) distinguishes historical runs, documentation reconciliation and pending manual/packaging work.
+Status: completed CHG-004 design preserved after P01 reconciliation and both-client regeneration. Current published and clean-proof acceptance each passed 92 cases, with nine harness guards passing. Clean proof `20261102T010021541172Z` preserved the original tree. [Decisions](docs/DECISIONS.md) records current defaults/provenance; [status](docs/STATUS.md) separates actual runs, earlier failures and pending manual/packaging work.
 
 ## Your design priorities
 
@@ -17,6 +17,8 @@ Leave preferences blank to use the adjacent defaults. These fields express prior
 <!-- USER:END DESIGN_CHOICES -->
 
 ## Architecture and principles
+
+Project identity is `Jaehyeok-spec-driven-code-generator` (P01). Existing application titles, storage/package identifiers and output paths retain their compatibility contracts; this documentation name change introduces no architecture or data migration.
 
 Current registered specs determine behavior; independent retained tests establish expectations before generation. A regeneration request first reconciles changed USER choices against the decision snapshot. Completed features remain unless those choices intentionally change them; FUTURE.md stays outside generation scope. The generic harness freezes registered Markdown/configuration, invokes the coding tool, validates isolated candidates and publishes only after checks. It owns paths, execution, integrity and evidence, with no messaging logic or finished client templates.
 
@@ -63,8 +65,8 @@ Real package-manager locks are committed; tested versions are recorded in STATUS
 |---|---|---|
 | Instruction_for_Agent.md | Retained construction guide | User-supplied guide revised by the agent with user authorization; commit 216ef72 |
 | Root docs, specs/, docs/ | Retained contracts and workflow | Agent-authored in Stage 1 and reconciled with actual Stage 2 implementation/evidence; no user field values were invented |
-| USER preference cells | User-owned inputs | All 26 blank; adjacent defaults summarize completed behavior and retain prior wording/provenance in DECISIONS |
-| M01–M06 | User-owned factual observations | Blank; no manual results recorded |
+| USER preference cells | User-owned inputs | P01 explicitly names Jaehyeok-spec-driven-code-generator; 25 preferences remain blank; current/previous defaults and provenance in DECISIONS |
+| M01–M06 | User-owned factual observations | M01–M05 supplied by the user; offline/restart PASS and usability Good. M06 remains blank; detailed browser/version and tested revision are not supplied. |
 | generator/, server/, tests/, scripts/ | Retained during client generation | Parent coding agent authored retained infrastructure/tests; actual commits record milestones |
 | generated/python-client/, generated/typescript-web/ | Deletion/regeneration boundaries | Separate actual Codex harness calls; Python regenerated for the page-limit regression/CHG-001 and both clients for CHG-003/004; recorded tool/model in STATUS |
 | Dependency locks / compiled assets | Locks committed / builds disposable | npm created committed locks; TypeScript/Node produced disposable browser assets |

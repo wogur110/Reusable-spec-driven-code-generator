@@ -1,16 +1,16 @@
 # Resolved decisions
 
-Current decisions include all completed changes through CHG-004 and the default USER-choice reconciliation workflow. All 26 `Your input` cells and six manual-observation cells remain blank. The adjacent preference defaults now describe finished behavior; they are agent-maintained summaries, not user-authored answers. Earlier defaults and the requests that superseded them are retained below. Historical runtime evidence remains tied to its recorded input hashes; this documentation synchronization does not claim another generation or test run.
+Current decisions include completed CHG-001–004 and explicit P01 project name `Jaehyeok-spec-driven-code-generator`. The other 25 preference inputs remain blank. After regeneration, the user supplied M01–M05; M06 remains blank. Current defaults reflect those decisions; previous values and provenance remain historical. Actual all-client regeneration `20261102T002927228257Z`, published-checkout acceptance, and independent clean proof `20261102T010021541172Z` passed against the reconciled contract.
 
-The user's explicit Stage 2 request authorized implementation, and later CHG-001–004 requests authorized the completed extensions. The current request authorizes synchronizing documentation with that behavior. Standalone public framing remains in force. Python and TypeScript remain independent languages; [project requirements](ASSIGNMENT.md) distinguishes source obligations from project choices.
+The user's Stage 2 and CHG-001–004 requests authorized the completed behavior. The current request authorizes reconciling edited USER choices, regenerating both clients through the harness and verifying clean regeneration. Standalone public framing remains in force. Python and TypeScript stay independent; [project requirements](ASSIGNMENT.md) distinguishes source obligations from project choices.
 
 ## Effective preferences
 
-Each row's source snapshot is a blank `Your input` cell. Linked forms remain editable; the effective values and provenance below are agent-maintained. `TEMPLATE_DEFAULT` applies unless a row identifies a later `USER_EXPLICIT` request or `AGENT_DERIVED` reconciliation. Updating adjacent examples does not change their historical provenance.
+P01 has the explicit source value below; all other preference inputs are blank. Linked forms remain editable, and this record is agent-maintained. TEMPLATE_DEFAULT applies unless a row identifies a later USER_EXPLICIT request or AGENT_DERIVED reconciliation. Updating adjacent examples does not rewrite historical provenance.
 
 | ID | Effective value | Source / effect |
 |---|---|---|
-| P01 | Project name: reusable-spec-driven-code-generator. | [PRODUCT_CHOICES](../specs/PRODUCT.md#your-product-choices); documentation title/identity |
+| P01 | Project name: Jaehyeok-spec-driven-code-generator. | USER_EXPLICIT: P01; [PRODUCT_CHOICES](../specs/PRODUCT.md#your-product-choices); project documentation identity, preserving technical compatibility identifiers |
 | P02 | Demonstrate recreating independent Python and TypeScript clients from precise specifications. | PRODUCT_CHOICES; REQ-GEN-01–03 |
 | P03 | Developer/reviewer running a local demonstration on one computer. | PRODUCT_CHOICES; launch and review instructions |
 | P04 | Python Tkinter desktop GUI, retained headless machine interface, and TypeScript browser with comparable compact desktop layout. | USER_EXPLICIT: CHG-001/004; PRODUCT_CHOICES, platform contracts |
@@ -61,11 +61,23 @@ Every TD row has provenance `AGENT_DERIVED`. These choices resolve implementatio
 
 ## Observation and reconciliation snapshot
 
-Source snapshot: P01–P11, A01–A05, D01–D05, and W01–W05 all blank as of this revision. M01, M02, M05, and M06 are `NOT_RECORDED`; M03 and M04 are `NOT_RUN`. These states describe missing evidence, not preferences. Current requirements contain no unresolved user-choice conflict. The current environment/model is verified; other operating systems and accounts remain unverified.
+Source snapshot: P01 is exactly `Jaehyeok-spec-driven-code-generator` (raw table-cell formatting preserved); P02–P11, A01–A05, D01–D05 and W01–W05 remain blank. All manual fields were blank during regeneration. The user subsequently recorded M03/M04 PASS and M05 Good, with Windows 11 mentioned in M01 and `11/1/2026, 9:20pm` in M02. Actual browser/version, tested revision and M06 evidence are not supplied. No unresolved choice conflict. Native/browser readiness and authenticated model access passed in the generation and clean-proof environment; other platforms/accounts have no equivalent automated verification.
 
 Every regeneration request includes comparing current preference cells against this snapshot. Preserve exact user wording. Reconcile changed choices into decisions, contracts, independent tests and necessary retained implementation/configuration before freezing inputs. With no changed choices, use the current contract unchanged. Blank/whitespace, TBD and — select adjacent current defaults; false, 0 and none are explicit choices. Never fill source cells with resolved values. Candidate-generation and repair agents cannot perform this parent reconciliation or modify frozen inputs.
 
 Unchanged blanks do not revoke completed changes. Saving preferences alone starts no work; a regeneration request includes reconciliation by default and does not restart Stage 1. FUTURE.md requires separate explicit selection/application. Preserve historical requests and runtime evidence; record previous/new values when choices change. Manual fields remain factual observations. See the [README default instruction](../README.md#default-regeneration-instruction).
+
+## P01 reconciliation and requested regeneration
+
+State: COMPLETE — published generation `20261102T002927228257Z` and checkout verification each passed 92/92; guards passed 9/9. Clean proof `20261102T010021541172Z` passed 92/92 inside the harness and standalone while preserving the original tree. Published generation used three calls per target; the clean proof used one per target.
+
+| Field | Previous source input / effective default | Current source input / adjacent default | Provenance |
+|---|---|---|---|
+| P01 | Blank / `reusable-spec-driven-code-generator` | `Jaehyeok-spec-driven-code-generator` / `Jaehyeok-spec-driven-code-generator` | USER_EXPLICIT input; default synchronized by the parent agent |
+
+P01 changes the project documentation identity. Existing paths, package/storage identifiers, window titles, selectors, schema versions and message behavior remain the CHG-004 contract; this is not a repository or data migration. The parent updated the README title, product identity/default, current decision snapshot and operating/evidence summaries. No other default column changes are needed. All user-authored cell text and manual observations are preserved.
+
+Retained test impact: no messaging/UI/storage assertions changed for this documentation name choice. The existing 92-case contract and nine guards remained frozen. Both clients were actually regenerated from the updated registered inputs, then passed published-checkout and independent clean verification. Generic runner, prompt, configuration and retained server remain unchanged. No pending FUTURE request or prior client source entered candidate context. This direct request creates no CHG entry. The TypeScript build conflict and first 91/92 acceptance failure remain recorded; ordinary bounded repairs changed only candidates.
 
 ## Current-default documentation reconciliation
 

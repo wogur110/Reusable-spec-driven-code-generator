@@ -2,9 +2,31 @@
 
 Updated 2026-11-01 (America/Los_Angeles). The agent authored specifications and retained infrastructure/tests; actual isolated Codex harness calls authored both clients. Blank USER preferences are not user-authored answers, and automated/agent checks do not fill manual observations.
 
+## P01 reconciliation and client regeneration
+
+State: COMPLETE. Both generated client directories were initially absent and were recreated through the actual harness. P01 changes from blank/effective `reusable-spec-driven-code-generator` to explicit `Jaehyeok-spec-driven-code-generator`; its adjacent default and documentation are synchronized. The other 25 preferences remain blank. All six manual observations were blank and preserved during generation; subsequent user entries are recorded below.
+
+This changes documentation identity only; existing CHG-004 messaging, GUI titles/selectors, paths and storage contracts are preserved. Retained tests/server, generic runner/prompt and target configuration are unchanged. FUTURE requests were not applied or supplied to candidate agents. No prior implementation or Git history was supplied to generation.
+
+| Current check | Actual result |
+|---|---|
+| Input/default reconciliation | P01 source wording preserved; previous/new input and default recorded in DECISIONS; other USER values/observations preserved. |
+| Setup/readiness | PASS after approved parent execution allowed Xvfb local Unix sockets; Tk 8.6.12, Chromium 141.0.7390.37, Node 22.17.0. Authenticated model preflight passed in both generation runs. |
+| Harness guard checks | PASS 9/9; artifacts/reconciliation/20261102T002611038268Z/harness.json. |
+| Published generation `20261102T002927228257Z` | PASS 92/92 before publication; three calls per target (initial plus two repairs). |
+| Published setup/build/verification | PASS; 92/92 with zero failed/skipped/flaky cases; artifacts/reconciliation/20261102T002611038268Z/published-acceptance.json. |
+| Clean proof `20261102T010021541172Z` | PASS 92/92 inside the harness and 92/92 standalone; original retained/generated tree preserved. Inner run `20261102T010033133984Z` used one initial call per target, no repair. |
+| Integrity | Frozen input hashes and generated source inventories recorded in EVIDENCE.json; no manual generated-source patches or retained assertion changes. |
+
+Published generation first failed the TypeScript build because a helper named status conflicted with a browser global. After that repair, acceptance passed 91/92: the existing web AT-13 timeout case did not display Offline. All new presence/layout cases passed. A second bounded repair fixed the browser candidate; the full suite then passed, including independent published-checkout verification. Both failures remain in actual reports; no assertion, timeout or retry policy was weakened. The clean proof passed on its initial candidate pair.
+
+Requested model: gpt-6-astra; effective model: UNREPORTED; tool: codex-cli 0.166.0. Input revision: `050aa0f` plus recorded P01 reconciliation; final evidence documentation follows verification. Fresh proof outputs remain in the disposable workspace. Regeneration created no CHG entry; the user subsequently requested a commit. Current packaging and remaining manual evidence details are separate from the completed checks.
+
+The user's subsequent TESTING.md entries report M03/M04 PASS and M05 Good, with Windows 11 mentioned in M01 and test time `11/1/2026, 9:20pm` in M02. All source wording is preserved. An actual browser/version, tested revision and M06 evidence were not provided; no agent observation fills those gaps. The user's observation edits and status reconciliation do not change generated code or the recorded runtime results.
+
 ## Current documentation baseline
 
-The current specifications and preference examples describe completed CHG-001–004, including the Python/server GUIs, compact web layout, directory/durable receipts and explicit presence. Regeneration checks changed USER choices and reconciles them before freezing inputs; pending FUTURE requests remain excluded. All 26 user input cells and six manual-observation cells are unchanged. Previous example/default text and provenance are retained in DECISIONS.
+The current specifications and preference examples describe completed CHG-001–004, including the Python/server GUIs, compact web layout, directory/durable receipts and explicit presence. Regeneration checks changed USER choices and reconciles them before freezing inputs; pending FUTURE requests remain excluded. At that documentation reconciliation, all 26 user inputs and six manual observations were blank and preserved. The later P01 update is recorded above; previous defaults and provenance remain in DECISIONS.
 
 This documentation-only reconciliation consolidates existing behavior, route/scheduler rules and acceptance mappings. It changes no implementation, retained test assertion, generic prompt or target configuration. The runtime PASS results below remain evidence for their recorded snapshots; no application tests or model generation were rerun for these documentation edits. Documentation checks passed: 21 Markdown documents reviewed, 138 local links/anchors valid, USER input/observation preservation, archived CHG-entry preservation, and documented configuration matching targets.json. The generic prompt remains unchanged; the other 20 Markdown documents were synchronized.
 
@@ -41,18 +63,18 @@ Earlier clean proof 20261101T143710332729Z remains FAIL: TypeScript's initial co
 | Area | State | Evidence / remaining work |
 |---|---|---|
 | Stage 1 documentation | COMPLETE | All 16 required documents, source comparison, catalog forms, and contracts completed; current docs reconciled with implementation |
-| Preferences | COMPLETE | All 26 optional cells unchanged/blank; effective defaults and explicit CHG-001–004 decisions in DECISIONS; no unresolved user-choice conflict |
+| Preferences | RECONCILED | P01=Jaehyeok-spec-driven-code-generator; 25 other inputs blank; prior/new default and explicit provenance recorded; no choice conflict |
 | Environment | VERIFIED for this environment | Ubuntu 22.04.5/WSL2 x86_64; Python 3.10.12, SQLite 3.37.2, Node 22.17.0, npm 10.9.2, Git 2.34.1; Tk 8.6.12; native GUI prerequisites installed by the user |
 | Coding-tool access | PASS | Project-local Codex 0.166.0, requested gpt-6-astra, effective UNREPORTED; authenticated writable preflight and real generation calls |
-| Implementation | COMPLETE | Retained components and generated clients build; actual generation, required checks, clean proof, and operating documentation complete |
-| Automated baseline | PASS | 92 tests: 15 protocol, four machine interface, 13 server GUI and 60 browser/client cases; zero failures/skips/flaky results |
-| Harness guards | PASS | Nine AT-18 tests, including inventory/path violations, incomplete events, invalid reports, timeout, input allowlisting, and publication rollback |
-| Clean regeneration | PASS | Run 20261101T232007378344Z recreated both clients, passed 92 tests in the harness and again standalone, and preserved the original tree |
+| Implementation | COMPLETE — clients regenerated | Both deleted client directories recreated and published only after 92/92 harness acceptance; published build/acceptance and independent clean proof pass. |
+| Automated baseline | PASS | Current published verification: 92/92, zero failed/skipped/flaky; 15 protocol, four machine-interface, 13 server-GUI and 60 browser/client cases. |
+| Harness guards | PASS | Current run passed all nine AT-18 guards; actual report retained under artifacts/reconciliation/20261102T002611038268Z/. |
+| Clean regeneration | PASS | Current proof `20261102T010021541172Z` passed 92/92 inside the harness and standalone, preserving original source. |
 | Evolution | PASS — CHG-001–004 | Client/server desktop, directory/durable receipts, explicit presence and compact browser layout verified; generic runner/prompt unchanged; stores remain version 1 |
 | Optional storage/crash injections | NOT_RUN — deferred | OF-01/OF-02 remain disclosed optional executions; normal restart, malformed-page rollback, and unsupported-store checks pass |
-| User manual review | GENERAL CONFIRMATION RECEIVED — CHG-001 and CHG-002 | The user confirmed CHG-002: “I found it works well.” Detailed M01–M06 observations were not supplied; source cells remain blank. |
-| Review archive | PRIOR REVISION VERIFIED; CURRENT NOT_CREATED | Earlier CHG-001 archive passed source/history restoration. Package the final committed CHG-004 revision separately; prior manifests do not cover it. |
-| Final release readiness | NOT_READY — manual observations and current archive pending | CHG-004 implementation/automated checks are complete; its manual review is pending. Detailed user observations and an archive of the final CHG-004 revision remain pending. |
+| User manual review | USER-REPORTED PASS — offline and restart checks | M03/M04 PASS; M05 Good; M01/M02 supplied verbatim in TESTING.md. Actual browser/version, tested revision and M06 evidence remain unspecified. Earlier CHG-001/002 confirmations are preserved. |
+| Review archive | PRIOR REVISION VERIFIED; CURRENT NOT_CREATED | Earlier archive/history checks remain historical. The newly generated P01 revision requires its own committed release archive. |
+| Final release readiness | NOT_READY — remaining manual details and current archive pending | Current regeneration/automated checks pass, and user-reported offline/restart checks pass. Browser/version, tested revision, M06 evidence and current packaging remain outstanding. |
 
 Baseline Stage 2 implementation completion requires generation, builds, required acceptance/guard checks, clean regeneration, and truthful operating documentation. Pending user observations and unrequested evolution remain separate; neither is silently marked passed.
 

@@ -1,6 +1,6 @@
 # Acceptance contract
 
-Status: current contract includes CHG-001–004: client/server desktop controls, shared directory/durable receipts, explicit presence and compact web layout. The last verified implementation passed 92 acceptance cases and nine harness guards; actual results, clean proof and earlier failures are in [STATUS](../docs/STATUS.md) and [EVIDENCE.json](../docs/EVIDENCE.json). This documentation reconciliation does not claim a new runtime run. Tests are authored before the run they validate; generated clients may not edit them.
+Status: the unchanged CHG-004 runtime contract passed 92 acceptance cases after P01 reconciliation and all-client regeneration, with nine harness guards passing. Clean proof `20261102T010021541172Z` passed all 92 cases inside the harness and standalone. [STATUS](../docs/STATUS.md) and [EVIDENCE.json](../docs/EVIDENCE.json) preserve actual results and failed attempts. P01 changes project documentation identity only; generated clients may not edit retained tests.
 
 ## Your acceptance expectations
 
@@ -15,6 +15,10 @@ Blank preferences use adjacent defaults, which include the completed baseline. E
 | A04 | What manual usability check matters? | | I can distinguish queued from accepted messages and find the sender and exact text of each incoming message without reading logs. |
 | A05 | What extra acceptance case do you want? | | Preserve the fixed scenario, A01–A04, derived boundary tests, and completed GUI/server/directory/receipt/presence/web-layout cases; no pending FUTURE feature is selected. |
 <!-- USER:END ACCEPTANCE_CHOICES -->
+
+## Project-name reconciliation scope
+
+P01 names the project Jaehyeok-spec-driven-code-generator in documentation. Existing GUI titles/selectors, storage/package identifiers and behavior remain unchanged. Retained application assertions required no change; P01 input/default/title/provenance consistency was checked separately. Requested all-client generation, published acceptance and independent clean proof passed the full existing contract.
 
 ## Fixtures and observation rules
 

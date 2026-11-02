@@ -1,245 +1,266 @@
-"""One serialized production scheduler shared by desktop and machine clients."""
+"""Production messaging engine shared by both frontends."""
 import threading
-import sqlite3
-from model import Store, ClientError, exact, require, integer, username, origin
-from transport import request
+from protocol import ClientError, Transport, exact, integer, message, require, username, wire_error
+from storage import Store
 
 class Client:
-    def __init__(self, server, directory, transport='online', changed=None):
-        self.server = origin(server)
-        self.store = Store(directory, self.server)
+    def __init__(self, server_origin, state_dir, transport='online', changed=None):
+        self.store = Store(state_dir, server_origin)
+        self.http = Transport(server_origin)
         self.lock = threading.RLock()
-        self.mode = transport
-        self.connection = 'offline' if transport == 'offline' else 'unknown'
-        self.last_error = None
-        self.paused = False
-        self.users = []
-        self.directory_status = 'stale' if transport == 'offline' else 'loading'
-        self.receipt_status = 'unknown'
-        self.presence_status = 'unknown'
-        self.mode_revision = 0
-        self.intent = bool(self.store.meta()['username'] and transport == 'online')
-        if self.intent:
-            self.presence_status = 'pending'
         self.stop = threading.Event()
         self.wake = threading.Event()
         self.changed = changed or (lambda: None)
-        self.thread = threading.Thread(target=self.run, daemon=True)
-
-    def start(self):
+        self.mode = transport
+        self.mode_revision = 0
+        self.connection = 'offline' if transport == 'offline' else 'unknown'
+        self.last_error = None
+        self.paused = False
+        self.presence_status = 'unknown'
+        self.presence_pending = False
+        self.directory_status = 'stale' if transport == 'offline' else 'loading'
+        self.receipt_status = 'unknown'
+        self.users = []
+        self.feature_error = ''
+        if self.store.snapshot()[0]['username'] and transport == 'online':
+            self.presence_pending = True
+            self.presence_status = 'pending'
+        self.thread = threading.Thread(target=self.run, name='messenger-sync', daemon=True)
         self.thread.start()
+
+    def snapshot(self):
+        with self.lock:
+            meta, inbox, outbox = self.store.snapshot()
+            status = {'username':meta['username'], 'transport':self.mode, 'connection':self.connection,
+                      'cursor':meta['receive_cursor'], 'pending_count':sum(r['state']=='queued' for r in outbox),
+                      'sync_paused':self.paused, 'last_error':self.last_error}
+            return {'status':status,'inbox':inbox,'outbox':outbox,'users':list(self.users),
+                    'directory_status':self.directory_status,'receipt_status':self.receipt_status,
+                    'presence_status':self.presence_status,'feature_error':self.feature_error}
 
     def login(self, name):
         with self.lock:
-            previous = self.store.meta()['username']
+            old = self.store.snapshot()[0]['username']
             result = self.store.login(name)
-            if previous is None and self.mode == 'online':
-                self.intent = True
+            if old is None and self.mode == 'online':
+                self.presence_pending = True
                 self.presence_status = 'pending'
-            self.changed()
-            self.wake.set()
-            return result
+        self.changed()
+        self.wake.set()
+        return result
 
     def send(self, recipient, text):
         with self.lock:
             if self.paused:
-                raise ClientError('CURSOR_INVALID', 'Reset local state for the new server session.')
+                raise ClientError('CURSOR_INVALID', 'Synchronization is paused. Explicitly reset the local store for this server session.')
             result = self.store.enqueue(recipient, text)
-            self.changed()
-            self.wake.set()
-            return result
-
-    def status(self):
-        with self.lock, self.store.lock:
-            meta = self.store.meta()
-            return {'username': meta['username'], 'transport': self.mode, 'connection': self.connection,
-                    'cursor': meta['receive_cursor'], 'pending_count': sum(m['state'] == 'queued' for m in self.store.outgoing()),
-                    'sync_paused': self.paused, 'last_error': self.last_error}
-
-    def snapshot(self):
-        with self.lock, self.store.lock:
-            return dict(status=self.status(), inbox=self.store.incoming(), outbox=self.store.outgoing(),
-                        users=list(self.users), directory_status=self.directory_status,
-                        receipt_status=self.receipt_status, presence_status=self.presence_status)
+        self.changed()
+        self.wake.set()
+        return result
 
     def transport(self, mode):
-        if mode not in ('online', 'offline'):
+        if mode not in ('online','offline'):
             raise ClientError('INVALID_COMMAND', 'Transport must be online or offline.')
         with self.lock:
-            if mode != self.mode:
+            if self.mode != mode:
                 self.mode = mode
                 self.mode_revision += 1
-                self.intent = bool(self.store.meta()['username'])
-                self.presence_status = 'pending' if self.intent else 'unknown'
-                self.connection = 'offline' if mode == 'offline' else 'unknown'
+                self.connection = 'offline' if mode == 'offline' else ('error' if self.paused else 'unknown')
                 if mode == 'offline':
                     self.directory_status = 'stale'
-                self.wake.set()
-            return self.status()
+                if self.store.snapshot()[0]['username']:
+                    self.presence_pending = True
+                    self.presence_status = 'pending'
+        self.wake.set()
+        return self.snapshot()['status']
 
     def refresh(self):
         self.wake.set()
 
-    def active(self):
-        with self.lock:
-            return not self.stop.is_set() and not self.paused and self.mode == 'online'
+    def shutdown(self):
+        self.stop.set()
+        self.wake.set()
+        self.thread.join()
+        self.store.close()
 
-    def report(self, error):
+    def allowed(self, revision):
         with self.lock:
-            self.last_error = error.data()
-            self.connection = 'offline' if error.code == 'TRANSPORT_ERROR' or self.mode == 'offline' else 'error'
+            return not self.stop.is_set() and not self.paused and self.mode == 'online' and self.mode_revision == revision
 
-    def presence(self):
+    def core_error(self, error):
         with self.lock:
-            if self.stop.is_set() or self.paused or not self.intent:
+            self.last_error = error.object()
+            self.connection = 'offline' if self.mode == 'offline' or error.code == 'TRANSPORT_ERROR' else 'error'
+            if error.code == 'CURSOR_INVALID':
+                self.paused = True
+                self.connection = 'error'
+                self.last_error = {'code':'CURSOR_INVALID','message':'Server cursor is invalid. Explicitly reset the local store for this server session.'}
+
+    def perform_presence(self, name, revision, mode):
+        payload = {'username':name,'online':mode=='online'}
+        error = None
+        with self.lock:
+            if self.stop.is_set() or self.paused or revision != self.mode_revision:
                 return
-            user = self.store.meta()['username']
-            if user is None:
-                return
-            revision, online = self.mode_revision, self.mode == 'online'
-            self.intent = False
             self.presence_status = 'pending'
         try:
-            status, result = request(self.server, 'POST', '/api/v1/presence', {'username': user, 'online': online}, 2)
-            exact(result, ('username', 'online'))
-            require(status == 200 and result['username'] == user and type(result['online']) is bool and result['online'] == online)
-            ok = True
-        except ClientError:
-            ok = False
+            status, body = self.http.request('POST','/api/v1/presence',payload,2)
+            if status != 200:
+                raise wire_error(status, body)
+            require(exact(body,'username online') and body['username']==name and type(body['online']) is bool and body['online']==payload['online'])
+        except ClientError as exc:
+            error = exc
         with self.lock:
-            if not self.stop.is_set() and revision == self.mode_revision:
-                self.presence_status = 'confirmed' if ok else 'error'
-                # Online failures retry once at the start of the next ordinary cycle.
+            if self.stop.is_set() or revision != self.mode_revision:
+                return
+            self.presence_status = 'error' if error else 'confirmed'
+            self.presence_pending = bool(error and mode == 'online')
 
-    def boundary(self):
-        # Process the latest intent before any ordinary request. Mode changes in a
-        # control request are coalesced and dispatched serially, never overlapped.
-        while True:
-            with self.lock:
-                pending = self.intent and not self.stop.is_set() and not self.paused
-            if not pending:
-                break
-            self.presence()
-        return self.active()
-
-    def cycle(self, user):
-        errors = []
-        if not self.boundary():
-            return
-        queued = [m for m in self.store.outgoing() if m['state'] == 'queued']
-        if queued:
-            row = queued[0]
-            try:
-                payload = {k: row[k] for k in ('message_id', 'sender', 'recipient', 'text')}
-                status, receipt = request(self.server, 'POST', '/api/v1/messages', payload)
-                exact(receipt, ('message_id', 'sender', 'recipient', 'sequence'))
-                require(all(receipt[k] == payload[k] for k in ('message_id', 'sender', 'recipient')) and integer(receipt['sequence'], 1))
-                if not self.stop.is_set():
-                    self.store.outcome(row['message_id'], 'accepted', int(receipt['sequence']))
-                    self.changed()
-            except ClientError as e:
-                errors.append(e)
-                if not self.stop.is_set():
-                    try:
-                        self.store.outcome(row['message_id'], 'failed' if e.permanent else 'queued', error=e)
-                        self.changed()
-                    except ClientError as write_error:
-                        errors.append(write_error)
-        if not self.boundary():
-            if errors:
-                self.report(errors[-1])
-            return
-        after = self.store.meta()['receive_cursor']
+    def send_one(self, row):
+        error, state, sequence = None, 'queued', None
         try:
-            status, page = request(self.server, 'GET', '/api/v1/messages?recipient=' + user + '&after=' + str(after))
-            require(status == 200)
-            if not self.stop.is_set():
-                updated = self.store.receive(page, user, after)
-                if updated:
-                    with self.lock:
-                        self.receipt_status = 'pending'
-                    self.changed()
-        except ClientError as e:
-            errors.append(e)
-            if e.code == 'CURSOR_INVALID':
-                with self.lock:
-                    self.paused = True
+            payload = {k:row[k] for k in ('message_id','sender','recipient','text')}
+            status, body = self.http.request('POST','/api/v1/messages',payload)
+            if status in (200,201):
+                require(exact(body,'message_id sender recipient sequence') and all(body[k]==row[k] for k in ('message_id','sender','recipient')) and integer(body['sequence'],1), 'Invalid acceptance receipt; original message will retry.')
+                state, sequence = 'accepted', int(body['sequence'])
+            elif 400 <= status < 600:
+                error = wire_error(status,body)
+                if 400 <= status < 500 and status not in (408,429):
+                    state = 'failed'
+            else:
+                error = ClientError('PROTOCOL_ERROR','Unexpected HTTP response; original message will retry.')
+        except ClientError as exc:
+            error = exc
+        if self.stop.is_set():
+            return None
+        try:
+            self.store.outcome(row['message_id'], state, sequence, error)
+            self.changed()
+        except ClientError as exc:
+            error = exc
+        if error:
+            self.core_error(error)
+        return error
+
+    def receive(self, name):
+        after = self.store.snapshot()[0]['receive_cursor']
+        status, body = self.http.request('GET', '/api/v1/messages?recipient=' + name + '&after=' + str(after))
         if self.stop.is_set():
             return
-        with self.lock:
-            if errors:
-                self.report(errors[-1])
-            elif self.mode == 'online':
-                self.connection = 'online'
-                self.last_error = None
-        if not self.boundary():
+        if status != 200:
+            err = wire_error(status,body)
+            if err.code == 'CURSOR_INVALID' and (not exact(body,'error') or body['error']['field'] != 'after'):
+                err = ClientError('PROTOCOL_ERROR','Invalid cursor error response.')
+            raise err
+        require(exact(body,'messages next_after') and isinstance(body['messages'],list) and len(body['messages']) <= 100 and integer(body['next_after']))
+        seen = set()
+        for index, row in enumerate(body['messages']):
+            require(message(row) and row['recipient']==name and row['sequence']==after+index+1, 'Invalid incoming message or noncontiguous page.')
+            key = row['sender'],row['message_id']
+            require(key not in seen, 'Duplicate key in incoming page.')
+            seen.add(key)
+        require(body['next_after']==after+len(body['messages']), 'Incoming page cursor does not match its messages.')
+        self.store.receive(body,after)
+        if body['messages']:
+            with self.lock:
+                self.receipt_status = 'pending'
+            self.changed()
+
+    def auxiliary(self, name, revision):
+        if not self.allowed(revision):
             return
-        through = self.store.meta()['receive_cursor']
+        through = self.store.snapshot()[0]['receive_cursor']
         try:
-            status, result = request(self.server, 'POST', '/api/v1/receipts', {'recipient': user, 'through': through}, 2)
-            exact(result, ('recipient', 'through'))
-            require(status == 200 and result['recipient'] == user and integer(result['through']) and result['through'] >= through)
+            status, body = self.http.request('POST','/api/v1/receipts',{'recipient':name,'through':through},2)
+            if status != 200:
+                raise wire_error(status,body)
+            require(exact(body,'recipient through') and body['recipient']==name and integer(body['through']) and body['through']>=through)
             with self.lock:
                 if not self.stop.is_set():
                     self.receipt_status = 'confirmed'
-        except ClientError:
+        except ClientError as exc:
             with self.lock:
                 self.receipt_status = 'error'
-        if not self.boundary():
+                self.feature_error = 'Receipt: ' + exc.message
+        if not self.allowed(revision):
             return
-        announcement_error = None
+        announce_error = None
         try:
-            status, result = request(self.server, 'POST', '/api/v1/users', {'username': user}, 2)
-            exact(result, ('username',))
-            require(status == 200 and result['username'] == user)
-        except ClientError as e:
-            announcement_error = e
-        if not self.boundary():
+            status, body = self.http.request('POST','/api/v1/users',{'username':name},2)
+            if status != 200:
+                raise wire_error(status,body)
+            require(exact(body,'username') and body['username']==name)
+        except ClientError as exc:
+            announce_error = exc
+        if not self.allowed(revision):
             return
         directory_error = None
-        revision = self.mode_revision
         try:
-            status, result = request(self.server, 'GET', '/api/v1/users', timeout=2)
-            exact(result, ('users',))
-            require(status == 200 and isinstance(result['users'], list))
-            previous = ''
-            for row in result['users']:
-                exact(row, ('username', 'online'))
-                require(username(row['username']) and type(row['online']) is bool and row['username'] > previous)
-                previous = row['username']
+            status, body = self.http.request('GET','/api/v1/users',None,2)
+            if status != 200:
+                raise wire_error(status,body)
+            require(exact(body,'users') and isinstance(body['users'],list))
+            names = []
+            for row in body['users']:
+                require(exact(row,'username online') and username(row['username']) and type(row['online']) is bool)
+                names.append(row['username'])
+            require(names==sorted(set(names)), 'Directory must have sorted unique users.')
             with self.lock:
-                if not self.stop.is_set():
-                    self.users = result['users']
-        except ClientError as e:
-            directory_error = e
+                if not self.stop.is_set() and revision == self.mode_revision and self.mode == 'online':
+                    self.users = body['users']
+        except ClientError as exc:
+            directory_error = exc
         with self.lock:
-            if self.mode != 'online' or revision != self.mode_revision:
+            if self.stop.is_set():
+                return
+            errors = [e for e in (announce_error,directory_error) if e]
+            if self.mode == 'offline' or revision != self.mode_revision:
                 self.directory_status = 'stale'
+            elif errors:
+                self.directory_status = 'stale' if any(e.code=='TRANSPORT_ERROR' for e in errors) else 'error'
+                self.feature_error = 'Directory: ' + '; '.join(e.message for e in errors)
             else:
-                err = directory_error or announcement_error
-                self.directory_status = ('stale' if err.code == 'TRANSPORT_ERROR' else 'error') if err else 'current'
+                self.directory_status = 'current'
+                if self.receipt_status != 'error':
+                    self.feature_error = ''
 
     def run(self):
         while not self.stop.is_set():
             self.wake.clear()
             try:
                 with self.lock:
-                    user = self.store.meta()['username']
-                    if user and self.mode == 'online' and self.presence_status == 'error':
-                        self.intent = True
-                if user and not self.paused:
-                    self.boundary()
-                    if self.active():
-                        self.cycle(user)
-                    self.boundary()
-            except (ClientError, sqlite3.Error) as e:
-                self.report(e if isinstance(e, ClientError) else ClientError('STORAGE_UNAVAILABLE', str(e)))
-            if not self.stop.is_set():
-                self.wake.wait(1)
-
-    def shutdown(self):
-        self.stop.set()
-        self.wake.set()
-        if self.thread.is_alive():
-            self.thread.join()
-        self.store.close()
+                    meta, _, rows = self.store.snapshot()
+                    name, mode, revision = meta['username'],self.mode,self.mode_revision
+                    paused, pending = self.paused,self.presence_pending
+                if name and not paused:
+                    if pending:
+                        self.perform_presence(name, revision, mode)
+                    if self.stop.is_set():
+                        break
+                    if revision != self.mode_revision:
+                        continue
+                    if self.allowed(revision):
+                        cycle_error = None
+                        first = next((r for r in rows if r['state']=='queued'),None)
+                        if first:
+                            cycle_error = self.send_one(first)
+                        if self.allowed(revision):
+                            try:
+                                self.receive(name)
+                            except ClientError as exc:
+                                self.core_error(exc)
+                                cycle_error = exc
+                        if self.allowed(revision):
+                            if cycle_error is None:
+                                with self.lock:
+                                    self.last_error = None
+                                    self.connection = 'online'
+                            self.auxiliary(name,revision)
+                if revision != self.mode_revision:
+                    continue
+            except ClientError as exc:
+                self.core_error(exc)
+            except Exception as exc:
+                self.core_error(ClientError('STORAGE_UNAVAILABLE','Synchronization failed: ' + str(exc)))
+            self.wake.wait(1)
